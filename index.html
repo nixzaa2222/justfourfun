@@ -123,7 +123,7 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div id="main-container" class="w-full max-w-6xl mx-auto mb-auto">
+    <div id="main-container" class="w-full max-w-6xl mx-auto flex-grow">
 
         <!-- Lobby Screen -->
         <div id="lobby-screen" class="text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl">
@@ -136,15 +136,15 @@
                 </div>
                 <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="card-game">
-                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เกมต่อคำฮา</h3>
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เกมการ์ดคำคม</h3>
                         <p class="text-sm text-stone-500">เกมการ์ดสุดคลาสสิกที่ต้องใช้ความคิดสร้างสรรค์ในการต่อคำให้ฮากระจาย</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="codename">
-                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">สายลับจับคำ</h3>
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">รหัสคำทาย</h3>
                         <p class="text-sm text-stone-500">เกมทายคำใบ้แบบทีม (รองรับโหมด Co-op 2 คน)</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="ito">
-                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">วัดใจเรียงเลข</h3>
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เรียงเลขวัดใจ</h3>
                         <p class="text-sm text-stone-500">เกมวัดใจที่ต้องสื่อสารและเรียงลำดับตัวเลขปริศนาให้ถูกต้อง</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="fun-facts">
@@ -338,9 +338,19 @@
 
     </div>
 
-    <footer class="text-center p-4 mt-8 text-xs text-stone-400">
-        <p>เว็บไซต์นี้สร้างขึ้นเพื่อความบันเทิงและเป็นโปรเจกต์เพื่อการศึกษา โดยได้รับแรงบันดาลใจจากบอร์ดเกมยอดนิยมหลายชนิด</p>
-        <p>และไม่ได้มีความเกี่ยวข้องหรือได้รับการสนับสนุนจากเจ้าของลิขสิทธิ์เกมดังกล่าวแต่อย่างใด</p>
+    <!-- Rules Modal -->
+    <div id="rules-modal-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div id="rules-modal-content" class="w-full max-w-lg p-6 rounded-xl shadow-2xl">
+            <button id="close-rules-btn" class="absolute top-3 right-3 text-stone-500 hover:text-black text-2xl">&times;</button>
+            <h3 id="rules-title" class="text-2xl font-bold mb-4"></h3>
+            <div id="rules-body" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <footer class="w-full text-center p-4 mt-auto">
+        <p class="text-xs text-stone-400 max-w-2xl mx-auto">
+            เว็บไซต์นี้สร้างขึ้นเพื่อความบันเทิงและเป็นโปรเจกต์เพื่อการศึกษา โดยได้รับแรงบันดาลใจจากบอร์ดเกมยอดนิยมหลายชนิด และไม่ได้มีความเกี่ยวข้องหรือได้รับการสนับสนุนจากเจ้าของลิขสิทธิ์เกมดังกล่าวแต่อย่างใด
+        </p>
     </footer>
 
     <script>
@@ -349,7 +359,7 @@
         // --- Game Rules Data ---
         const gameRules = {
             'card-game': {
-                title: 'วิธีเล่น: เกมต่อคำฮา',
+                title: 'วิธีเล่น: เกมการ์ดคำคม',
                 content: `
                     <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
                     <p class="mb-4">สะสมคะแนนให้ได้มากที่สุดโดยการเลือกการ์ดคำตอบที่ฮาที่สุดมาเติมในช่องว่างของประโยคโจทย์!</p>
@@ -366,7 +376,7 @@
                 `
             },
             'codename': {
-                title: 'วิธีเล่น: สายลับจับคำ',
+                title: 'วิธีเล่น: รหัสคำทาย',
                 content: `
                     <h4 class="font-bold text-lg mb-2 rule-header">โหมดทีม (3-4 คน)</h4>
                     <p class="mb-2">ผู้เล่นแบ่งเป็น 2 ทีม (แดง vs น้ำเงิน) แต่ละทีมมี Spymaster 1 คนคอยใบ้คำให้ลูกทีมทายการ์ดของสีตัวเองให้ครบก่อนอีกฝ่าย</p>
@@ -379,7 +389,7 @@
                 `
             },
             'ito': {
-                title: 'วิธีเล่น: วัดใจเรียงเลข',
+                title: 'วิธีเล่น: เรียงเลขวัดใจ',
                 content: `
                     <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
                     <p class="mb-4">ร่วมมือกับเพื่อนเพื่อเรียงลำดับตัวเลขปริศนาของทุกคนจากน้อยไปมากให้ถูกต้อง!</p>
@@ -1096,6 +1106,7 @@
                 }
             });
 
+
             drawSpinner();
         })();
 
@@ -1155,7 +1166,7 @@
             }
 
             function finishRound() {
-                if (!timerInterval) return;
+                if (!timerInterval) return; // Don't do anything if timer is not running
 
                 clearInterval(timerInterval);
 
