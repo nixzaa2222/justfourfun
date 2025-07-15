@@ -1,0 +1,1194 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUST FOUR FUN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --bg-color: #fdf6e3; /* Cream */
+            --card-bg-color: #fffbf0;
+            --primary-color: #cce3de; /* Mint Green */
+            --primary-text-color: #064e3b; /* Darker Green */
+            --accent-color: #f8a096; /* Salmon Pink */
+            --accent-text-color: #881337; /* Darker Pink */
+            --secondary-color: #e3c5a8; /* Sandy Beige */
+            --text-color: #57534e; /* Stone 600 */
+            --heading-color: #44403c; /* Stone 700 */
+            --border-color: #e7e5e4; /* Stone 200 */
+        }
+        body {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .hidden { display: none !important; }
+        .card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+        .card:hover, .card.selected {
+            border-color: var(--primary-text-color);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(4, 120, 87, 0.1), 0 4px 6px -2px rgba(4, 120, 87, 0.05);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--primary-text-color);
+            font-weight: bold;
+            transition: background-color 0.2s;
+            border: 1px solid var(--primary-text-color);
+        }
+        .btn-primary:hover { background-color: #a7f3d0; }
+        .btn-primary:disabled {
+            background-color: #e7e5e4;
+            color: #a8a29e;
+            border-color: #d6d3d1;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background-color: #e7e5e4;
+            color: #57534e;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover { background-color: #d6d3d1; }
+        .input-field {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        #rules-modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        #rules-modal-content {
+            background-color: var(--card-bg-color);
+            border: 2px solid var(--primary-text-color);
+        }
+        #rules-title, .rule-header {
+             color: var(--primary-text-color);
+        }
+        /* Codenames Styles */
+        .cn-card {
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+        .cn-card.revealed.red { background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color); }
+        .cn-card.revealed.blue { background-color: #93c5fd; color: #1e40af; border-color: #3b82f6; }
+        .cn-card.revealed.green { background-color: var(--primary-color); color: var(--primary-text-color); border-color: var(--primary-text-color); }
+        .cn-card.revealed.neutral { background-color: var(--secondary-color); color: #78350f; border-color: #78350f; }
+        .cn-card.revealed.assassin { background-color: #57534e; color: white; border-color: #1c1917; }
+        .spymaster-view .cn-card.red { border-color: #fca5a5; background-color: #fee2e2; color: #b91c1c; }
+        .spymaster-view .cn-card.blue { border-color: #93c5fd; background-color: #dbeafe; color: #1d4ed8; }
+        .spymaster-view .cn-card.green { border-color: #86efac; background-color: #dcfce7; color: #15803d; }
+        .spymaster-view .cn-card.neutral { border-color: var(--secondary-color); background-color: #fef3c7; color: #a16207; }
+        .spymaster-view .cn-card.assassin { border-color: #a8a29e; background-color: #44403c; color: white; }
+        /* ito Styles */
+        .ito-player-card.success {
+            background-color: var(--primary-color);
+            border-color: var(--primary-text-color);
+            color: var(--primary-text-color);
+        }
+        .ito-player-card.fail {
+            background-color: var(--accent-color);
+            border-color: var(--accent-text-color);
+            color: var(--accent-text-color);
+        }
+        /* Spinner Wheel Styles */
+        .spinner-container::before {
+            content: '▼';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            color: var(--accent-color);
+        }
+        /* Stopwatch Styles */
+        #stopwatch-time {
+            font-family: 'monospace';
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="main-container" class="w-full max-w-6xl mx-auto">
+
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl">
+            <h1 class="text-4xl sm:text-5xl font-bold" style="color: var(--primary-text-color);">JUST FOUR FUN</h1>
+            <p class="text-stone-500 mb-6">เล่นเกมสนุกๆ กับเพื่อนซี้สี่คน</p>
+            <div class="mb-6">
+                <div class="flex justify-center items-center gap-4 mb-4">
+                    <h2 class="text-xl font-semibold" style="color: var(--heading-color);">เลือกเกมที่จะเล่น</h2>
+                    <button id="how-to-play-btn" class="px-3 py-1 text-sm rounded-full btn-secondary" disabled>วิธีเล่น ?</button>
+                </div>
+                <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                    <div class="card p-4 rounded-lg cursor-pointer" data-game="card-game">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เกมต่อคำฮา</h3>
+                        <p class="text-sm text-stone-500">เกมการ์ดสุดคลาสสิกที่ต้องใช้ความคิดสร้างสรรค์ในการต่อคำให้ฮากระจาย</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer" data-game="codename">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">โค้ดเนมส์</h3>
+                        <p class="text-sm text-stone-500">เกมทายคำใบ้แบบทีม (รองรับโหมด Co-op 2 คน)</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer" data-game="ito">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">ito เรียงเลข</h3>
+                        <p class="text-sm text-stone-500">เกมวัดใจที่ต้องสื่อสารและเรียงลำดับตัวเลขปริศนาให้ถูกต้อง</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer" data-game="fun-facts">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">Fun Facts</h3>
+                        <p class="text-sm text-stone-500">ทายใจให้ตรงเป๊ะ! คุณรู้จักเพื่อนดีแค่ไหนกันนะ?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-8">
+                 <h2 class="text-xl font-semibold mb-4" style="color: var(--heading-color);">เครื่องมือ</h2>
+                 <div id="tool-selection-area" class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                    <div class="card p-4 rounded-lg cursor-pointer" data-tool="spinner">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">วงล้อสุ่ม</h3>
+                        <p class="text-sm text-stone-500">สร้างวงล้อสุ่มจากข้อความที่คุณต้องการ</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer" data-tool="stopwatch">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เครื่องมือจับเวลา</h3>
+                        <p class="text-sm text-stone-500">จับเวลาและบันทึกรอบสำหรับการแข่งขัน</p>
+                    </div>
+                 </div>
+            </div>
+            <div id="player-entry" class="space-y-4 max-w-sm mx-auto">
+                 <input type="text" id="playerName" placeholder="ใส่ชื่อของคุณ..." class="w-full p-3 text-center rounded-lg input-field focus:outline-none focus:ring-2" style="--tw-ring-color: var(--primary-text-color)">
+                <button id="createRoomBtn" class="w-full p-3 rounded-lg btn-primary" disabled>สร้างห้อง (สำหรับเล่นเกม)</button>
+                <div class="flex items-center justify-center"><hr class="w-full border-stone-300"><span class="px-2 text-stone-500">หรือ</span><hr class="w-full border-stone-300"></div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="roomCodeInput" placeholder="ใส่รหัสห้อง" class="flex-grow p-3 text-center rounded-lg input-field focus:outline-none focus:ring-2" style="--tw-ring-color: var(--primary-text-color)">
+                    <button id="joinRoomBtn" class="p-3 rounded-lg btn-primary" disabled>เข้าร่วมห้อง (สำหรับเล่นเกม)</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Waiting Room Screen -->
+        <div id="waiting-screen" class="hidden text-center p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-bold mb-2" style="color: var(--heading-color);">กำลังรอผู้เล่น...</h2>
+            <p class="text-stone-500 mb-4">รหัสห้องของคุณคือ:</p>
+            <div class="bg-green-100 text-green-800 text-3xl font-bold p-4 rounded-lg inline-block mb-6 tracking-widest" id="roomCodeDisplay"></div>
+            <h3 class="font-semibold mb-3" style="color: var(--heading-color);">ผู้เล่นในห้อง (<span id="playerCount">1</span>/4):</h3>
+            <div id="playerList" class="grid grid-cols-2 gap-3 mb-6 max-w-md mx-auto"></div>
+            <button id="startGameBtn" class="w-full max-w-xs p-3 rounded-lg btn-primary" disabled>เริ่มเกม (ต้องมี 2 คนขึ้นไป)</button>
+        </div>
+
+        <!-- Card Game Screen -->
+        <div id="card-game-screen" class="hidden w-full">
+            <div id="cg-scoreboard" class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-4 text-sm"></div>
+            <div class="prompt-card w-full p-6 mb-4 rounded-xl text-center bg-stone-700 text-white">
+                <p class="text-xl sm:text-2xl font-bold" id="cg-promptText"></p>
+            </div>
+            <p id="cg-game-info-text" class="text-center font-semibold mb-4 text-lg" style="color: var(--primary-text-color);"></p>
+            <div id="cg-played-cards-area" class="min-h-[150px] grid grid-cols-2 md:grid-cols-3 gap-4 mb-6"></div>
+            <h3 class="text-center font-bold mb-2">การ์ดของคุณ:</h3>
+            <div id="cg-my-cards-area" class="min-h-[150px] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Codename Game Screen -->
+        <div id="codename-screen" class="hidden w-full">
+            <div id="cn-coop-info-bar" class="hidden text-center mb-4 p-3 bg-stone-100 rounded-lg space-y-1">
+                <div class="flex justify-around items-center">
+                    <p class="text-lg">เทิร์นที่เหลือ: <span id="cn-coop-turns-left" class="font-bold text-amber-600"></span></p>
+                    <p class="text-lg">หาให้เจอ: <span id="cn-coop-words-found" class="font-bold" style="color: var(--primary-text-color);"></span> / <span id="cn-coop-words-goal"></span></p>
+                </div>
+                <p id="cn-coop-turn-info" class="text-xl font-bold" style="color: var(--primary-text-color);"></p>
+            </div>
+            <div id="cn-team-info-bar" class="text-center mb-4 p-3 bg-stone-100 rounded-lg">
+                <p id="cn-turn-info" class="text-xl font-bold" style="color: var(--primary-text-color);"></p>
+                <p id="cn-clue-info" class="text-lg text-stone-600"></p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div id="cn-sidebar" class="w-full md:w-1/4 space-y-4">
+                    <div id="cn-team-area" class="space-y-4">
+                        <div id="cn-red-team" class="p-4 bg-red-100 rounded-lg border-2 border-red-400">
+                            <h3 class="text-xl font-bold text-red-600">ทีมสีแดง (<span id="cn-red-score">0</span>)</h3>
+                            <ul id="cn-red-players" class="my-2 space-y-1 text-red-800"></ul>
+                            <button class="w-full p-2 mt-1 text-sm btn-secondary hidden" data-team="red" id="cn-spymaster-red-btn">เป็น Spymaster</button>
+                        </div>
+                        <div id="cn-blue-team" class="p-4 bg-blue-100 rounded-lg border-2 border-blue-400">
+                            <h3 class="text-xl font-bold text-blue-600">ทีมสีน้ำเงิน (<span id="cn-blue-score">0</span>)</h3>
+                            <ul id="cn-blue-players" class="my-2 space-y-1 text-blue-800"></ul>
+                            <button class="w-full p-2 mt-1 text-sm btn-secondary hidden" data-team="blue" id="cn-spymaster-blue-btn">เป็น Spymaster</button>
+                        </div>
+                        <div id="cn-join-team-area" class="space-y-2">
+                            <button class="w-full p-2 text-sm btn-secondary" data-team="red" id="cn-join-red-btn">เข้าร่วมทีมแดง</button>
+                            <button class="w-full p-2 text-sm btn-secondary" data-team="blue" id="cn-join-blue-btn">เข้าร่วมทีมน้ำเงิน</button>
+                        </div>
+                    </div>
+                    <button id="cn-end-turn-btn" class="w-full p-2 btn-primary hidden">จบเทิร์น</button>
+                </div>
+                <div id="cn-board-container" class="w-full md:w-3/4">
+                    <div id="cn-spymaster-clue-area" class="hidden mb-4 flex gap-2">
+                        <input type="text" id="cn-clue-word" placeholder="คำใบ้" class="p-2 rounded-lg input-field flex-grow">
+                        <input type="number" id="cn-clue-number" placeholder="จำนวน" min="1" max="8" class="p-2 w-20 rounded-lg input-field">
+                        <button id="cn-give-clue-btn" class="p-2 btn-primary">ให้คำใบ้</button>
+                    </div>
+                    <div id="cn-board" class="grid grid-cols-5 gap-2"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ito Game Screen -->
+        <div id="ito-screen" class="hidden w-full text-center">
+            <div class="mb-6 p-4 bg-stone-100 rounded-lg">
+                <p class="text-stone-500">โจทย์รอบนี้</p>
+                <h2 id="ito-theme-display" class="text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
+            </div>
+            <div class="mb-8">
+                <p class="mb-2">การ์ดของคุณ (เห็นเฉพาะคุณ)</p>
+                <div id="ito-my-number-card" class="w-40 h-24 mx-auto bg-white text-stone-900 rounded-lg flex items-center justify-center text-4xl font-bold shadow-lg border-2">?</div>
+            </div>
+            <div class="mb-4">
+                <p class="mb-2">ช่วยกันลากการ์ดเพื่อนๆ มาเรียงลำดับจาก **น้อยไปมาก**</p>
+                <div id="ito-player-ordering-area" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap">
+                    <!-- Player cards will be injected here -->
+                </div>
+            </div>
+            <button id="ito-lock-order-btn" class="p-3 px-8 rounded-lg btn-primary">ยืนยันลำดับ</button>
+        </div>
+
+        <!-- Fun Facts Game Screen -->
+        <div id="fun-facts-screen" class="hidden w-full text-center">
+            <div class="mb-6 p-4 bg-stone-100 rounded-lg">
+                <p class="text-stone-500">โจทย์รอบนี้</p>
+                <h2 id="ff-question-display" class="text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
+            </div>
+            <div id="ff-scoreboard" class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-4 text-sm"></div>
+
+            <div id="ff-answer-input-area" class="mb-8 max-w-md mx-auto">
+                <p class="mb-2">คำตอบของคุณ (ตัวเลขเท่านั้น)</p>
+                <div class="flex gap-2">
+                    <input type="number" id="ff-my-answer" class="input-field p-3 w-full rounded-lg text-center" placeholder="ใส่คำตอบของคุณ...">
+                    <button id="ff-submit-answer-btn" class="btn-primary p-3 rounded-lg">ส่งคำตอบ</button>
+                </div>
+            </div>
+
+            <div id="ff-betting-area" class="hidden mb-8">
+                <p id="ff-betting-info" class="text-xl text-amber-600 mb-4"></p>
+                <div id="ff-bet-options" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap">
+                    <!-- Betting ranges will be injected here -->
+                </div>
+            </div>
+
+            <div id="ff-results-area" class="hidden mb-8">
+                 <p id="ff-result-info" class="text-xl" style="color: var(--primary-text-color);"></p>
+                 <div id="ff-result-cards" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap">
+                    <!-- Result cards will be injected here -->
+                </div>
+                 <button id="ff-next-round-btn" class="hidden mt-4 p-3 px-8 rounded-lg btn-primary">รอบต่อไป</button>
+            </div>
+        </div>
+
+        <!-- Spinner Tool Screen -->
+        <div id="spinner-screen" class="hidden w-full">
+            <button id="spinner-back-btn" class="absolute top-4 left-4 btn-secondary p-2 rounded-full">← กลับ</button>
+            <div class="flex flex-col lg:flex-row gap-8 items-start justify-center">
+                <div class="w-full lg:w-1/3">
+                    <h2 class="text-2xl font-bold mb-4 text-center">สร้างวงล้อของคุณ</h2>
+                    <textarea id="spinner-options" class="w-full h-48 p-3 rounded-lg input-field" placeholder="ใส่ข้อความที่ต้องการสุ่ม โดยขึ้นบรรทัดใหม่สำหรับแต่ละข้อความ..."></textarea>
+                    <button id="spinner-update-btn" class="w-full mt-2 p-3 btn-primary rounded-lg">อัปเดตวงล้อ</button>
+                </div>
+                <div class="w-full lg:w-2/3 flex flex-col items-center">
+                    <div id="spinner-result" class="text-3xl font-bold mb-4 h-12"></div>
+                    <div class="relative spinner-container mb-4">
+                        <canvas id="spinner-canvas" width="400" height="400"></canvas>
+                    </div>
+                    <button id="spin-btn" class="p-4 px-10 text-xl btn-primary rounded-lg">หมุน!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stopwatch Screen -->
+        <div id="stopwatch-screen" class="hidden w-full">
+            <button id="stopwatch-back-btn" class="absolute top-4 left-4 btn-secondary p-2 rounded-full">← กลับ</button>
+            <div class="flex flex-col items-center justify-center max-w-md mx-auto">
+                <h2 class="text-3xl font-bold mb-6" style="color: var(--heading-color);">เครื่องมือจับเวลา</h2>
+                <div class="w-full bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center mb-6">
+                    <p id="stopwatch-time" class="text-6xl font-bold" style="color: var(--primary-text-color);">00:00.00</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                    <button id="stopwatch-start-btn" class="p-4 text-lg btn-primary">Start</button>
+                    <button id="stopwatch-stop-btn" class="p-4 text-lg hidden" style="background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color);">Stop</button>
+                    <button id="stopwatch-finish-round-btn" class="p-4 text-lg btn-secondary">จบรอบ</button>
+                    <button id="stopwatch-reset-btn" class="p-4 text-lg btn-secondary">Reset</button>
+                </div>
+                <div class="w-full text-left">
+                    <h3 class="text-xl font-semibold mb-2" style="color: var(--heading-color);">รอบเวลา:</h3>
+                    <ul id="stopwatch-laps" class="w-full bg-white/80 backdrop-blur-sm rounded-lg p-4 space-y-2 max-h-60 overflow-y-auto">
+                        <!-- Lap times will be added here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div id="rules-modal-content" class="w-full max-w-lg p-6 rounded-xl shadow-2xl">
+            <button id="close-rules-btn" class="absolute top-3 right-3 text-stone-500 hover:text-black text-2xl">&times;</button>
+            <h3 id="rules-title" class="text-2xl font-bold mb-4"></h3>
+            <div id="rules-body" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // --- Game Rules Data ---
+        const gameRules = {
+            'card-game': {
+                title: 'วิธีเล่น: เกมต่อคำฮา',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">สะสมคะแนนให้ได้มากที่สุดโดยการเลือกการ์ดคำตอบที่ฮาที่สุดมาเติมในช่องว่างของประโยคโจทย์!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>ผู้เล่นคนหนึ่งจะถูกสุ่มเลือกเป็น <strong>"Judge" (ผู้ตัดสิน)</strong> ในแต่ละรอบ</li>
+                        <li>Judge จะได้รับการ์ดคำถาม (การ์ดสีเข้ม) ที่มีประโยคเว้นว่างไว้</li>
+                        <li>ผู้เล่นคนอื่นๆ (ที่ไม่ใช่ Judge) จะได้รับการ์ดคำตอบ (การ์ดสีขาว) คนละ 5 ใบ</li>
+                        <li>ผู้เล่นทุกคนต้องเลือกการ์ดคำตอบที่คิดว่าตลกที่สุด 1 ใบเพื่อส่งให้ Judge</li>
+                        <li>Judge จะอ่านประโยคคำถามพร้อมกับคำตอบทั้งหมด (โดยไม่รู้ว่าใครส่งใบไหน) และเลือกใบที่ชอบที่สุด</li>
+                        <li>เจ้าของการ์ดที่ถูกเลือกจะได้รับ 1 คะแนน</li>
+                        <li>จบรอบ! ระบบจะสลับคนที่เป็น Judge แล้วเริ่มรอบใหม่ไปเรื่อยๆ</li>
+                    </ol>
+                `
+            },
+            'codename': {
+                title: 'วิธีเล่น: โค้ดเนมส์',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">โหมดทีม (3-4 คน)</h4>
+                    <p class="mb-2">ผู้เล่นแบ่งเป็น 2 ทีม (แดง vs น้ำเงิน) แต่ละทีมมี Spymaster 1 คนคอยใบ้คำให้ลูกทีมทายการ์ดของสีตัวเองให้ครบก่อนอีกฝ่าย</p>
+                    <p><strong>กฎการทาย:</strong> เมื่อ Spymaster ใบ้ "คำใบ้ [ตัวเลข]" ทีมจะทายได้ [ตัวเลข] ครั้ง หากทายถูกทั้งหมด จะได้สิทธิ์ทายโบนัสเพิ่มอีก 1 ครั้ง หรือจะกดจบเทิร์นก็ได้</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2 rule-header">โหมด Co-op (2 คน)</h4>
+                    <p class="mb-2">ผู้เล่น 2 คนอยู่ทีมเดียวกัน ช่วยกันหาการ์ดสายลับ (สีเขียว) 15 ใบให้เจอก่อนจะหมด 9 เทิร์น โดยจะสลับกันเป็นคนใบ้และคนทาย</p>
+                    <p><strong>กฎการทาย:</strong> เมื่อทายการ์ดสีเขียวถูก จะได้ทายต่อจนกว่าจะเจอการ์ดที่ไม่ใช่สีเขียว หรือกดจบเทิร์น</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2 rule-header">ข้อควรระวัง!</h4>
+                    <p>ไม่ว่าจะโหมดไหน หากทีมของคุณเปิดเจอ <strong>การ์ดมือสังหาร (สีดำ)</strong> ทีมจะแพ้ทันที!</p>
+                `
+            },
+            'ito': {
+                title: 'วิธีเล่น: ito เรียงเลข',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">ร่วมมือกับเพื่อนเพื่อเรียงลำดับตัวเลขปริศนาของทุกคนจากน้อยไปมากให้ถูกต้อง!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>ทุกคนจะได้รับ "โจทย์" เดียวกัน และ "ตัวเลข" 1-100 ของตัวเอง (ซึ่งคนอื่นไม่เห็น)</li>
+                        <li>แต่ละคนจะต้องพูดเพื่ออธิบาย "ความแรง" ของตัวเลขที่ตัวเองได้ โดยอิงจากโจทย์ เช่น โจทย์คือ "ความนิยมของสัตว์เลี้ยง" เลข 1 อาจจะหมายถึง "หนู" ส่วนเลข 100 อาจจะหมายถึง "สุนัข"</li>
+                        <li><strong>ห้ามพูดตัวเลขเด็ดขาด!</strong></li>
+                        <li>เมื่อทุกคนอธิบายจบแล้ว ให้ช่วยกันลากการ์ดของผู้เล่นในช่องด้านล่างเพื่อเรียงลำดับจากน้อยไปมากตามที่เข้าใจ</li>
+                        <li>เมื่อมั่นใจแล้ว ให้กดปุ่ม "ยืนยันลำดับ" เพื่อดูผลเฉลย</li>
+                    </ol>
+                `
+            },
+            'fun-facts': {
+                title: 'วิธีเล่น: Fun Facts',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">ใช้ไหวพริบในการคาดเดาและทายให้ถูกว่า คำตอบของผู้เล่นคนไหนที่อยู่ "ใกล้เคียง" กับคำตอบปริศนามากที่สุดเพื่อทำคะแนน!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>ทุกคนจะได้รับโจทย์คำถามเดียวกัน (เช่น "คุณมีรองเท้ากี่คู่?")</li>
+                        <li>แต่ละคนพิมพ์คำตอบ (ตัวเลข) ของตัวเองแล้วกดยืนยัน (คำตอบจะถูกเก็บเป็นความลับ)</li>
+                        <li>เมื่อทุกคนตอบครบ ระบบจะสุ่มเลือก 1 คนเป็น "เจ้าของคำตอบปริศนา" และจะเปิดเผยคำตอบของผู้เล่นคนอื่นๆ ทั้งหมด</li>
+                        <li>คำตอบที่เปิดเผยจะถูกนำมาสร้างเป็น "ช่วงคะแนน" ให้ทาย</li>
+                        <li>ผู้เล่นที่เหลือ (ที่ไม่ใช่เจ้าของคำตอบปริศนา) จะต้องคลิกเลือก "ช่วงคะแนน" ที่คิดว่าคำตอบปริศนาจะตกอยู่</li>
+                        <li>เมื่อทุกคนลงเดิมพันครบแล้ว Host จะกดปุ่ม "เฉลย"</li>
+                        <li>ผู้เล่นที่ทายถูกจะได้รับคะแนนไป!</li>
+                    </ol>
+                `
+            }
+        };
+
+        // --- DOM Elements ---
+        const screens = {
+            lobby: document.getElementById('lobby-screen'),
+            waiting: document.getElementById('waiting-screen'),
+            cardGame: document.getElementById('card-game-screen'),
+            codename: document.getElementById('codename-screen'),
+            ito: document.getElementById('ito-screen'),
+            funFacts: document.getElementById('fun-facts-screen'),
+            spinner: document.getElementById('spinner-screen'),
+            stopwatch: document.getElementById('stopwatch-screen'),
+        };
+        const gameSelectionArea = document.getElementById('game-selection-area');
+        const toolSelectionArea = document.getElementById('tool-selection-area');
+        const playerNameInput = document.getElementById('playerName');
+        const createRoomBtn = document.getElementById('createRoomBtn');
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const roomCodeInput = document.getElementById('roomCodeInput');
+        const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+        const playerList = document.getElementById('playerList');
+        const playerCount = document.getElementById('playerCount');
+        const startGameBtn = document.getElementById('startGameBtn');
+        
+        // Rules Modal Elements
+        const howToPlayBtn = document.getElementById('how-to-play-btn');
+        const rulesModalOverlay = document.getElementById('rules-modal-overlay');
+        const closeRulesBtn = document.getElementById('close-rules-btn');
+        const rulesTitle = document.getElementById('rules-title');
+        const rulesBody = document.getElementById('rules-body');
+        
+        // --- Global Variables ---
+        let myRoomCode = '';
+        let isHost = false;
+        let selectedGame = null;
+
+        // --- Helper Functions ---
+        function showScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            const screenElement = document.getElementById(screenName);
+            if (screenElement) {
+                screenElement.classList.remove('hidden');
+            } else {
+                const fallbackElement = document.getElementById(`${screenName}-screen`);
+                if (fallbackElement) {
+                    fallbackElement.classList.remove('hidden');
+                } else {
+                    console.error(`Screen with ID "${screenName}" or "${screenName}-screen" not found.`);
+                    screens.lobby.classList.remove('hidden');
+                }
+            }
+        }
+
+        function updateLobby(players) {
+            playerList.innerHTML = '';
+            players.forEach(p => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'p-3 bg-stone-100 rounded-lg text-stone-700';
+                playerDiv.textContent = `${p.name} ${p.id === socket.id ? ' (คุณ)' : ''}`;
+                playerList.appendChild(playerDiv);
+            });
+            playerCount.textContent = players.length;
+            if (isHost) {
+                const minPlayers = (selectedGame === 'codename' || selectedGame === 'ito' || selectedGame === 'fun-facts') ? 2 : 2;
+                startGameBtn.disabled = players.length < minPlayers;
+                startGameBtn.textContent = players.length < minPlayers ? `ต้องมี ${minPlayers} คนขึ้นไป` : 'เริ่มเกมเลย!';
+            }
+        }
+
+        function updateButtonStates() {
+            const playerName = playerNameInput.value.trim();
+            const roomCode = roomCodeInput.value.trim();
+            createRoomBtn.disabled = !(playerName && selectedGame);
+            joinRoomBtn.disabled = !(playerName && roomCode);
+        }
+        
+        // --- Event Listeners ---
+        playerNameInput.addEventListener('input', updateButtonStates);
+        roomCodeInput.addEventListener('input', updateButtonStates);
+
+        gameSelectionArea.addEventListener('click', (e) => {
+            const card = e.target.closest('.card');
+            if (!card) return;
+            document.querySelectorAll('#game-selection-area .card, #tool-selection-area .card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedGame = card.dataset.game;
+            howToPlayBtn.disabled = false;
+            updateButtonStates();
+        });
+        
+        toolSelectionArea.addEventListener('click', (e) => {
+            const card = e.target.closest('.card');
+            if (!card) return;
+            const tool = card.dataset.tool;
+            if (tool) {
+                showScreen(`${tool}-screen`);
+            }
+        });
+
+        document.getElementById('spinner-back-btn').addEventListener('click', () => {
+            showScreen('lobby-screen');
+        });
+        document.getElementById('stopwatch-back-btn').addEventListener('click', () => {
+            showScreen('lobby-screen');
+        });
+
+        createRoomBtn.addEventListener('click', () => {
+            if (createRoomBtn.disabled) return;
+            const playerName = playerNameInput.value.trim();
+            socket.emit('createRoom', { playerName, gameType: selectedGame });
+            isHost = true;
+        });
+
+        joinRoomBtn.addEventListener('click', () => {
+            if (joinRoomBtn.disabled) return;
+            const playerName = playerNameInput.value.trim();
+            const roomCode = roomCodeInput.value.trim().toUpperCase();
+            myRoomCode = roomCode;
+            socket.emit('joinRoom', { playerName, roomCode });
+        });
+        
+        startGameBtn.addEventListener('click', () => {
+            if (isHost) {
+                socket.emit('startGame', myRoomCode);
+            }
+        });
+
+        howToPlayBtn.addEventListener('click', () => {
+            if (!selectedGame) return;
+            const rules = gameRules[selectedGame];
+            rulesTitle.textContent = rules.title;
+            rulesBody.innerHTML = rules.content;
+            rulesModalOverlay.classList.remove('hidden');
+        });
+
+        closeRulesBtn.addEventListener('click', () => rulesModalOverlay.classList.add('hidden'));
+        rulesModalOverlay.addEventListener('click', (e) => {
+            if (e.target === rulesModalOverlay) {
+                rulesModalOverlay.classList.add('hidden');
+            }
+        });
+
+        // --- Socket.IO Handlers ---
+        socket.on('roomCreated', ({ roomCode, players }) => {
+            myRoomCode = roomCode;
+            roomCodeDisplay.textContent = roomCode;
+            showScreen('waiting-screen');
+            updateLobby(players);
+        });
+
+        socket.on('joinSuccess', ({ roomCode, players, gameType }) => {
+            myRoomCode = roomCode;
+            selectedGame = gameType;
+            isHost = false;
+            roomCodeDisplay.textContent = roomCode;
+            showScreen('waiting-screen');
+            updateLobby(players);
+        });
+
+        socket.on('updateLobby', (players) => {
+            updateLobby(players);
+        });
+
+        socket.on('gameStarted', (gameType) => {
+            showScreen(`${gameType}-screen`);
+            if (isHost) {
+                socket.emit('host_gameLogicStart', myRoomCode);
+            }
+        });
+        
+        socket.on('error', (message) => {
+            alert(`เกิดข้อผิดพลาด: ${message}`);
+        });
+
+        // --- Card Game Client Logic ---
+        (function initCardGame() {
+            const cgScoreboard = document.getElementById('cg-scoreboard');
+            const cgPromptText = document.getElementById('cg-promptText');
+            const cgGameInfoText = document.getElementById('cg-game-info-text');
+            const cgPlayedCardsArea = document.getElementById('cg-played-cards-area');
+            const cgMyCardsArea = document.getElementById('cg-my-cards-area');
+
+            function updateCardGameUI(data) {
+                const { players, prompt, judge } = data;
+                cgScoreboard.innerHTML = '';
+                players.forEach(p => {
+                    const scoreDiv = document.createElement('div');
+                    scoreDiv.className = 'px-3 py-1 bg-stone-200 rounded-full';
+                    scoreDiv.textContent = `${p.name}: ${p.score}`;
+                    cgScoreboard.appendChild(scoreDiv);
+                });
+                cgPromptText.innerHTML = prompt.replace('______', `<span class="bg-stone-800 px-4 py-1 rounded-md">______</span>`);
+                cgPlayedCardsArea.innerHTML = '';
+                if (socket.id === judge.id) {
+                    cgGameInfoText.textContent = "คุณคือ Judge ในรอบนี้! รอเพื่อนๆ ลงการ์ด...";
+                    cgMyCardsArea.innerHTML = '<p class="col-span-full text-center text-stone-400">รอบนี้คุณไม่ได้เล่นการ์ด</p>';
+                } else {
+                    cgGameInfoText.textContent = `รอบนี้ ${judge.name} เป็น Judge`;
+                }
+            }
+
+            socket.on('cardGame_newRound', (data) => updateCardGameUI(data));
+            socket.on('cardGame_dealCards', (cards) => {
+                cgMyCardsArea.innerHTML = '';
+                cards.forEach(cardText => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card answer-card p-4 rounded-lg flex items-center justify-center text-center cursor-pointer';
+                    cardDiv.textContent = cardText;
+                    cardDiv.onclick = () => {
+                        socket.emit('cardGame_playCard', { card: cardText });
+                        cgMyCardsArea.innerHTML = `<p class="col-span-full text-center text-stone-400">คุณลงการ์ด: "${cardText}"</p>`;
+                    };
+                    cgMyCardsArea.appendChild(cardDiv);
+                });
+            });
+            socket.on('cardGame_revealCards', (playedCards) => {
+                cgPlayedCardsArea.innerHTML = '';
+                const isJudge = cgGameInfoText.textContent.startsWith("คุณคือ Judge");
+                cgGameInfoText.textContent = isJudge ? "เลือกการ์ดที่ฮาสุด!" : "มาดูการ์ดของเพื่อนๆ กัน!";
+                for (const playerId in playedCards) {
+                    const cardText = playedCards[playerId];
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card answer-card p-4 rounded-lg flex items-center justify-center text-center';
+                    cardDiv.textContent = cardText;
+                    if (isJudge) {
+                        cardDiv.classList.add('cursor-pointer');
+                        cardDiv.onclick = () => socket.emit('cardGame_pickWinner', { winnerSocketId: playerId });
+                    }
+                    cgPlayedCardsArea.appendChild(cardDiv);
+                }
+            });
+            socket.on('cardGame_announceWinner', ({ winnerName, winningCard, players }) => {
+                cgGameInfoText.innerHTML = `ผู้ชนะรอบนี้คือ <span class="font-bold" style="color: var(--primary-text-color);">${winnerName}</span>!`;
+                cgPlayedCardsArea.innerHTML = `<div class="col-span-full text-center"><p class="mb-2">ด้วยคำตอบสุดปัง:</p><div class="card answer-card p-4 rounded-lg max-w-xs mx-auto">${winningCard}</div></div>`;
+                cgScoreboard.innerHTML = '';
+                players.forEach(p => {
+                    const scoreDiv = document.createElement('div');
+                    scoreDiv.className = 'px-3 py-1 bg-stone-200 rounded-full';
+                    scoreDiv.textContent = `${p.name}: ${p.score}`;
+                    cgScoreboard.appendChild(scoreDiv);
+                });
+            });
+        })();
+
+        // --- Codename Client Logic ---
+        (function initCodename() {
+            const cnCoopInfoBar = document.getElementById('cn-coop-info-bar');
+            const cnTeamInfoBar = document.getElementById('cn-team-info-bar');
+            const cnTeamArea = document.getElementById('cn-team-area');
+            const cnTurnInfo = document.getElementById('cn-turn-info');
+            const cnClueInfo = document.getElementById('cn-clue-info');
+            const cnBoard = document.getElementById('cn-board');
+            const cnBoardContainer = document.getElementById('cn-board-container');
+            const cnSpymasterClueArea = document.getElementById('cn-spymaster-clue-area');
+            const cnGiveClueBtn = document.getElementById('cn-give-clue-btn');
+            const cnClueWord = document.getElementById('cn-clue-word');
+            const cnClueNumber = document.getElementById('cn-clue-number');
+            const cnEndTurnBtn = document.getElementById('cn-end-turn-btn');
+            const cnJoinTeamArea = document.getElementById('cn-join-team-area');
+            const cnCoopTurnsLeft = document.getElementById('cn-coop-turns-left');
+            const cnCoopWordsFound = document.getElementById('cn-coop-words-found');
+            const cnCoopWordsGoal = document.getElementById('cn-coop-words-goal');
+            const cnCoopTurnInfo = document.getElementById('cn-coop-turn-info');
+
+            function renderCodenameBoard(gameState) {
+                const myPlayerId = gameState.players.find(p => p.id === socket.id);
+                if (!myPlayerId) return;
+                const isSpymaster = myPlayerId.isSpymaster;
+
+                if (gameState.isCoop) {
+                    cnCoopInfoBar.classList.remove('hidden');
+                    cnTeamInfoBar.classList.add('hidden');
+                    cnTeamArea.classList.add('hidden');
+                    cnJoinTeamArea.classList.add('hidden');
+                    cnCoopTurnsLeft.textContent = gameState.turnsLeft;
+                    cnCoopWordsFound.textContent = gameState.wordsFound;
+                    cnCoopWordsGoal.textContent = gameState.wordsToFind;
+                    const spymaster = gameState.players.find(p => p.isSpymaster);
+                    const guesser = gameState.players.find(p => !p.isSpymaster);
+                    if (isSpymaster) {
+                        cnCoopTurnInfo.textContent = `ตาของคุณใบ้ให้ ${guesser.name} ทาย`;
+                    } else {
+                        cnCoopTurnInfo.textContent = `รอ ${spymaster.name} ใบ้...`;
+                    }
+                } else {
+                    cnCoopInfoBar.classList.add('hidden');
+                    cnTeamInfoBar.classList.remove('hidden');
+                    cnTeamArea.classList.remove('hidden');
+                    cnJoinTeamArea.classList.toggle('hidden', !!myPlayerId.team);
+                    ['red', 'blue'].forEach(teamColor => {
+                        const teamData = gameState.teams[teamColor];
+                        document.getElementById(`cn-${teamColor}-score`).textContent = teamData.score;
+                        const playersEl = document.getElementById(`cn-${teamColor}-players`);
+                        playersEl.innerHTML = '';
+                        teamData.players.forEach(pId => {
+                            const player = gameState.players.find(p => p.id === pId);
+                            if (player) {
+                                const li = document.createElement('li');
+                                li.textContent = `${player.name} ${teamData.spymaster === pId ? ' (หัวหน้า)' : ''}`;
+                                playersEl.appendChild(li);
+                            }
+                        });
+                        document.getElementById(`cn-spymaster-${teamColor}-btn`).classList.toggle('hidden', !myPlayerId.team || myPlayerId.team !== teamColor || teamData.spymaster);
+                    });
+                    const turnTeamName = gameState.turn === 'red' ? 'ทีมสีแดง' : 'ทีมสีน้ำเงิน';
+                    cnTurnInfo.textContent = `ตาของ ${turnTeamName}`;
+                    cnTurnInfo.className = `text-xl font-bold ${gameState.turn === 'red' ? 'text-red-500' : 'text-blue-500'}`;
+                }
+
+                cnBoardContainer.classList.toggle('spymaster-view', isSpymaster);
+                cnSpymasterClueArea.classList.add('hidden');
+                cnEndTurnBtn.classList.add('hidden');
+                const clue = gameState.clue;
+                if (clue && clue.word) {
+                    const clueText = `คำใบ้: "${clue.word}" | จำนวน: ${clue.number} (เหลือ ${gameState.guessesLeft} ครั้ง)`;
+                    cnClueInfo.textContent = clueText;
+                    if (gameState.isCoop) cnCoopTurnInfo.textContent = clueText;
+                } else {
+                    const waitingText = 'รอ Spymaster ให้คำใบ้...';
+                    cnClueInfo.textContent = waitingText;
+                    if (gameState.isCoop && !isSpymaster) cnCoopTurnInfo.textContent = waitingText;
+                }
+                const isMyTurnToAct = (gameState.isCoop && isSpymaster) || (!gameState.isCoop && myPlayerId.team === gameState.turn && isSpymaster);
+                if (isMyTurnToAct && (!clue || !clue.word)) {
+                    cnSpymasterClueArea.classList.remove('hidden');
+                }
+                const isMyTurnToGuess = (gameState.isCoop && !isSpymaster) || (!gameState.isCoop && myPlayerId.team === gameState.turn && !isSpymaster);
+                if (isMyTurnToGuess && clue && clue.word) {
+                    cnEndTurnBtn.classList.remove('hidden');
+                }
+                cnBoard.innerHTML = '';
+                gameState.board.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'cn-card flex items-center justify-center p-2 text-center font-bold rounded-lg';
+                    cardEl.textContent = card.word;
+                    cardEl.dataset.index = index;
+                    if (card.revealed) {
+                        cardEl.classList.add('revealed', card.type);
+                    } else {
+                        if (isSpymaster) {
+                            cardEl.classList.add(card.type);
+                        }
+                        cardEl.classList.add('cursor-pointer');
+                        cardEl.onclick = () => {
+                            const canGuess = (gameState.isCoop && !isSpymaster) || (!gameState.isCoop && myPlayerId.team === gameState.turn && !isSpymaster);
+                            if (canGuess && clue.word && gameState.guessesLeft > 0) {
+                                socket.emit('codename_makeGuess', { cardIndex: index });
+                            }
+                        };
+                    }
+                    cnBoard.appendChild(cardEl);
+                });
+            }
+
+            function handleCodenameGameOver(data) {
+                const { winner, reason, isCoop } = data;
+                cnSpymasterClueArea.classList.add('hidden');
+                cnEndTurnBtn.classList.add('hidden');
+                cnBoard.querySelectorAll('.cn-card').forEach(c => c.onclick = null);
+                if (isCoop) {
+                    if (winner === 'players') {
+                        cnCoopTurnInfo.textContent = `สุดยอด! ชนะแล้ว!`;
+                    } else {
+                        cnCoopTurnInfo.textContent = `เกมจบแล้ว! ${reason}`;
+                    }
+                } else {
+                    const winnerTeamName = winner === 'red' ? 'ทีมสีแดง' : 'ทีมสีน้ำเงิน';
+                    cnTurnInfo.textContent = `เกมจบแล้ว! ${winnerTeamName} ชนะ!`;
+                    cnClueInfo.textContent = reason;
+                }
+            }
+
+            document.body.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.id === 'cn-join-red-btn' || target.id === 'cn-join-blue-btn') {
+                    socket.emit('codename_joinTeam', { team: target.dataset.team });
+                }
+                if (target.id === 'cn-spymaster-red-btn' || target.id === 'cn-spymaster-blue-btn') {
+                    socket.emit('codename_becomeSpymaster', { team: target.dataset.team });
+                }
+                if (target.id === 'cn-give-clue-btn') {
+                    const word = cnClueWord.value.trim();
+                    const number = parseInt(cnClueNumber.value, 10);
+                    if (word && number > 0) {
+                        socket.emit('codename_giveClue', { word, number });
+                        cnClueWord.value = '';
+                        cnClueNumber.value = '';
+                    }
+                }
+                if (target.id === 'cn-end-turn-btn') {
+                    socket.emit('codename_endTurn');
+                }
+            });
+
+            socket.on('codename_updateState', (gameState) => renderCodenameBoard(gameState));
+            socket.on('codename_gameOver', (data) => handleCodenameGameOver(data));
+        })();
+        
+        // --- ito Client Logic ---
+        (function initItoGame() {
+            const themeDisplay = document.getElementById('ito-theme-display');
+            const myNumberCard = document.getElementById('ito-my-number-card');
+            const orderingArea = document.getElementById('ito-player-ordering-area');
+            const lockOrderBtn = document.getElementById('ito-lock-order-btn');
+            let draggedItem = null;
+
+            socket.on('ito_newRound', ({ theme, number, players }) => {
+                themeDisplay.textContent = theme;
+                myNumberCard.textContent = number;
+                orderingArea.innerHTML = '';
+                lockOrderBtn.disabled = false;
+                lockOrderBtn.textContent = 'ยืนยันลำดับ';
+
+                players.forEach(player => {
+                    const card = document.createElement('div');
+                    card.className = 'ito-player-card p-4 bg-stone-100 rounded-lg text-lg font-bold border-2';
+                    card.textContent = player.name;
+                    card.dataset.playerId = player.id;
+                    card.draggable = true;
+                    orderingArea.appendChild(card);
+                });
+            });
+
+            orderingArea.addEventListener('dragstart', (e) => {
+                draggedItem = e.target;
+                setTimeout(() => e.target.classList.add('dragging'), 0);
+            });
+
+            orderingArea.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+                draggedItem = null;
+            });
+
+            orderingArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(orderingArea, e.clientX);
+                if (afterElement == null) {
+                    orderingArea.appendChild(draggedItem);
+                } else {
+                    orderingArea.insertBefore(draggedItem, afterElement);
+                }
+            });
+
+            function getDragAfterElement(container, x) {
+                const draggableElements = [...container.querySelectorAll('.ito-player-card:not(.dragging)')];
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = x - box.left - box.width / 2;
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            lockOrderBtn.addEventListener('click', () => {
+                const orderedPlayerIds = [...orderingArea.querySelectorAll('.ito-player-card')].map(card => card.dataset.playerId);
+                socket.emit('ito_submitOrder', { orderedPlayerIds });
+                lockOrderBtn.disabled = true;
+            });
+
+            socket.on('ito_showResults', ({ results, success }) => {
+                orderingArea.querySelectorAll('.ito-player-card').forEach(card => card.draggable = false);
+                
+                results.forEach(result => {
+                    const card = orderingArea.querySelector(`[data-player-id="${result.id}"]`);
+                    if (card) {
+                        card.textContent = `${result.name}: ${result.number}`;
+                        card.classList.add(success ? 'success' : 'fail');
+                    }
+                });
+
+                if (success) {
+                    lockOrderBtn.textContent = 'ถูกต้องทั้งหมด! เริ่มรอบใหม่...';
+                } else {
+                    lockOrderBtn.textContent = 'เรียงผิด! เริ่มรอบใหม่...';
+                }
+            });
+        })();
+
+        // --- Fun Facts Client Logic ---
+        (function initFunFacts() {
+            const questionDisplay = document.getElementById('ff-question-display');
+            const answerInputArea = document.getElementById('ff-answer-input-area');
+            const myAnswerInput = document.getElementById('ff-my-answer');
+            const submitAnswerBtn = document.getElementById('ff-submit-answer-btn');
+            const bettingArea = document.getElementById('ff-betting-area');
+            const bettingInfo = document.getElementById('ff-betting-info');
+            const betOptions = document.getElementById('ff-bet-options');
+            const resultsArea = document.getElementById('ff-results-area');
+            const resultInfo = document.getElementById('ff-result-info');
+            const resultCards = document.getElementById('ff-result-cards');
+            const scoreboard = document.getElementById('ff-scoreboard');
+            const nextRoundBtn = document.getElementById('ff-next-round-btn');
+
+            function updateScoreboard(players) {
+                scoreboard.innerHTML = '';
+                players.forEach(p => {
+                    const scoreDiv = document.createElement('div');
+                    scoreDiv.className = 'px-3 py-1 bg-stone-200 rounded-full';
+                    scoreDiv.textContent = `${p.name}: ${p.score}`;
+                    scoreboard.appendChild(scoreDiv);
+                });
+            }
+
+            submitAnswerBtn.addEventListener('click', () => {
+                const answer = parseInt(myAnswerInput.value, 10);
+                if (!isNaN(answer)) {
+                    socket.emit('funFacts_submitAnswer', { answer });
+                    answerInputArea.classList.add('hidden');
+                    bettingInfo.textContent = "รอผู้เล่นคนอื่นตอบคำถาม...";
+                    bettingArea.classList.remove('hidden');
+                    betOptions.innerHTML = ''; 
+                }
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if (isHost) {
+                    socket.emit('funFacts_nextRound');
+                }
+            });
+
+            socket.on('funFacts_newRound', ({ question, players }) => {
+                questionDisplay.textContent = question;
+                updateScoreboard(players);
+                answerInputArea.classList.remove('hidden');
+                bettingArea.classList.add('hidden');
+                resultsArea.classList.add('hidden');
+                myAnswerInput.value = '';
+                nextRoundBtn.classList.add('hidden');
+            });
+
+            socket.on('funFacts_startBetting', ({ secretPlayer, ranges }) => {
+                betOptions.innerHTML = '';
+                bettingArea.classList.remove('hidden');
+                if (secretPlayer.id === socket.id) {
+                    bettingInfo.textContent = "คุณคือเจ้าของคำตอบปริศนา! รอเพื่อนๆ ทาย...";
+                } else {
+                    bettingInfo.textContent = `คำตอบของ ${secretPlayer.name} อยู่ในช่วงไหน?`;
+                    ranges.forEach((range, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'ff-range-card p-4 bg-white rounded-lg text-lg font-bold';
+                        card.textContent = range.label;
+                        card.onclick = () => {
+                            socket.emit('funFacts_placeBet', { betOnRangeIndex: index });
+                            document.querySelectorAll('#ff-bet-options .ff-range-card').forEach(c => c.classList.remove('my-bet'));
+                            card.classList.add('my-bet');
+                        };
+                        betOptions.appendChild(card);
+                    });
+                }
+            });
+
+            socket.on('funFacts_showResult', ({ allPlayers, correctRangeIndex, winners }) => {
+                bettingArea.classList.add('hidden');
+                resultsArea.classList.remove('hidden');
+                nextRoundBtn.classList.add('hidden');
+
+                const secretPlayer = allPlayers.find(p => p.isSecret);
+                resultInfo.textContent = `คำตอบที่ถูกต้องของ ${secretPlayer.name} คือ ${secretPlayer.answer}!`;
+                
+                resultCards.innerHTML = ''; 
+                
+                const rangeCards = betOptions.querySelectorAll('.ff-range-card');
+                rangeCards.forEach((card, index) => {
+                    const resultCard = card.cloneNode(true); 
+                    resultCard.onclick = null; 
+                    
+                    if(index === correctRangeIndex) {
+                        resultCard.classList.add('correct');
+                    } else {
+                        resultCard.classList.add('incorrect');
+                    }
+                    resultCards.appendChild(resultCard);
+                });
+
+                if(winners.length > 0) {
+                    const winnerNames = winners.map(wId => allPlayers.find(p => p.id === wId).name).join(', ');
+                    resultInfo.textContent += ` ผู้ที่ทายถูกคือ: ${winnerNames}!`;
+                } else {
+                    resultInfo.textContent += ` ไม่มีใครทายถูกเลย!`;
+                }
+
+                updateScoreboard(allPlayers);
+
+                if (isHost) {
+                    nextRoundBtn.classList.remove('hidden');
+                }
+            });
+        })();
+
+        // --- Spinner Wheel Logic ---
+        (function initSpinner() {
+            const canvas = document.getElementById('spinner-canvas');
+            const ctx = canvas.getContext('2d');
+            const spinBtn = document.getElementById('spin-btn');
+            const updateBtn = document.getElementById('spinner-update-btn');
+            const optionsTextarea = document.getElementById('spinner-options');
+            const resultDiv = document.getElementById('spinner-result');
+
+            let options = ["กินเหล้า", "เล่าเรื่องผี", "ร้องเพลง", "เต้น", "ตอบคำถาม", "พัก 5 นาที"];
+            const colors = ["#f8a096", "#cce3de", "#e3c5a8", "#fde047", "#93c5fd", "#c4b5fd", "#fca5a5"];
+            let startAngle = 0;
+            let arc = 0;
+            let spinTimeout = null;
+            let spinAngleStart = 10;
+            let spinTime = 0;
+            let spinTimeTotal = 0;
+
+            function drawSpinner() {
+                if (options.length === 0) return;
+                arc = Math.PI / (options.length / 2);
+                ctx.clearRect(0, 0, 400, 400);
+                ctx.strokeStyle = "#e7e5e4";
+                ctx.lineWidth = 2;
+                ctx.font = '16px IBM Plex Sans Thai, sans-serif';
+
+                for (let i = 0; i < options.length; i++) {
+                    const angle = startAngle + i * arc;
+                    ctx.fillStyle = colors[i % colors.length];
+                    ctx.beginPath();
+                    ctx.arc(200, 200, 190, angle, angle + arc, false);
+                    ctx.arc(200, 200, 0, angle + arc, angle, true);
+                    ctx.stroke();
+                    ctx.fill();
+
+                    ctx.save();
+                    ctx.fillStyle = "#44403c";
+                    ctx.translate(200 + Math.cos(angle + arc / 2) * 120, 200 + Math.sin(angle + arc / 2) * 120);
+                    ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                    const text = options[i];
+                    ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+                    ctx.restore();
+                }
+            }
+
+            function rotate() {
+                spinTime += 30;
+                if (spinTime >= spinTimeTotal) {
+                    stopRotate();
+                    return;
+                }
+                const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+                startAngle += (spinAngle * Math.PI / 180);
+                drawSpinner();
+                spinTimeout = setTimeout(rotate, 30);
+            }
+
+            function stopRotate() {
+                clearTimeout(spinTimeout);
+                const degrees = startAngle * 180 / Math.PI + 90;
+                const arcd = arc * 180 / Math.PI;
+                const index = Math.floor((360 - degrees % 360) / arcd);
+                ctx.save();
+                ctx.font = 'bold 30px IBM Plex Sans Thai, sans-serif';
+                const text = options[index];
+                resultDiv.textContent = `ผลลัพธ์: ${text}`;
+                ctx.restore();
+                spinBtn.disabled = false;
+            }
+
+            function easeOut(t, b, c, d) {
+                const ts = (t /= d) * t;
+                const tc = ts * t;
+                return b + c * (tc + -3 * ts + 3 * t);
+            }
+
+            spinBtn.addEventListener("click", () => {
+                if (options.length === 0) return;
+                spinBtn.disabled = true;
+                resultDiv.textContent = "หมุนนนน...";
+                spinAngleStart = Math.random() * 10 + 10;
+                spinTime = 0;
+                spinTimeTotal = Math.random() * 3000 + 4000;
+                rotate();
+            });
+
+            updateBtn.addEventListener("click", () => {
+                const newOptions = optionsTextarea.value.split('\n').filter(opt => opt.trim() !== '');
+                if (newOptions.length > 0) {
+                    options = newOptions;
+                    drawSpinner();
+                }
+            });
+
+            drawSpinner();
+        })();
+
+        // --- Stopwatch Logic ---
+        (function initStopwatch() {
+            const timeDisplay = document.getElementById('stopwatch-time');
+            const startBtn = document.getElementById('stopwatch-start-btn');
+            const stopBtn = document.getElementById('stopwatch-stop-btn');
+            const finishRoundBtn = document.getElementById('stopwatch-finish-round-btn');
+            const resetBtn = document.getElementById('stopwatch-reset-btn');
+            const lapsList = document.getElementById('stopwatch-laps');
+
+            let startTime = 0;
+            let elapsedTime = 0;
+            let timerInterval = null;
+            let lapCounter = 0;
+
+            function formatTime(time) {
+                const date = new Date(time);
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+                const milliseconds = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
+                return `${minutes}:${seconds}.${milliseconds}`;
+            }
+
+            function updateDisplay() {
+                elapsedTime = Date.now() - startTime;
+                timeDisplay.textContent = formatTime(elapsedTime);
+            }
+            
+            function start() {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(updateDisplay, 10);
+                
+                startBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = false;
+                resetBtn.disabled = false;
+            }
+
+            function stop() {
+                clearInterval(timerInterval);
+                
+                stopBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = true;
+            }
+
+            function reset() {
+                stop();
+                elapsedTime = 0;
+                lapCounter = 0;
+                timeDisplay.textContent = '00:00.00';
+                lapsList.innerHTML = '';
+                resetBtn.disabled = true;
+                finishRoundBtn.disabled = true;
+            }
+
+            function finishRound() {
+                if (!timerInterval) return; // Don't do anything if timer is not running
+
+                clearInterval(timerInterval);
+
+                lapCounter++;
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-2 bg-stone-100 rounded';
+                li.innerHTML = `
+                    <span class="font-semibold text-stone-600">รอบที่ ${lapCounter}</span>
+                    <span class="font-mono text-stone-800">${formatTime(elapsedTime)}</span>
+                `;
+                lapsList.prepend(li);
+
+                elapsedTime = 0;
+                timeDisplay.textContent = '00:00.00';
+                
+                stopBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = true;
+                resetBtn.disabled = false;
+            }
+
+            startBtn.addEventListener('click', start);
+            stopBtn.addEventListener('click', stop);
+            resetBtn.addEventListener('click', reset);
+            finishRoundBtn.addEventListener('click', finishRound);
+
+            reset();
+        })();
+
+    </script>
+</body>
+</html>
