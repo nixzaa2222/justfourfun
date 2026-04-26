@@ -38,6 +38,20 @@ const friendQuizData = {
         "คุณคิดว่าคุณจะอายุยืนกี่ปี?"
     ]
 };
+const fakeArtistData = {
+    categories: [
+        { name: "สัตว์ป่า", words: ["ช้าง", "สิงโต", "ยีราฟ", "ลิง", "เสือ", "งู", "หมี"] },
+        { name: "อาหาร", words: ["พิซซ่า", "แฮมเบอร์เกอร์", "ซูชิ", "ส้มตำ", "ชาบู", "ไข่ดาว"] },
+        { name: "สถานที่", words: ["โรงพยาบาล", "โรงเรียน", "ชายหาด", "สวนสนุก", "ภูเขา", "สนามบิน"] },
+        { name: "อาชีพ", words: ["หมอ", "ตำรวจ", "ครู", "นักดับเพลิง", "ทหาร", "นักร้อง"] },
+        { name: "ยานพาหนะ", words: ["รถไฟ", "เครื่องบิน", "เรือ", "จักรยาน", "รถมอเตอร์ไซค์", "รถถัง"] }
+    ],
+    // สีปากกา 16 สี สำหรับผู้เล่นสูงสุด 16 คน
+    colors: [
+        '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
+        '#6366f1', '#84cc16', '#eab308', '#d946ef', '#06b6d4', '#64748b', '#78350f', '#0f766e'
+    ]
+};
 
 const rooms = {};
 
@@ -66,7 +80,8 @@ io.on('connection', (socket) => {
 
     socket.on('joinRoom', ({ playerName, roomCode }) => {
         const room = rooms[roomCode];
-        if (room && room.players.length < 4 && room.gameState === 'waiting') {
+        // ขยายห้องรับได้สูงสุด 16 คน
+        if (room && room.players.length < 16 && room.gameState === 'waiting') {
             room.players.push({ id: socket.id, name: playerName, score: 0 });
             socket.join(roomCode);
             
@@ -91,20 +106,135 @@ io.on('connection', (socket) => {
         if (room && room.players.length > 0 && room.players[0].id === socket.id) {
             try {
                 if (room.gameType === 'word-guess') {
-                    if (room.players.length >= 2 && room.players.length <= 2) { // Strictly 2 players for co-op
+                    if (room.players.length >= 2 && room.players.length <= 2) {
                         startWordGuessCoopGame(roomCode);
-                    } else { // 3-4 players for team mode
+                    } else {
                         startWordGuessTeamGame(roomCode);
                     }
                 } else if (room.gameType === 'number-sort') {
                     startNumberSortRound(roomCode);
                 } else if (room.gameType === 'friend-quiz') {
                     startFriendQuizRound(roomCode);
+                } else if (room.gameType === 'fake-artist') {
+                    startFakeArtistRound(roomCode);
                 }
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
                 io.to(roomCode).emit('error', 'เกิดข้อผิดพลาดร้ายแรงขณะเริ่มเกม');
             }
+        }
+    });
+
+    // --- Fake Artist Listeners ---
+    socket.on('fakeArtist_drawLine', (data) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        if (roomCode) {
+            // ส่งข้อมูลเส้นที่วาดไปให้ทุกคนในห้อง (ยกเว้นคนวาดเอง)
+            socket.to(roomCode).emit('fakeArtist_onDraw', data);
+        }
+    });
+
+    socket.on('fakeArtist_endTurn', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game || room.gameType !== 'fake-artist') return;
+
+        const game = room.game;
+        // เช็คว่าคนที่ส่งมาคือคนที่ถึงคิวจริงๆ
+        if (game.turnOrder[game.currentTurnIndex] !== socket.id) return;
+
+        game.currentTurnIndex++;
+
+        // ถ้าวาดครบ 1 รอบของทุกคนแล้ว
+        if (game.currentTurnIndex >= game.turnOrder.length) {
+            game.currentTurnIndex = 0;
+            game.round++;
+            
+            // วาดคนละ 2 รอบ แล้วให้โหวต
+            if (game.round > 2) {
+                game.phase = 'voting';
+                io.to(roomCode).emit('fakeArtist_startVoting', { 
+                    players: room.players.map(p => ({ id: p.id, name: p.name, color: game.playerInfo[p.id].color }))
+                });
+                return;
+            }
+        }
+
+        const nextPlayerId = game.turnOrder[game.currentTurnIndex];
+        const nextPlayer = room.players.find(p => p.id === nextPlayerId);
+        
+        io.to(roomCode).emit('fakeArtist_updateTurn', {
+            currentTurnId: nextPlayerId,
+            currentTurnName: nextPlayer.name,
+            round: game.round
+        });
+    });
+
+    socket.on('fakeArtist_submitVote', ({ votedId }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game || room.game.phase !== 'voting') return;
+
+        room.game.votes[socket.id] = votedId;
+
+        // ถ้าโหวตครบทุกคนแล้ว
+        if (Object.keys(room.game.votes).length === room.players.length) {
+            room.game.phase = 'reveal';
+            
+            // นับคะแนนโหวต
+            const voteCounts = {};
+            Object.values(room.game.votes).forEach(id => {
+                voteCounts[id] = (voteCounts[id] || 0) + 1;
+            });
+
+            // หาคนที่ได้โหวตมากที่สุด
+            let maxVotes = 0;
+            let mostVotedId = null;
+            let isTie = false;
+
+            for (const [id, count] of Object.entries(voteCounts)) {
+                if (count > maxVotes) {
+                    maxVotes = count;
+                    mostVotedId = id;
+                    isTie = false;
+                } else if (count === maxVotes) {
+                    isTie = true;
+                }
+            }
+
+            const fakeArtist = room.players.find(p => p.id === room.game.fakeArtistId);
+            const isFakeCaught = (!isTie && mostVotedId === room.game.fakeArtistId);
+
+            io.to(roomCode).emit('fakeArtist_reveal', {
+                votes: voteCounts,
+                fakeArtistId: room.game.fakeArtistId,
+                fakeArtistName: fakeArtist.name,
+                isFakeCaught: isFakeCaught
+            });
+        }
+    });
+
+    socket.on('fakeArtist_submitGuess', ({ guessWord }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game || room.game.phase !== 'reveal') return;
+
+        // เช็คว่าคนที่เดาคือจิตรกรกำมะลอจริงๆ
+        if (socket.id !== room.game.fakeArtistId) return;
+
+        const isCorrect = guessWord.trim() === room.game.word;
+        
+        io.to(roomCode).emit('fakeArtist_gameOver', {
+            isCorrect: isCorrect,
+            actualWord: room.game.word,
+            category: room.game.category
+        });
+    });
+    
+    socket.on('fakeArtist_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
+            startFakeArtistRound(roomCode);
         }
     });
     
@@ -327,6 +457,69 @@ io.on('connection', (socket) => {
         }
     });
 });
+
+// --- Fake Artist Logic Functions ---
+function startFakeArtistRound(roomCode) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        room.gameState = 'waiting';
+        io.to(roomCode).emit('updateLobby', room.players);
+        return;
+    }
+
+    // สุ่มหมวดหมู่และคำศัพท์
+    const catIndex = Math.floor(Math.random() * fakeArtistData.categories.length);
+    const categoryObj = fakeArtistData.categories[catIndex];
+    const wordIndex = Math.floor(Math.random() * categoryObj.words.length);
+    const word = categoryObj.words[wordIndex];
+
+    // สุ่มคนเป็น Fake Artist
+    const fakeArtistIndex = Math.floor(Math.random() * room.players.length);
+    const fakeArtistId = room.players[fakeArtistIndex].id;
+
+    // สุ่มสีให้ผู้เล่นทุกคนไม่ซ้ำกัน
+    const shuffledColors = [...fakeArtistData.colors].sort(() => 0.5 - Math.random());
+    const playerInfo = {};
+    const turnOrder = [];
+
+    // จัดลำดับคนวาด (สลับตำแหน่งแบบสุ่มเพื่อไม่ให้คนร้ายอยู่ที่สุดท้ายตลอด)
+    const shuffledPlayers = [...room.players].sort(() => 0.5 - Math.random());
+    
+    shuffledPlayers.forEach((p, index) => {
+        playerInfo[p.id] = {
+            color: shuffledColors[index % shuffledColors.length],
+            isFakeArtist: p.id === fakeArtistId
+        };
+        turnOrder.push(p.id);
+    });
+
+    room.game = {
+        category: categoryObj.name,
+        word: word,
+        fakeArtistId: fakeArtistId,
+        playerInfo: playerInfo,
+        turnOrder: turnOrder,
+        currentTurnIndex: 0,
+        round: 1, // วาด 2 รอบ
+        votes: {},
+        phase: 'drawing'
+    };
+
+    // ส่งข้อมูลแบบแยกให้แต่ละคน เพื่อรักษาความลับ
+    room.players.forEach(p => {
+        const info = playerInfo[p.id];
+        io.to(p.id).emit('fakeArtist_newRound', {
+            category: categoryObj.name,
+            word: info.isFakeArtist ? null : word, // คนร้ายจะไม่เห็นคำ
+            isFakeArtist: info.isFakeArtist,
+            myColor: info.color,
+            turnOrderNames: turnOrder.map(id => room.players.find(player => player.id === id).name),
+            currentTurnId: turnOrder[0],
+            currentTurnName: room.players.find(player => player.id === turnOrder[0]).name
+        });
+    });
+}
+
 
 // --- Word Guess Logic Functions ---
 function startWordGuessTeamGame(roomCode) {

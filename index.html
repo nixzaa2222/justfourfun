@@ -4,31 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUST FOUR FUN</title>
+    <title>Cozy Corner</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // ตั้งค่า Tailwind ให้รองรับ Dark Mode ผ่านคลาส 'dark'
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
     <style>
+        /* ชุดสี Light Mode (Earth Tone) */
         :root {
-            --bg-color: #fdf6e3; /* Cream */
-            --card-bg-color: #fffbf0;
-            --primary-color: #cce3de; /* Mint Green */
-            --primary-text-color: #064e3b; /* Darker Green */
-            --accent-color: #f8a096; /* Salmon Pink */
-            --accent-text-color: #881337; /* Darker Pink */
-            --secondary-color: #e3c5a8; /* Sandy Beige */
-            --text-color: #57534e; /* Stone 600 */
-            --heading-color: #44403c; /* Stone 700 */
-            --border-color: #e7e5e4; /* Stone 200 */
+            --bg-color: #F4EFE6; /* Warm oatmeal */
+            --card-bg-color: #FDFBF7; /* Off white */
+            --primary-color: #A3B18A; /* Sage green */
+            --primary-text-color: #344E41; /* Deep forest */
+            --accent-color: #E29578; /* Soft terracotta */
+            --accent-text-color: #8A3A23; /* Rust brown */
+            --secondary-color: #DDA15E; /* Warm ochre */
+            --text-color: #5E503F; /* Walnut */
+            --heading-color: #28231D; /* Dark roast */
+            --border-color: #E3D5C8; /* Muted sand */
         }
+
+        /* ชุดสี Dark Mode (Earth Tone) */
+        html.dark {
+            --bg-color: #2C2621; /* Dark earth */
+            --card-bg-color: #3A322C; /* Lighter earth */
+            --primary-color: #344E41; /* Deep forest */
+            --primary-text-color: #A3B18A; /* Sage green */
+            --accent-color: #8A3A23; /* Rust brown */
+            --accent-text-color: #E29578; /* Soft terracotta */
+            --secondary-color: #604933; /* Dark ochre */
+            --text-color: #E3D5C8; /* Muted sand */
+            --heading-color: #F4EFE6; /* Warm oatmeal */
+            --border-color: #564D44; /* Stone brown */
+        }
+
         body {
             font-family: 'IBM Plex Sans Thai', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .hidden { display: none !important; }
+        
         .card {
             background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
@@ -38,8 +62,9 @@
         .card:hover, .card.selected {
             border-color: var(--primary-text-color);
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(4, 120, 87, 0.1), 0 4px 6px -2px rgba(4, 120, 87, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(52, 78, 65, 0.15), 0 4px 6px -2px rgba(52, 78, 65, 0.1);
         }
+        
         .btn-primary {
             background-color: var(--primary-color);
             color: var(--primary-text-color);
@@ -47,25 +72,34 @@
             transition: background-color 0.2s;
             border: 1px solid var(--primary-text-color);
         }
-        .btn-primary:hover { background-color: #a7f3d0; }
+        .btn-primary:hover { 
+            background-color: #8da074; 
+        }
+        html.dark .btn-primary:hover {
+            background-color: #2a4035;
+        }
         .btn-primary:disabled {
-            background-color: #e7e5e4;
+            background-color: var(--border-color);
             color: #a8a29e;
-            border-color: #d6d3d1;
+            border-color: var(--border-color);
             cursor: not-allowed;
         }
+        
         .btn-secondary {
-            background-color: #e7e5e4;
-            color: #57534e;
+            background-color: var(--border-color);
+            color: var(--text-color);
             font-weight: bold;
             transition: background-color 0.2s;
         }
-        .btn-secondary:hover { background-color: #d6d3d1; }
+        .btn-secondary:hover { background-color: #d4c5b3; }
+        html.dark .btn-secondary:hover { background-color: #4a423a; }
+        
         .input-field {
-            background-color: #fff;
+            background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
             color: var(--text-color);
         }
+        
         #rules-modal-overlay {
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
@@ -77,6 +111,7 @@
         #rules-title, .rule-header {
              color: var(--primary-text-color);
         }
+        
         /* Word Guess Styles */
         .wg-card {
             background-color: var(--card-bg-color);
@@ -86,14 +121,23 @@
         }
         .wg-card.revealed.red { background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color); }
         .wg-card.revealed.blue { background-color: #93c5fd; color: #1e40af; border-color: #3b82f6; }
+        html.dark .wg-card.revealed.blue { background-color: #1e3a8a; color: #93c5fd; border-color: #60a5fa; }
         .wg-card.revealed.green { background-color: var(--primary-color); color: var(--primary-text-color); border-color: var(--primary-text-color); }
         .wg-card.revealed.neutral { background-color: var(--secondary-color); color: #78350f; border-color: #78350f; }
+        html.dark .wg-card.revealed.neutral { color: #fef3c7; border-color: #fef3c7; }
         .wg-card.revealed.assassin { background-color: #57534e; color: white; border-color: #1c1917; }
+        html.dark .wg-card.revealed.assassin { background-color: #1c1917; color: white; border-color: #ef4444; }
+        
         .spymaster-view .wg-card.red { border-color: #fca5a5; background-color: #fee2e2; color: #b91c1c; }
+        html.dark .spymaster-view .wg-card.red { border-color: #991b1b; background-color: #7f1d1d; color: #fca5a5; }
         .spymaster-view .wg-card.blue { border-color: #93c5fd; background-color: #dbeafe; color: #1d4ed8; }
+        html.dark .spymaster-view .wg-card.blue { border-color: #1e40af; background-color: #1e3a8a; color: #93c5fd; }
         .spymaster-view .wg-card.green { border-color: #86efac; background-color: #dcfce7; color: #15803d; }
+        html.dark .spymaster-view .wg-card.green { border-color: #166534; background-color: #14532d; color: #86efac; }
         .spymaster-view .wg-card.neutral { border-color: var(--secondary-color); background-color: #fef3c7; color: #a16207; }
+        html.dark .spymaster-view .wg-card.neutral { border-color: var(--secondary-color); background-color: #451a03; color: #fde68a; }
         .spymaster-view .wg-card.assassin { border-color: #a8a29e; background-color: #44403c; color: white; }
+        html.dark .spymaster-view .wg-card.assassin { border-color: #ef4444; background-color: #1c1917; color: white; }
         
         /* Number Sort Styles */
         .ns-player-card.success {
@@ -121,7 +165,19 @@
         .fq-range-card.selected {
              border-color: var(--primary-text-color);
              transform: translateY(-4px);
-             box-shadow: 0 10px 15px -3px rgba(4, 120, 87, 0.1), 0 4px 6px -2px rgba(4, 120, 87, 0.05);
+             box-shadow: 0 10px 15px -3px rgba(52, 78, 65, 0.15), 0 4px 6px -2px rgba(52, 78, 65, 0.1);
+        }
+
+        /* Fake Artist Styles */
+        #fa-drawing-canvas {
+            background-color: #ffffff; /* กระดานควรเป็นสีขาวเสมอเพื่อให้สีชัดเจน */
+            cursor: crosshair;
+            touch-action: none; /* ป้องกันการเลื่อนจอตอนวาดบนมือถือ */
+        }
+        .fa-vote-btn.selected {
+            background-color: var(--accent-color);
+            color: var(--accent-text-color);
+            border-color: var(--accent-text-color);
         }
 
         /* Spinner Wheel Styles */
@@ -140,31 +196,48 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center justify-center min-h-screen p-4 transition-colors duration-300">
+
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle" class="fixed top-4 right-4 p-2 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-stone-200 shadow-md transition-colors z-50 hover:bg-stone-300 dark:hover:bg-stone-600 focus:outline-none">
+        <!-- Moon Icon (แสดงตอน Light Mode) -->
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <!-- Sun Icon (แสดงตอน Dark Mode) -->
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+    </button>
 
     <div id="main-container" class="w-full max-w-6xl mx-auto flex-grow">
 
         <!-- Lobby Screen -->
-        <div id="lobby-screen" class="text-center p-6 sm:p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl">
-            <h1 class="text-4xl sm:text-5xl font-bold" style="color: var(--primary-text-color);">JUST FOUR FUN</h1>
-            <p class="text-stone-500 mb-6">เล่นเกมสนุกๆ กับเพื่อนซี้สี่คน</p>
+        <div id="lobby-screen" class="text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors">
+            <h1 class="text-4xl sm:text-5xl font-bold" style="color: var(--primary-text-color);">Cozy Corner</h1>
+            <p class="text-stone-500 dark:text-stone-400 mb-6">คอมมูนิตี้เล่นเกมสนุกๆ รองรับสูงสุด 16 คน</p>
             <div class="mb-6">
                 <div class="flex justify-center items-center gap-4 mb-4">
                     <h2 class="text-xl font-semibold" style="color: var(--heading-color);">เลือกเกมที่จะเล่น</h2>
                     <button id="how-to-play-btn" class="px-3 py-1 text-sm rounded-full btn-secondary" disabled>วิธีเล่น ?</button>
                 </div>
-                <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="word-guess">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">รหัสคำทาย</h3>
-                        <p class="text-sm text-stone-500">เกมทายคำใบ้แบบทีม (รองรับโหมด Co-op 2 คน)</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">เกมทายคำใบ้แบบทีม (โหมด Co-op 2 คน)</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="number-sort">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เรียงเลขวัดใจ</h3>
-                        <p class="text-sm text-stone-500">เกมวัดใจที่ต้องสื่อสารและเรียงลำดับตัวเลขปริศนาให้ถูกต้อง</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">วัดใจสื่อสารและเรียงลำดับตัวเลขปริศนา</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-game="friend-quiz">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">ทายใจเพื่อน</h3>
-                        <p class="text-sm text-stone-500">ทายใจให้ตรงเป๊ะ! คุณรู้จักเพื่อนดีแค่ไหนกันนะ?</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">ทายใจให้ตรงเป๊ะ! คุณรู้จักเพื่อนดีแค่ไหน?</p>
+                    </div>
+                    <!-- ปุ่มเข้าเกม จิตรกรกำมะลอ -->
+                    <div class="card p-4 rounded-lg cursor-pointer" data-game="fake-artist">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">จิตรกรกำมะลอ</h3>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">วาดรูปซ่อนแอบ! ใครกันที่ไม่ได้รู้หัวข้อ?</p>
                     </div>
                 </div>
             </div>
@@ -173,18 +246,18 @@
                  <div id="tool-selection-area" class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
                     <div class="card p-4 rounded-lg cursor-pointer" data-tool="spinner">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">วงล้อสุ่ม</h3>
-                        <p class="text-sm text-stone-500">สร้างวงล้อสุ่มจากข้อความที่คุณต้องการ</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">สร้างวงล้อสุ่มจากข้อความที่คุณต้องการ</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer" data-tool="stopwatch">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เครื่องมือจับเวลา</h3>
-                        <p class="text-sm text-stone-500">จับเวลาและบันทึกรอบสำหรับการแข่งขัน</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400">จับเวลาและบันทึกรอบสำหรับการแข่งขัน</p>
                     </div>
                  </div>
             </div>
             <div id="player-entry" class="space-y-4 max-w-sm mx-auto">
                  <input type="text" id="playerName" placeholder="ใส่ชื่อของคุณ..." class="w-full p-3 text-center rounded-lg input-field focus:outline-none focus:ring-2" style="--tw-ring-color: var(--primary-text-color)">
                 <button id="createRoomBtn" class="w-full p-3 rounded-lg btn-primary" disabled>สร้างห้อง (สำหรับเล่นเกม)</button>
-                <div class="flex items-center justify-center"><hr class="w-full border-stone-300"><span class="px-2 text-stone-500">หรือ</span><hr class="w-full border-stone-300"></div>
+                <div class="flex items-center justify-center"><hr class="w-full border-stone-300 dark:border-stone-600"><span class="px-2 text-stone-500 dark:text-stone-400">หรือ</span><hr class="w-full border-stone-300 dark:border-stone-600"></div>
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="text" id="roomCodeInput" placeholder="ใส่รหัสห้อง" class="flex-grow p-3 text-center rounded-lg input-field focus:outline-none focus:ring-2" style="--tw-ring-color: var(--primary-text-color)">
                     <button id="joinRoomBtn" class="p-3 rounded-lg btn-primary" disabled>เข้าร่วมห้อง (สำหรับเล่นเกม)</button>
@@ -193,28 +266,98 @@
         </div>
         
         <!-- Waiting Room Screen -->
-        <div id="waiting-screen" class="hidden text-center p-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-2xl">
+        <div id="waiting-screen" class="hidden text-center p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors">
             <h2 class="text-2xl font-bold mb-2" style="color: var(--heading-color);">กำลังรอผู้เล่น...</h2>
-            <p class="text-stone-500 mb-4">รหัสห้องของคุณคือ:</p>
-            <div class="bg-green-100 text-green-800 text-3xl font-bold p-4 rounded-lg inline-block mb-6 tracking-widest" id="roomCodeDisplay"></div>
-            <h3 class="font-semibold mb-3" style="color: var(--heading-color);">ผู้เล่นในห้อง (<span id="playerCount">1</span>/4):</h3>
-            <div id="playerList" class="grid grid-cols-2 gap-3 mb-6 max-w-md mx-auto"></div>
+            <p class="text-stone-500 dark:text-stone-400 mb-4">รหัสห้องของคุณคือ:</p>
+            <div class="bg-[#d2dbc4] dark:bg-[#2a4035] text-[#344E41] dark:text-[#A3B18A] text-3xl font-bold p-4 rounded-lg inline-block mb-6 tracking-widest border border-[#A3B18A]" id="roomCodeDisplay"></div>
+            <h3 class="font-semibold mb-3" style="color: var(--heading-color);">ผู้เล่นในห้อง (<span id="playerCount">1</span>/16):</h3>
+            <div id="playerList" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 max-w-2xl mx-auto"></div>
             <button id="startGameBtn" class="w-full max-w-xs p-3 rounded-lg btn-primary" disabled>เริ่มเกม (ต้องมี 2 คนขึ้นไป)</button>
+        </div>
+
+        <!-- Fake Artist Game Screen -->
+        <div id="fake-artist-screen" class="hidden w-full text-center">
+            
+            <!-- Header (Word & Role) -->
+            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors shadow-sm flex flex-col sm:flex-row justify-between items-center">
+                <div class="text-left">
+                    <p class="text-stone-500 dark:text-stone-400 text-sm">หมวดหมู่: <span id="fa-category-display" class="font-bold"></span></p>
+                    <h2 id="fa-word-display" class="text-2xl sm:text-3xl font-bold mt-1" style="color: var(--primary-text-color);"></h2>
+                </div>
+                <div class="mt-2 sm:mt-0 flex items-center gap-2">
+                    <span class="text-sm">สีปากกาของคุณ:</span>
+                    <div id="fa-my-color-box" class="w-8 h-8 rounded-full border-2 border-stone-800 dark:border-stone-200"></div>
+                </div>
+            </div>
+
+            <!-- Drawing Area -->
+            <div id="fa-drawing-area" class="w-full max-w-4xl mx-auto mb-4 relative">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <p class="font-bold text-lg">ตาของ: <span id="fa-current-turn-name" class="text-xl" style="color: var(--accent-color);"></span></p>
+                    <p class="text-sm font-semibold bg-stone-200 dark:bg-stone-700 px-3 py-1 rounded-full">รอบที่: <span id="fa-round-display">1</span>/2</p>
+                </div>
+                
+                <div class="border-4 rounded-lg overflow-hidden shadow-md relative" style="border-color: var(--border-color);">
+                    <!-- Canvas ใช้สำหรับวาด -->
+                    <canvas id="fa-drawing-canvas" width="800" height="500" class="w-full h-auto block"></canvas>
+                    
+                    <!-- Overlay บอกให้รอคิว -->
+                    <div id="fa-waiting-overlay" class="absolute inset-0 bg-black/10 flex items-center justify-center backdrop-blur-[1px] transition-opacity">
+                        <p class="bg-white/90 dark:bg-stone-800/90 px-4 py-2 rounded-lg font-bold shadow-sm">รอก่อนนะ ยังไม่ถึงตาคุณ</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex justify-center">
+                    <button id="fa-end-turn-btn" class="p-3 px-8 rounded-lg btn-primary hidden text-lg shadow-md animate-pulse">จบตาของฉัน (วาดเสร็จแล้ว)</button>
+                </div>
+            </div>
+
+            <!-- Voting Area -->
+            <div id="fa-voting-area" class="hidden w-full max-w-4xl mx-auto mb-4 bg-stone-100 dark:bg-[#3A322C] p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-2" style="color: var(--accent-color);">ถึงเวลาจับผิด!</h2>
+                <p class="mb-4">ใครคือ "จิตรกรกำมะลอ" ที่วาดมั่วๆ ไม่รู้หัวข้อ? (โหวตได้ 1 คน)</p>
+                <div id="fa-vote-options" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <!-- ปุ่มรายชื่อคนโหวตจะถูกสร้างตรงนี้ -->
+                </div>
+                <p id="fa-vote-status" class="mt-4 text-stone-500 font-semibold"></p>
+            </div>
+
+            <!-- Reveal / Guess Area -->
+            <div id="fa-reveal-area" class="hidden w-full max-w-4xl mx-auto mb-4 p-6 rounded-lg border-2" style="border-color: var(--primary-text-color);">
+                <h2 id="fa-reveal-title" class="text-3xl font-bold mb-4" style="color: var(--primary-text-color);"></h2>
+                <div id="fa-vote-results" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+                
+                <div id="fa-fake-guess-section" class="hidden bg-white/50 dark:bg-stone-800/50 p-4 rounded-lg">
+                    <p class="mb-2 font-bold text-lg">โอกาสสุดท้าย! จิตรกรกำมะลอจะขอทายคำศัพท์เพื่อขโมยชัยชนะ!</p>
+                    <p id="fa-fake-wait-msg" class="text-stone-500 mb-2">รอจิตรกรกำมะลอทายคำศัพท์...</p>
+                    <div id="fa-fake-input-group" class="hidden flex gap-2 justify-center max-w-sm mx-auto">
+                        <input type="text" id="fa-fake-guess-input" placeholder="ใส่คำศัพท์ที่คิดว่าใช่..." class="input-field p-2 rounded-lg w-full text-center">
+                        <button id="fa-fake-guess-submit" class="btn-primary p-2 rounded-lg">ส่งคำตอบ</button>
+                    </div>
+                </div>
+
+                <div id="fa-final-result-section" class="hidden mt-6">
+                    <h3 id="fa-final-winner-text" class="text-4xl font-bold mb-2" style="color: var(--accent-color);"></h3>
+                    <p class="text-xl">คำศัพท์ที่แท้จริงคือ: <span id="fa-final-word-text" class="font-bold underline"></span></p>
+                    <button id="fa-next-round-btn" class="hidden mt-6 p-3 px-8 rounded-lg btn-primary mx-auto">เล่นรอบต่อไป</button>
+                </div>
+            </div>
+
         </div>
 
         <!-- Word Guess Game Screen -->
         <div id="word-guess-screen" class="hidden w-full">
             <div id="wg-info-container" class="mb-4">
-                <div id="wg-coop-info-bar" class="hidden text-center p-3 bg-stone-100 rounded-lg space-y-1">
+                <div id="wg-coop-info-bar" class="hidden text-center p-3 bg-stone-100 dark:bg-stone-800 rounded-lg space-y-1 transition-colors">
                     <div class="flex justify-around items-center">
-                        <p class="text-lg">เทิร์นที่เหลือ: <span id="wg-coop-turns-left" class="font-bold text-amber-600"></span></p>
+                        <p class="text-lg">เทิร์นที่เหลือ: <span id="wg-coop-turns-left" class="font-bold text-amber-600 dark:text-amber-400"></span></p>
                         <p class="text-lg">หาให้เจอ: <span id="wg-coop-words-found" class="font-bold" style="color: var(--primary-text-color);"></span> / <span id="wg-coop-words-goal"></span></p>
                     </div>
                     <p id="wg-coop-turn-info" class="text-xl font-bold" style="color: var(--primary-text-color);"></p>
                 </div>
-                <div id="wg-team-info-bar" class="hidden text-center p-3 bg-stone-100 rounded-lg">
+                <div id="wg-team-info-bar" class="hidden text-center p-3 bg-stone-100 dark:bg-stone-800 rounded-lg transition-colors">
                     <p id="wg-turn-info" class="text-xl font-bold" style="color: var(--primary-text-color);"></p>
-                    <p id="wg-clue-info" class="text-lg text-stone-600"></p>
+                    <p id="wg-clue-info" class="text-lg text-stone-600 dark:text-stone-400"></p>
                 </div>
                  <div id="wg-game-over-area" class="hidden text-center p-4">
                     <p id="wg-game-over-text" class="text-3xl font-bold mb-4"></p>
@@ -224,14 +367,14 @@
             <div class="flex flex-col md:flex-row gap-6">
                 <div id="wg-sidebar" class="w-full md:w-1/4 space-y-4">
                     <div id="wg-team-area" class="space-y-4">
-                        <div id="wg-red-team" class="p-4 bg-red-100 rounded-lg border-2 border-red-400">
-                            <h3 class="text-xl font-bold text-red-600">ทีมสีแดง (<span id="wg-red-score">0</span>)</h3>
-                            <ul id="wg-red-players" class="my-2 space-y-1 text-red-800"></ul>
+                        <div id="wg-red-team" class="p-4 bg-red-100 dark:bg-red-950/50 rounded-lg border-2 border-red-400 dark:border-red-900 transition-colors">
+                            <h3 class="text-xl font-bold text-red-600 dark:text-red-400">ทีมสีแดง (<span id="wg-red-score">0</span>)</h3>
+                            <ul id="wg-red-players" class="my-2 space-y-1 text-red-800 dark:text-red-300"></ul>
                             <button class="w-full p-2 mt-1 text-sm btn-secondary hidden" data-team="red" id="wg-spymaster-red-btn">เป็น Spymaster</button>
                         </div>
-                        <div id="wg-blue-team" class="p-4 bg-blue-100 rounded-lg border-2 border-blue-400">
-                            <h3 class="text-xl font-bold text-blue-600">ทีมสีน้ำเงิน (<span id="wg-blue-score">0</span>)</h3>
-                            <ul id="wg-blue-players" class="my-2 space-y-1 text-blue-800"></ul>
+                        <div id="wg-blue-team" class="p-4 bg-blue-100 dark:bg-blue-950/50 rounded-lg border-2 border-blue-400 dark:border-blue-900 transition-colors">
+                            <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400">ทีมสีน้ำเงิน (<span id="wg-blue-score">0</span>)</h3>
+                            <ul id="wg-blue-players" class="my-2 space-y-1 text-blue-800 dark:text-blue-300"></ul>
                             <button class="w-full p-2 mt-1 text-sm btn-secondary hidden" data-team="blue" id="wg-spymaster-blue-btn">เป็น Spymaster</button>
                         </div>
                         <div id="wg-join-team-area" class="space-y-2">
@@ -254,13 +397,13 @@
         
         <!-- Number Sort Game Screen -->
         <div id="number-sort-screen" class="hidden w-full text-center">
-            <div class="mb-6 p-4 bg-stone-100 rounded-lg">
-                <p class="text-stone-500">โจทย์รอบนี้</p>
+            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
+                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
                 <h2 id="ns-theme-display" class="text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
             </div>
             <div class="mb-8">
                 <p class="mb-2">การ์ดของคุณ (เห็นเฉพาะคุณ)</p>
-                <div id="ns-my-number-card" class="w-40 h-24 mx-auto bg-white text-stone-900 rounded-lg flex items-center justify-center text-4xl font-bold shadow-lg border-2">?</div>
+                <div id="ns-my-number-card" class="w-40 h-24 mx-auto bg-white dark:bg-[#2C2621] text-stone-900 dark:text-stone-100 rounded-lg flex items-center justify-center text-4xl font-bold shadow-lg border-2 border-stone-300 dark:border-stone-600 transition-colors">?</div>
             </div>
             <div class="mb-4">
                 <p id="ns-ordering-info" class="mb-2">ช่วยกันลากการ์ดเพื่อนๆ มาเรียงลำดับจาก **น้อยไปมาก**</p>
@@ -274,8 +417,8 @@
 
         <!-- Friend Quiz Game Screen -->
         <div id="friend-quiz-screen" class="hidden w-full text-center">
-            <div class="mb-6 p-4 bg-stone-100 rounded-lg">
-                <p class="text-stone-500">โจทย์รอบนี้</p>
+            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
+                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
                 <h2 id="fq-question-display" class="text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
             </div>
             <div id="fq-scoreboard" class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-4 text-sm"></div>
@@ -289,7 +432,7 @@
             </div>
 
             <div id="fq-betting-area" class="hidden mb-8">
-                <p id="fq-betting-info" class="text-xl text-stone-600 mb-4"></p>
+                <p id="fq-betting-info" class="text-xl text-stone-600 dark:text-stone-400 mb-4"></p>
                 <div id="fq-bet-options" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap">
                     <!-- Betting ranges will be injected here -->
                 </div>
@@ -328,7 +471,7 @@
             <button id="stopwatch-back-btn" class="absolute top-4 left-4 btn-secondary p-2 rounded-full">← กลับ</button>
             <div class="flex flex-col items-center justify-center max-w-md mx-auto">
                 <h2 class="text-3xl font-bold mb-6" style="color: var(--heading-color);">เครื่องมือจับเวลา</h2>
-                <div class="w-full bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center mb-6">
+                <div class="w-full bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm p-8 rounded-xl shadow-lg text-center mb-6 transition-colors">
                     <p id="stopwatch-time" class="text-6xl font-bold" style="color: var(--primary-text-color);">00:00.00</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4 w-full mb-6">
@@ -339,7 +482,7 @@
                 </div>
                 <div class="w-full text-left">
                     <h3 class="text-xl font-semibold mb-2" style="color: var(--heading-color);">รอบเวลา:</h3>
-                    <ul id="stopwatch-laps" class="w-full bg-white/80 backdrop-blur-sm rounded-lg p-4 space-y-2 max-h-60 overflow-y-auto">
+                    <ul id="stopwatch-laps" class="w-full bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-lg p-4 space-y-2 max-h-60 overflow-y-auto transition-colors">
                         <!-- Lap times will be added here -->
                     </ul>
                 </div>
@@ -350,20 +493,50 @@
 
     <!-- Rules Modal -->
     <div id="rules-modal-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div id="rules-modal-content" class="w-full max-w-lg p-6 rounded-xl shadow-2xl">
-            <button id="close-rules-btn" class="absolute top-3 right-3 text-stone-500 hover:text-black text-2xl">&times;</button>
+        <div id="rules-modal-content" class="w-full max-w-lg p-6 rounded-xl shadow-2xl transition-colors">
+            <button id="close-rules-btn" class="absolute top-3 right-3 text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white text-2xl">&times;</button>
             <h3 id="rules-title" class="text-2xl font-bold mb-4"></h3>
-            <div id="rules-body" class="space-y-4"></div>
+            <div id="rules-body" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
     <footer class="w-full text-center p-4 mt-auto">
-        <p class="text-xs text-stone-400 max-w-2xl mx-auto">
+        <p class="text-xs text-stone-400 dark:text-stone-500 max-w-2xl mx-auto">
             เว็บไซต์นี้สร้างขึ้นเพื่อความบันเทิงและเป็นโปรเจกต์เพื่อการศึกษา โดยได้รับแรงบันดาลใจจากบอร์ดเกมยอดนิยมหลายชนิด และไม่ได้มีความเกี่ยวข้องหรือได้รับการสนับสนุนจากเจ้าของลิขสิทธิ์เกมดังกล่าวแต่อย่างใด
         </p>
     </footer>
 
     <script>
+        // --- Dark Mode Logic ---
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const moonIcon = document.getElementById('moon-icon');
+        const sunIcon = document.getElementById('sun-icon');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            moonIcon.classList.add('hidden');
+            sunIcon.classList.remove('hidden');
+        } else {
+            htmlElement.classList.remove('dark');
+            moonIcon.classList.remove('hidden');
+            sunIcon.classList.add('hidden');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                localStorage.theme = 'light';
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+        });
+
+
         const socket = io();
 
         // --- Game Rules Data ---
@@ -371,28 +544,24 @@
             'word-guess': {
                 title: 'วิธีเล่น: รหัสคำทาย',
                 content: `
-                    <h4 class="font-bold text-lg mb-2 rule-header">โหมดทีม (3-4 คน)</h4>
-                    <p class="mb-2">ผู้เล่นแบ่งเป็น 2 ทีม (แดง vs น้ำเงิน) แต่ละทีมมี Spymaster 1 คนคอยใบ้คำให้ลูกทีมทายการ์ดของสีตัวเองให้ครบก่อนอีกฝ่าย</p>
-                    <p><strong>กฎการทาย:</strong> เมื่อ Spymaster ใบ้ "คำใบ้ [ตัวเลข]" ทีมจะทายได้ [ตัวเลข] ครั้ง หากทายถูกทั้งหมด จะได้สิทธิ์ทายโบนัสเพิ่มอีก 1 ครั้ง หรือจะกดจบเทิร์นก็ได้</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">โหมดทีม</h4>
+                    <p class="mb-2">แบ่งเป็น 2 ทีม แต่ละทีมมี Spymaster 1 คนคอยใบ้คำให้ลูกทีมทายการ์ดของสีตัวเองให้ครบก่อนอีกฝ่าย</p>
+                    <p><strong>กฎการทาย:</strong> Spymaster ใบ้ "คำใบ้ [ตัวเลข]" ทีมจะทายได้ [ตัวเลข] ครั้ง หากทายถูกหมด จะได้ทายโบนัสเพิ่ม 1 ครั้ง หรือกดจบเทิร์นก็ได้</p>
                     <h4 class="font-bold text-lg mt-4 mb-2 rule-header">โหมด Co-op (2 คน)</h4>
-                    <p class="mb-2">ผู้เล่น 2 คนอยู่ทีมเดียวกัน ช่วยกันหาการ์ดสายลับ (สีเขียว) 15 ใบให้เจอก่อนจะหมด 9 เทิร์น โดยจะสลับกันเป็นคนใบ้และคนทาย</p>
-                    <p><strong>กฎการทาย:</strong> เมื่อทายการ์ดสีเขียวถูก จะได้ทายต่อจนกว่าจะเจอการ์ดที่ไม่ใช่สีเขียว หรือกดจบเทิร์น</p>
+                    <p class="mb-2">ผู้เล่น 2 คนช่วยกันหาการ์ดสายลับ (สีเขียว) 15 ใบให้เจอก่อนหมด 9 เทิร์น</p>
                     <h4 class="font-bold text-lg mt-4 mb-2 rule-header">ข้อควรระวัง!</h4>
-                    <p>ไม่ว่าจะโหมดไหน หากทีมของคุณเปิดเจอ <strong>การ์ดมือสังหาร (สีดำ)</strong> ทีมจะแพ้ทันที!</p>
+                    <p>หากทีมของคุณเปิดเจอ <strong>การ์ดมือสังหาร (สีดำ)</strong> ทีมจะแพ้ทันที!</p>
                 `
             },
             'number-sort': {
                 title: 'วิธีเล่น: เรียงเลขวัดใจ',
                 content: `
-                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
-                    <p class="mb-4">ร่วมมือกับเพื่อนเพื่อเรียงลำดับตัวเลขปริศนาของทุกคนจากน้อยไปมากให้ถูกต้อง!</p>
                     <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
                     <ol class="list-decimal list-inside space-y-2 text-left">
                         <li>ทุกคนจะได้รับ "โจทย์" เดียวกัน และ "ตัวเลข" 1-100 ของตัวเอง (ซึ่งคนอื่นไม่เห็น)</li>
-                        <li>แต่ละคนจะต้องพูดเพื่ออธิบาย "ความแรง" ของตัวเลขที่ตัวเองได้ โดยอิงจากโจทย์ เช่น โจทย์คือ "ความนิยมของสัตว์เลี้ยง" เลข 1 อาจจะหมายถึง "หนู" ส่วนเลข 100 อาจจะหมายถึง "สุนัข"</li>
+                        <li>แต่ละคนจะต้องพูดอธิบาย "ความแรง" ของตัวเลขตัวเอง โดยอิงจากโจทย์</li>
                         <li><strong>ห้ามพูดตัวเลขเด็ดขาด!</strong></li>
-                        <li>เมื่อทุกคนอธิบายจบแล้ว ให้ช่วยกันลากการ์ดของผู้เล่นในช่องด้านล่างเพื่อเรียงลำดับจากน้อยไปมากตามที่เข้าใจ</li>
-                        <li>เมื่อมั่นใจแล้ว ให้กดปุ่ม "ยืนยันลำดับ" เพื่อดูผลเฉลย</li>
+                        <li>ช่วยกันลากการ์ดเพื่อนๆ เพื่อเรียงลำดับจากน้อยไปมากตามที่เข้าใจ</li>
                         <li>หากถูกต้อง จะเริ่มรอบใหม่ หากผิด จะต้องลองเรียงใหม่</li>
                     </ol>
                 `
@@ -400,17 +569,32 @@
             'friend-quiz': {
                 title: 'วิธีเล่น: ทายใจเพื่อน',
                 content: `
-                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
-                    <p class="mb-4">ใช้ไหวพริบในการคาดเดาและทายให้ถูกว่า คำตอบของผู้เล่นคนไหนที่อยู่ "ใกล้เคียง" กับคำตอบปริศนามากที่สุดเพื่อทำคะแนน!</p>
                     <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
                     <ol class="list-decimal list-inside space-y-2 text-left">
-                        <li>ทุกคนจะได้รับโจทย์คำถามเดียวกัน (เช่น "คุณมีรองเท้ากี่คู่?")</li>
-                        <li>แต่ละคนพิมพ์คำตอบ (ตัวเลข) ของตัวเองแล้วกดยืนยัน (คำตอบจะถูกเก็บเป็นความลับ)</li>
-                        <li>เมื่อทุกคนตอบครบ ระบบจะสุ่มเลือก 1 คนเป็น "เจ้าของคำตอบปริศนา" และจะเปิดเผยคำตอบของผู้เล่นคนอื่นๆ ทั้งหมด</li>
-                        <li>คำตอบที่เปิดเผยจะถูกนำมาสร้างเป็น "ช่วงคะแนน" ให้ทาย</li>
-                        <li>ผู้เล่นที่เหลือ (ที่ไม่ใช่เจ้าของคำตอบปริศนา) จะต้องคลิกเลือก "ช่วงคะแนน" ที่คิดว่าคำตอบปริศนาจะตกอยู่</li>
-                        <li>เมื่อทุกคนลงเดิมพันครบแล้ว จะมีการเปิดเผยคำตอบและผู้ที่ทายถูกจะได้รับคะแนน</li>
-                        <li>Host สามารถกด "รอบต่อไป" เพื่อเริ่มเล่นรอบใหม่ได้</li>
+                        <li>ทุกคนจะได้รับโจทย์คำถามเดียวกัน พิมพ์คำตอบ (ตัวเลข) ของตัวเองแล้วกดยืนยัน</li>
+                        <li>ระบบจะสุ่มเลือก 1 คนเป็น "เจ้าของคำตอบปริศนา" และเปิดเผยคำตอบคนอื่นๆ</li>
+                        <li>คำตอบที่เปิดเผยจะถูกนำมาสร้างเป็น "ช่วงคะแนน"</li>
+                        <li>ผู้เล่นที่เหลือจะต้องคลิกเลือก "ช่วงคะแนน" ที่คิดว่าคำตอบปริศนาจะตกอยู่เพื่อทำคะแนน!</li>
+                    </ol>
+                `
+            },
+            'fake-artist': {
+                title: 'วิธีเล่น: จิตรกรกำมะลอ',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-2">หาตัว "จิตรกรกำมะลอ" ที่ไม่รู้หัวข้อให้เจอ! ส่วนคนเป็นกำมะลอก็ต้องเนียนวาดให้เหมือนรู้!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>ระบบจะสุ่มหมวดหมู่และ "คำศัพท์" ให้ทุกคนรู้ <br><strong>ยกเว้น 1 คน</strong> ที่จะได้เป็น "จิตรกรกำมะลอ" (จะเห็นแค่หมวดหมู่)</li>
+                        <li>ทุกคนจะได้สีปากกาประจำตัวไม่ซ้ำกัน</li>
+                        <li>เมื่อถึงตาของคุณ ให้วาด <strong>1 เส้นเท่านั้น</strong> (วาดเสร็จให้กดปุ่มจบตา) เพื่อสื่อถึงคำศัพท์นั้นโดยไม่ให้ชัดเจนเกินไป (เดี๋ยวคนร้ายรู้!)</li>
+                        <li>วนวาดคนละ 2 รอบ จากนั้นทุกคนโหวตชี้ตัวว่าใครคือจิตรกรกำมะลอ</li>
+                        <li><strong>การตัดสิน:</strong> 
+                            <ul class="list-disc list-inside ml-4 mt-1">
+                                <li>ถ้าจิตรกรกำมะลอ <strong>ไม่ถูกโหวต</strong> (หรือคะแนนโหวตเสมอ) = จิตรกรกำมะลอ <strong>ชนะ!</strong></li>
+                                <li>ถ้าจิตรกรกำมะลอ <strong>ถูกโหวตจับได้</strong> = จิตรกรกำมะลอจะมีสิทธิ์ทายคำศัพท์ 1 ครั้ง <br>ถ้าทายถูก = ขโมยชัยชนะไปเลย! ถ้าทายผิด = คนอื่นชนะ</li>
+                            </ul>
+                        </li>
                     </ol>
                 `
             }
@@ -423,6 +607,7 @@
             wordGuess: document.getElementById('word-guess-screen'),
             numberSort: document.getElementById('number-sort-screen'),
             friendQuiz: document.getElementById('friend-quiz-screen'),
+            fakeArtist: document.getElementById('fake-artist-screen'),
             spinner: document.getElementById('spinner-screen'),
             stopwatch: document.getElementById('stopwatch-screen'),
         };
@@ -465,7 +650,7 @@
             playerList.innerHTML = '';
             players.forEach(p => {
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'p-3 bg-stone-100 rounded-lg text-stone-700';
+                playerDiv.className = 'p-3 bg-stone-100 dark:bg-[#4a423a] rounded-lg text-stone-700 dark:text-stone-200 transition-colors truncate text-center';
                 playerDiv.textContent = `${p.name} ${p.id === socket.id ? ' (คุณ)' : ''}`;
                 playerList.appendChild(playerDiv);
             });
@@ -558,7 +743,7 @@
             myRoomCode = roomCode;
             selectedGame = gameType;
             isHost = false;
-            startGameBtn.classList.add('hidden'); // Non-hosts can't start the game
+            startGameBtn.classList.add('hidden'); 
             roomCodeDisplay.textContent = roomCode;
             showScreen('waiting');
             updateLobby(players);
@@ -578,6 +763,306 @@
         socket.on('error', (message) => {
             alert(`เกิดข้อผิดพลาด: ${message}`);
         });
+
+        // --- Fake Artist Client Logic ---
+        (function initFakeArtist() {
+            const categoryDisplay = document.getElementById('fa-category-display');
+            const wordDisplay = document.getElementById('fa-word-display');
+            const myColorBox = document.getElementById('fa-my-color-box');
+            
+            const drawingArea = document.getElementById('fa-drawing-area');
+            const currentTurnName = document.getElementById('fa-current-turn-name');
+            const roundDisplay = document.getElementById('fa-round-display');
+            const canvas = document.getElementById('fa-drawing-canvas');
+            const ctx = canvas.getContext('2d');
+            const waitingOverlay = document.getElementById('fa-waiting-overlay');
+            const endTurnBtn = document.getElementById('fa-end-turn-btn');
+
+            const votingArea = document.getElementById('fa-voting-area');
+            const voteOptions = document.getElementById('fa-vote-options');
+            const voteStatus = document.getElementById('fa-vote-status');
+
+            const revealArea = document.getElementById('fa-reveal-area');
+            const revealTitle = document.getElementById('fa-reveal-title');
+            const voteResultsDiv = document.getElementById('fa-vote-results');
+            const fakeGuessSection = document.getElementById('fa-fake-guess-section');
+            const fakeWaitMsg = document.getElementById('fa-fake-wait-msg');
+            const fakeInputGroup = document.getElementById('fa-fake-input-group');
+            const fakeGuessInput = document.getElementById('fa-fake-guess-input');
+            const fakeGuessSubmitBtn = document.getElementById('fa-fake-guess-submit');
+            
+            const finalResultSection = document.getElementById('fa-final-result-section');
+            const finalWinnerText = document.getElementById('fa-final-winner-text');
+            const finalWordText = document.getElementById('fa-final-word-text');
+            const nextRoundBtn = document.getElementById('fa-next-round-btn');
+
+            let myColor = '#000000';
+            let myTurn = false;
+            let isDrawing = false;
+            let hasDrawnInTurn = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            // ปรับเส้นให้นุ่มขึ้น
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 5;
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function getMousePos(evt) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                let clientX = evt.clientX;
+                let clientY = evt.clientY;
+
+                if (evt.touches && evt.touches.length > 0) {
+                    clientX = evt.touches[0].clientX;
+                    clientY = evt.touches[0].clientY;
+                }
+
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function drawLine(x0, y0, x1, y1, color) {
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.strokeStyle = color;
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            // Events สำหรับวาดรูป
+            function startDrawing(e) {
+                if (!myTurn || hasDrawnInTurn) return;
+                e.preventDefault();
+                isDrawing = true;
+                const pos = getMousePos(e);
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function draw(e) {
+                if (!isDrawing || !myTurn) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
+                
+                drawLine(lastX, lastY, pos.x, pos.y, myColor);
+
+                // ส่งไปให้คนอื่นดูแบบ Real-time
+                socket.emit('fakeArtist_drawLine', {
+                    x0: lastX, y0: lastY, x1: pos.x, y1: pos.y, color: myColor
+                });
+
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function stopDrawing(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                isDrawing = false;
+                hasDrawnInTurn = true; // วาดได้แค่เส้นเดียวต่อเทิร์น
+                endTurnBtn.classList.remove('hidden'); // แสดงปุ่มให้กดจบเทิร์น
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', startDrawing, {passive: false});
+            canvas.addEventListener('touchmove', draw, {passive: false});
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchcancel', stopDrawing);
+
+            endTurnBtn.addEventListener('click', () => {
+                myTurn = false;
+                hasDrawnInTurn = false;
+                endTurnBtn.classList.add('hidden');
+                waitingOverlay.classList.remove('hidden');
+                socket.emit('fakeArtist_endTurn');
+            });
+
+            // รับข้อมูลวาดจากคนอื่น
+            socket.on('fakeArtist_onDraw', (data) => {
+                drawLine(data.x0, data.y0, data.x1, data.y1, data.color);
+            });
+
+            // เริ่มรอบใหม่
+            socket.on('fakeArtist_newRound', (data) => {
+                clearCanvas();
+                drawingArea.classList.remove('hidden');
+                votingArea.classList.add('hidden');
+                revealArea.classList.add('hidden');
+                finalResultSection.classList.add('hidden');
+                fakeGuessSection.classList.add('hidden');
+                endTurnBtn.classList.add('hidden');
+                nextRoundBtn.classList.add('hidden');
+                
+                categoryDisplay.textContent = data.category;
+                myColor = data.myColor;
+                myColorBox.style.backgroundColor = myColor;
+                roundDisplay.textContent = "1";
+
+                if (data.isFakeArtist) {
+                    wordDisplay.textContent = "คุณคือ จิตรกรกำมะลอ!";
+                    wordDisplay.className = "text-2xl sm:text-3xl font-bold mt-1 text-red-500 animate-pulse";
+                } else {
+                    wordDisplay.textContent = `คำศัพท์: "${data.word}"`;
+                    wordDisplay.className = "text-2xl sm:text-3xl font-bold mt-1 text-green-600 dark:text-green-400";
+                }
+
+                updateTurnUI(data.currentTurnId, data.currentTurnName, 1);
+            });
+
+            socket.on('fakeArtist_updateTurn', (data) => {
+                updateTurnUI(data.currentTurnId, data.currentTurnName, data.round);
+            });
+
+            function updateTurnUI(turnId, turnName, round) {
+                currentTurnName.textContent = turnName;
+                roundDisplay.textContent = round;
+                hasDrawnInTurn = false;
+
+                if (turnId === socket.id) {
+                    myTurn = true;
+                    waitingOverlay.classList.add('hidden');
+                } else {
+                    myTurn = false;
+                    waitingOverlay.classList.remove('hidden');
+                    endTurnBtn.classList.add('hidden');
+                }
+            }
+
+            // ช่วงโหวตจับผิด
+            socket.on('fakeArtist_startVoting', (data) => {
+                drawingArea.classList.add('hidden');
+                votingArea.classList.remove('hidden');
+                voteOptions.innerHTML = '';
+                voteStatus.textContent = '';
+
+                data.players.forEach(p => {
+                    if (p.id === socket.id) return; // ไม่ให้โหวตตัวเอง
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'fa-vote-btn card p-3 rounded-lg font-bold border-2 transition-all flex items-center justify-center gap-2';
+                    
+                    // สร้างวงกลมสีเพื่อให้จำได้ว่าใครวาดสีอะไร
+                    const colorIndicator = document.createElement('div');
+                    colorIndicator.className = 'w-4 h-4 rounded-full';
+                    colorIndicator.style.backgroundColor = p.color;
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = p.name;
+
+                    btn.appendChild(colorIndicator);
+                    btn.appendChild(nameSpan);
+
+                    btn.onclick = () => {
+                        // ปลด active ปุ่มอื่น
+                        document.querySelectorAll('.fa-vote-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        
+                        socket.emit('fakeArtist_submitVote', { votedId: p.id });
+                        
+                        // Disable ปุ่มทั้งหมดหลังโหวตแล้ว
+                        document.querySelectorAll('.fa-vote-btn').forEach(b => {
+                            b.disabled = true;
+                            b.style.opacity = '0.5';
+                        });
+                        btn.style.opacity = '1';
+                        voteStatus.textContent = 'รอผู้เล่นคนอื่นโหวต...';
+                    };
+                    voteOptions.appendChild(btn);
+                });
+            });
+
+            // เปิดตัวคนร้าย
+            socket.on('fakeArtist_reveal', (data) => {
+                votingArea.classList.add('hidden');
+                revealArea.classList.remove('hidden');
+                
+                // สรุปผลโหวต
+                voteResultsDiv.innerHTML = '';
+                for (const [id, count] of Object.entries(data.votes)) {
+                    const badge = document.createElement('span');
+                    badge.className = 'bg-stone-200 dark:bg-stone-700 px-3 py-1 rounded-full text-sm';
+                    const isTarget = id === data.fakeArtistId ? ' (จิตรกรกำมะลอ)' : '';
+                    badge.textContent = `ได้ ${count} โหวต${isTarget}`;
+                    voteResultsDiv.appendChild(badge);
+                }
+
+                if (data.isFakeCaught) {
+                    revealTitle.textContent = `โดนจับได้แล้ว! ${data.fakeArtistName} คือจิตรกรกำมะลอ!`;
+                    revealTitle.className = "text-3xl font-bold mb-4 text-red-500";
+                    fakeGuessSection.classList.remove('hidden');
+                    
+                    if (socket.id === data.fakeArtistId) {
+                        fakeWaitMsg.classList.add('hidden');
+                        fakeInputGroup.classList.remove('hidden');
+                        fakeInputGroup.classList.add('flex');
+                    } else {
+                        fakeWaitMsg.classList.remove('hidden');
+                        fakeInputGroup.classList.add('hidden');
+                        fakeInputGroup.classList.remove('flex');
+                    }
+                } else {
+                    revealTitle.textContent = `เนียนกริ๊บ! ${data.fakeArtistName} (จิตรกรกำมะลอ) รอดตัวไปได้!`;
+                    revealTitle.className = "text-3xl font-bold mb-4 text-green-500";
+                    
+                    // ส่งหลอกไปเฉลยเลย (Fake ชนะแล้ว)
+                    if (socket.id === data.fakeArtistId) {
+                        socket.emit('fakeArtist_submitGuess', { guessWord: "I_WON_ALREADY" }); 
+                    }
+                }
+            });
+
+            fakeGuessSubmitBtn.addEventListener('click', () => {
+                const guessWord = fakeGuessInput.value;
+                if(guessWord.trim() !== '') {
+                    socket.emit('fakeArtist_submitGuess', { guessWord });
+                    fakeInputGroup.classList.add('hidden');
+                    fakeWaitMsg.textContent = "รอลุ้นผลลัพธ์...";
+                    fakeWaitMsg.classList.remove('hidden');
+                }
+            });
+
+            // สรุปผลเกม
+            socket.on('fakeArtist_gameOver', (data) => {
+                fakeGuessSection.classList.add('hidden');
+                finalResultSection.classList.remove('hidden');
+                finalWordText.textContent = data.actualWord;
+
+                if (data.isCorrect) {
+                    // รอดเพราะทายถูก หรือรอดเพราะไม่โดนโหวต (คำใบ้จาก I_WON_ALREADY จะไม่ตรง แต่ logic ฝั่ง server ไม่เช็คกรณีรอดไปแล้ว)
+                    // ถ้ารอดเพราะโหวตพลาด จะขึ้นว่า เนียนกริ๊บ อยู่แล้ว
+                    finalWinnerText.textContent = "จิตรกรกำมะลอ พลิกชนะไปได้!";
+                    finalWinnerText.className = "text-4xl font-bold mb-2 text-red-500";
+                } else {
+                    finalWinnerText.textContent = "ทีมศิลปินจับโกหกสำเร็จ! (จิตรกรทายผิด)";
+                    finalWinnerText.className = "text-4xl font-bold mb-2 text-green-500";
+                }
+
+                if (isHost) {
+                    nextRoundBtn.classList.remove('hidden');
+                }
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if (isHost) socket.emit('fakeArtist_nextRound');
+            });
+
+        })();
+
 
         // --- Word Guess Client Logic ---
         (function initWordGuess() {
@@ -676,7 +1161,7 @@
                 wgBoard.innerHTML = '';
                 gameState.board.forEach((card, index) => {
                     const cardEl = document.createElement('div');
-                    cardEl.className = 'wg-card flex items-center justify-center p-2 text-center font-bold rounded-lg';
+                    cardEl.className = 'wg-card flex items-center justify-center p-2 text-center font-bold rounded-lg transition-colors duration-200';
                     cardEl.textContent = card.word;
                     cardEl.dataset.index = index;
                     if (card.revealed) {
@@ -768,7 +1253,7 @@
 
                 players.forEach(player => {
                     const card = document.createElement('div');
-                    card.className = 'ns-player-card p-4 bg-stone-100 rounded-lg text-lg font-bold border-2 cursor-grab';
+                    card.className = 'ns-player-card p-4 bg-stone-100 dark:bg-stone-700 rounded-lg text-lg font-bold border-2 cursor-grab transition-colors';
                     card.textContent = player.name;
                     card.dataset.playerId = player.id;
                     card.draggable = true;
@@ -870,7 +1355,7 @@
                 scoreboard.innerHTML = '';
                 players.forEach(p => {
                     const scoreDiv = document.createElement('div');
-                    scoreDiv.className = 'px-3 py-1 bg-stone-200 rounded-full';
+                    scoreDiv.className = 'px-3 py-1 bg-stone-200 dark:bg-stone-700 rounded-full transition-colors';
                     scoreDiv.textContent = `${p.name}: ${p.score}`;
                     scoreboard.appendChild(scoreDiv);
                 });
@@ -969,7 +1454,8 @@
             const resultDiv = document.getElementById('spinner-result');
 
             let options = ["กินเหล้า", "เล่าเรื่องผี", "ร้องเพลง", "เต้น", "ตอบคำถาม", "พัก 5 นาที"];
-            const colors = ["#f8a096", "#cce3de", "#e3c5a8", "#fde047", "#93c5fd", "#c4b5fd", "#fca5a5"];
+            // เปลี่ยนสีวงล้อให้เป็น Earth Tone
+            const colors = ["#E29578", "#A3B18A", "#DDA15E", "#F4A261", "#8AB17D", "#E9C46A", "#E07A5F"];
             let startAngle = 0;
             let arc = 0;
             let spinTimeout = null;
@@ -981,7 +1467,10 @@
                 if (options.length === 0) return;
                 arc = Math.PI / (options.length / 2);
                 ctx.clearRect(0, 0, 400, 400);
-                ctx.strokeStyle = "#e7e5e4";
+                
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                ctx.strokeStyle = isDarkMode ? "#44403c" : "#e7e5e4"; 
+                
                 ctx.lineWidth = 2;
                 ctx.font = '16px IBM Plex Sans Thai, sans-serif';
 
@@ -995,7 +1484,7 @@
                     ctx.fill();
 
                     ctx.save();
-                    ctx.fillStyle = "#44403c";
+                    ctx.fillStyle = "#28231D"; 
                     ctx.translate(200 + Math.cos(angle + arc / 2) * 120, 200 + Math.sin(angle + arc / 2) * 120);
                     ctx.rotate(angle + arc / 2 + Math.PI / 2);
                     const text = options[i];
@@ -1003,6 +1492,10 @@
                     ctx.restore();
                 }
             }
+            
+            document.getElementById('darkModeToggle').addEventListener('click', () => {
+                setTimeout(drawSpinner, 10);
+            });
 
             function rotate() {
                 spinTime += 30;
@@ -1052,7 +1545,6 @@
                     drawSpinner();
                 }
             });
-
 
             drawSpinner();
         })();
@@ -1113,16 +1605,16 @@
             }
 
             function finishRound() {
-                if (!timerInterval) return; // Don't do anything if timer is not running
+                if (!timerInterval) return;
 
                 clearInterval(timerInterval);
 
                 lapCounter++;
                 const li = document.createElement('li');
-                li.className = 'flex justify-between items-center p-2 bg-stone-100 rounded';
+                li.className = 'flex justify-between items-center p-2 bg-stone-100 dark:bg-stone-700 rounded transition-colors';
                 li.innerHTML = `
-                    <span class="font-semibold text-stone-600">รอบที่ ${lapCounter}</span>
-                    <span class="font-mono text-stone-800">${formatTime(elapsedTime)}</span>
+                    <span class="font-semibold text-stone-600 dark:text-stone-300">รอบที่ ${lapCounter}</span>
+                    <span class="font-mono text-stone-800 dark:text-stone-100">${formatTime(elapsedTime)}</span>
                 `;
                 lapsList.prepend(li);
 
