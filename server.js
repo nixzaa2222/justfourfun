@@ -103,6 +103,29 @@ const uniqueClueData = {
         'โล่', 'ดาบ', 'ธนู', 'ปืน', 'กระสุน', 'ระเบิด', 'รถถัง', 'เฮลิคอปเตอร์', 'เรือดำน้ำ', 'รถดับเพลิง'
     ]
 };
+const truthOrLieData = {
+    prompts: [
+        "วีรกรรมสุดแสบสมัยเด็ก",
+        "อาหารที่แปลกที่สุดที่เคยกิน",
+        "เรื่องน่าอายที่สุดในชีวิต",
+        "ความลับที่เพื่อนในกลุ่ม(อาจจะ)ยังไม่รู้",
+        "อุบัติเหตุหรือเหตุการณ์เฉียดตาย",
+        "สถานที่ที่เคยไปสร้างวีรกรรมโป๊ะแตก",
+        "ของที่เคยแอบขโมย (หรือเกือบขโมย)",
+        "เรื่องโกหกที่เคยแต่งขึ้นแล้วเนียนที่สุด",
+        "ความสามารถพิเศษแปลกๆ ที่ไม่มีใครรู้",
+        "ของสะสมที่แปลกที่สุดในบ้าน",
+        "เรื่องพีคๆ ตอนไปเที่ยวต่างจังหวัด/ต่างประเทศ",
+        "ประสบการณ์เจอผี หรือสิ่งลี้ลับ (ที่คิดไปเอง)",
+        "ข้ออ้างตอนตื่นสายที่ใช้บ่อยสุด",
+        "วีรกรรมสุดฮาเกี่ยวกับแฟนเก่า (หรือคนคุยเก่า)",
+        "สัตว์เลี้ยงหรือสัตว์แปลกๆ ที่เคยเลี้ยง",
+        "เรื่องเข้าใจผิดที่ฝังใจมานาน",
+        "ของแพงที่สุดที่เคยซื้อแล้วเสียดายเงิน",
+        "อุบัติเหตุทางแฟชั่น (แต่งตัวพลาดที่สุด)",
+        "ข้อความแชทที่เคยส่งผิดคนแล้วโป๊ะแตก"
+    ]
+};
 
 const rooms = {};
 
@@ -111,17 +134,46 @@ function findRoomBySocketId(socketId) {
     return Object.keys(rooms).find(roomCode => rooms[roomCode] && rooms[roomCode].players.some(p => p.id === socketId));
 }
 
+function broadcastScores(roomCode) {
+    if(rooms[roomCode]) {
+        io.to(roomCode).emit('updateScores', rooms[roomCode].players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score })));
+    }
+}
+
 // --- Main Socket Logic ---
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
 
-    socket.on('createRoom', ({ playerName, gameType }) => {
+    // --- Room Chat & Reactions ---
+    socket.on('sendChat', (message) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room) {
+            const player = room.players.find(p => p.id === socket.id);
+            if (player) {
+                io.to(roomCode).emit('receiveChat', { sender: player.name, avatar: player.avatar, message: message.trim(), senderId: player.id });
+            }
+        }
+    });
+
+    socket.on('sendReaction', ({ emoji }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room) {
+            const player = room.players.find(p => p.id === socket.id);
+            if (player) {
+                io.to(roomCode).emit('receiveReaction', { emoji, senderName: player.name, avatar: player.avatar });
+            }
+        }
+    });
+
+    socket.on('createRoom', ({ playerName, avatar, gameType }) => {
         let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
         while (rooms[roomCode]) { roomCode = Math.random().toString(36).substring(2, 6).toUpperCase(); }
         
         rooms[roomCode] = {
             gameType: gameType,
-            players: [{ id: socket.id, name: playerName, score: 0 }],
+            players: [{ id: socket.id, name: playerName, avatar: avatar || '👤', score: 0 }],
             gameState: 'waiting',
             game: {}, 
         };
@@ -129,14 +181,15 @@ io.on('connection', (socket) => {
         socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
     });
 
-    socket.on('joinRoom', ({ playerName, roomCode }) => {
+    socket.on('joinRoom', ({ playerName, avatar, roomCode }) => {
         const room = rooms[roomCode];
         if (room && room.players.length < 16 && room.gameState === 'waiting') {
-            room.players.push({ id: socket.id, name: playerName, score: 0 });
+            room.players.push({ id: socket.id, name: playerName, avatar: avatar || '👤', score: 0 });
             socket.join(roomCode);
             
             socket.emit('joinSuccess', { roomCode, players: room.players, gameType: room.gameType });
             io.to(roomCode).emit('updateLobby', room.players);
+            broadcastScores(roomCode);
         } else {
             socket.emit('error', 'ไม่สามารถเข้าร่วมห้องได้ (อาจจะเต็ม, รหัสผิด, หรือเกมเริ่มไปแล้ว)');
         }
@@ -170,6 +223,8 @@ io.on('connection', (socket) => {
                     startMatchTheBlankRound(roomCode);
                 } else if (room.gameType === 'unique-clue') {
                     startUniqueClueRound(roomCode);
+                } else if (room.gameType === 'truth-or-lie') {
+                    startTruthOrLieRound(roomCode);
                 }
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
@@ -177,6 +232,73 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    // --- Truth or Lie Listeners ---
+    socket.on('truthOrLie_submitAnswer', ({ truth, lie }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game || room.gameType !== 'truth-or-lie' || room.game.phase !== 'answering') return;
+
+        // สุ่มสลับ A B
+        const isTruthA = Math.random() > 0.5;
+        const optionA = isTruthA ? truth : lie;
+        const optionB = isTruthA ? lie : truth;
+        const lieOption = isTruthA ? 'B' : 'A';
+
+        room.game.answers[socket.id] = {
+            truth: truth.trim(),
+            lie: lie.trim(),
+            optionA: optionA.trim(),
+            optionB: optionB.trim(),
+            lieOption: lieOption
+        };
+
+        // ถ้าทุกคนตอบครบแล้ว
+        if (Object.keys(room.game.answers).length === room.players.length) {
+            startTruthOrLieVoting(roomCode);
+        }
+    });
+
+    socket.on('truthOrLie_submitVote', ({ vote }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game || room.gameType !== 'truth-or-lie' || room.game.phase !== 'voting') return;
+
+        const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
+        if (socket.id === activePlayerId) return; // เจ้าของคำตอบห้ามโหวตตัวเอง
+
+        room.game.votes[socket.id] = vote;
+
+        // ถ้าคนที่ต้องโหวต (ทุกคนลบ 1) โหวตครบแล้ว
+        if (Object.keys(room.game.votes).length === room.players.length - 1) {
+            truthOrLie_revealVote(roomCode);
+        }
+    });
+
+    socket.on('truthOrLie_nextPlayer', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id && room.gameType === 'truth-or-lie') {
+            room.game.activePlayerIndex++;
+            if (room.game.activePlayerIndex < room.players.length) {
+                startTruthOrLieVoting(roomCode);
+            } else {
+                // จบรอบ แสดงสรุป
+                room.game.phase = 'summary';
+                io.to(roomCode).emit('truthOrLie_endRound', { 
+                    players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
+                });
+            }
+        }
+    });
+
+    socket.on('truthOrLie_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
+            startTruthOrLieRound(roomCode);
+        }
+    });
+
 
     // --- Unique Clue Listeners ---
     socket.on('uniqueClue_submitClue', ({ clue }) => {
@@ -201,10 +323,10 @@ io.on('connection', (socket) => {
 
             for (const [pId, c] of Object.entries(room.game.clues)) {
                 const normalized = c.toLowerCase();
-                const playerName = room.players.find(p => p.id === pId).name;
+                const player = room.players.find(p => p.id === pId);
                 const isDuplicate = clueCounts[normalized] > 1;
 
-                playerClues.push({ playerId: pId, playerName, clue: c, isValid: !isDuplicate });
+                playerClues.push({ playerId: pId, playerName: player.name, playerAvatar: player.avatar, clue: c, isValid: !isDuplicate });
                 if (!isDuplicate) {
                     validClues.push(c);
                 }
@@ -237,6 +359,7 @@ io.on('connection', (socket) => {
                     if (giver) giver.score += 1;
                 }
             });
+            broadcastScores(roomCode);
         }
         
         room.game.phase = 'result';
@@ -245,7 +368,7 @@ io.on('connection', (socket) => {
             word: room.game.word,
             guess: guess.trim(),
             playerClues: room.game.playerClues,
-            players: room.players.map(p => ({id: p.id, name: p.name, score: p.score}))
+            players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score}))
         });
     });
 
@@ -291,12 +414,14 @@ io.on('connection', (socket) => {
                 results.push({
                     id: p.id,
                     name: p.name,
+                    avatar: p.avatar,
                     word: w,
                     points: pointsEarned,
                     totalScore: p.score
                 });
             });
 
+            broadcastScores(roomCode);
             io.to(roomCode).emit('matchTheBlank_showResult', { results });
         }
     });
@@ -333,7 +458,7 @@ io.on('connection', (socket) => {
             if (game.round > 2) {
                 game.phase = 'voting';
                 io.to(roomCode).emit('secretPainter_startVoting', { 
-                    players: room.players.map(p => ({ id: p.id, name: p.name, color: game.playerInfo[p.id].color }))
+                    players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, color: game.playerInfo[p.id].color }))
                 });
                 return;
             }
@@ -345,6 +470,7 @@ io.on('connection', (socket) => {
         io.to(roomCode).emit('secretPainter_updateTurn', {
             currentTurnId: nextPlayerId,
             currentTurnName: nextPlayer.name,
+            currentTurnAvatar: nextPlayer.avatar,
             round: game.round
         });
     });
@@ -385,6 +511,7 @@ io.on('connection', (socket) => {
                 votes: voteCounts,
                 secretPainterId: room.game.secretPainterId,
                 secretPainterName: secretPainter.name,
+                secretPainterAvatar: secretPainter.avatar,
                 isPainterCaught: isPainterCaught
             });
         }
@@ -399,6 +526,16 @@ io.on('connection', (socket) => {
 
         const isCorrect = guessWord.trim() === room.game.word;
         
+        if (isCorrect) {
+            const painter = room.players.find(p => p.id === room.game.secretPainterId);
+            if (painter) painter.score += 5;
+        } else {
+            room.players.forEach(p => {
+                if (p.id !== room.game.secretPainterId) p.score += 2;
+            });
+        }
+        broadcastScores(roomCode);
+
         io.to(roomCode).emit('secretPainter_gameOver', {
             isCorrect: isCorrect,
             actualWord: room.game.word,
@@ -527,7 +664,12 @@ io.on('connection', (socket) => {
             }
         }
 
-        const results = room.players.map(p => ({ id: p.id, name: p.name, number: p.number }));
+        if (success) {
+            room.players.forEach(p => p.score += 2);
+            broadcastScores(roomCode);
+        }
+
+        const results = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, number: p.number }));
         io.to(roomCode).emit('numberSort_showResults', { results, success });
     });
     
@@ -561,7 +703,7 @@ io.on('connection', (socket) => {
             room.game.ranges = generateQuizBettingRanges(revealedPlayers);
 
             io.to(roomCode).emit('friendQuiz_startBetting', {
-                secretPlayer: { id: room.game.secretPlayerId, name: room.players[secretPlayerIndex].name },
+                secretPlayer: { id: room.game.secretPlayerId, name: room.players[secretPlayerIndex].name, avatar: room.players[secretPlayerIndex].avatar },
                 ranges: room.game.ranges
             });
         }
@@ -593,10 +735,13 @@ io.on('connection', (socket) => {
                 }
             });
 
+            broadcastScores(roomCode);
+
             io.to(roomCode).emit('friendQuiz_showResult', {
                 allPlayers: room.players.map(p => ({
                     id: p.id,
                     name: p.name,
+                    avatar: p.avatar,
                     answer: p.answer,
                     score: p.score,
                     isSecret: p.id === secretPlayer.id
@@ -627,11 +772,109 @@ io.on('connection', (socket) => {
                     delete rooms[roomCode];
                 } else {
                     io.to(roomCode).emit('updateLobby', room.players);
+                    broadcastScores(roomCode);
                 }
             }
         }
     });
 });
+
+// --- Truth or Lie Logic Functions ---
+function startTruthOrLieRound(roomCode) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 3) {
+        io.to(roomCode).emit('error', 'เกมนี้สนุกเมื่อเล่น 3 คนขึ้นไปครับ');
+        room.gameState = 'waiting';
+        io.to(roomCode).emit('updateLobby', room.players);
+        return;
+    }
+    
+    // สุ่มโจทย์
+    const promptIndex = Math.floor(Math.random() * truthOrLieData.prompts.length);
+    const prompt = truthOrLieData.prompts[promptIndex];
+
+    const turnOrder = [...room.players].sort(() => 0.5 - Math.random()).map(p => p.id);
+
+    room.game = {
+        phase: 'answering',
+        prompt: prompt,
+        answers: {},
+        votes: {},
+        turnOrder: turnOrder,
+        activePlayerIndex: 0
+    };
+
+    io.to(roomCode).emit('truthOrLie_newRound', {
+        prompt: prompt,
+        players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
+    });
+}
+
+function startTruthOrLieVoting(roomCode) {
+    const room = rooms[roomCode];
+    room.game.phase = 'voting';
+    room.game.votes = {}; // เคลียร์โหวตของรอบผู้เล่นก่อนหน้า
+
+    const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
+    const activePlayer = room.players.find(p => p.id === activePlayerId);
+    const activeAnswers = room.game.answers[activePlayerId];
+
+    io.to(roomCode).emit('truthOrLie_startVoting', {
+        activePlayer: { id: activePlayer.id, name: activePlayer.name, avatar: activePlayer.avatar },
+        optionA: activeAnswers.optionA,
+        optionB: activeAnswers.optionB,
+        playerCount: room.players.length
+    });
+}
+
+function truthOrLie_revealVote(roomCode) {
+    const room = rooms[roomCode];
+    room.game.phase = 'reveal_vote';
+
+    const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
+    const activePlayer = room.players.find(p => p.id === activePlayerId);
+    const activeAnswers = room.game.answers[activePlayerId];
+    
+    const lieOption = activeAnswers.lieOption; // 'A' or 'B'
+    let fooledCount = 0;
+    const voteDetails = []; // เก็บว่าใครโหวตอะไร
+
+    // ตรวจสอบคะแนน
+    for (const [voterId, vote] of Object.entries(room.game.votes)) {
+        const voter = room.players.find(p => p.id === voterId);
+        if (!voter) continue;
+
+        voteDetails.push({ name: voter.name, avatar: voter.avatar, vote: vote });
+
+        if (vote !== lieOption) {
+            // โดนหลอก! (โหวตผิด)
+            fooledCount++;
+        } else {
+            // จับโกหกได้!
+            voter.score += 1;
+        }
+    }
+
+    // ให้คะแนนคนตอบ
+    activePlayer.score += fooledCount;
+    // โบนัสถ้าหลอกได้ทุกคน (ทุกคนลบ 1 คือตัวคนตอบเอง)
+    if (fooledCount > 0 && fooledCount === (room.players.length - 1)) {
+        activePlayer.score += 2; 
+    }
+
+    broadcastScores(roomCode);
+
+    io.to(roomCode).emit('truthOrLie_showVoteResult', {
+        activePlayer: { name: activePlayer.name, avatar: activePlayer.avatar },
+        truth: activeAnswers.truth,
+        lie: activeAnswers.lie,
+        lieOption: lieOption, // ข้อที่โกหก
+        fooledCount: fooledCount,
+        voteDetails: voteDetails,
+        totalVoters: room.players.length - 1
+    });
+}
+
 
 // --- Unique Clue Logic Functions ---
 function startUniqueClueRound(roomCode) {
@@ -655,9 +898,9 @@ function startUniqueClueRound(roomCode) {
     };
 
     io.to(roomCode).emit('uniqueClue_newRound', {
-        guesser: { id: guesserId, name: room.players[guesserIndex].name },
+        guesser: { id: guesserId, name: room.players[guesserIndex].name, avatar: room.players[guesserIndex].avatar },
         word: word,
-        players: room.players.map(p => ({id: p.id, name: p.name, score: p.score}))
+        players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score}))
     });
 }
 
@@ -713,7 +956,8 @@ function startSecretPainterRound(roomCode) {
             myColor: info.color,
             turnOrderNames: turnOrder.map(id => room.players.find(player => player.id === id).name),
             currentTurnId: turnOrder[0],
-            currentTurnName: room.players.find(player => player.id === turnOrder[0]).name
+            currentTurnName: room.players.find(player => player.id === turnOrder[0]).name,
+            currentTurnAvatar: room.players.find(player => player.id === turnOrder[0]).avatar
         });
     });
 }
@@ -828,7 +1072,7 @@ function startNumberSortRound(roomCode) {
         io.to(player.id).emit('numberSort_newRound', {
             theme: theme,
             number: player.number,
-            players: room.players.map(p => ({ id: p.id, name: p.name }))
+            players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }))
         });
     });
 }
@@ -855,7 +1099,7 @@ function startFriendQuizRound(roomCode) {
     const question = friendQuizData.questions[Math.floor(Math.random() * friendQuizData.questions.length)];
     room.game.question = question;
 
-    io.to(roomCode).emit('friendQuiz_newRound', { question, players: room.players.map(p => ({id: p.id, name: p.name, score: p.score})) });
+    io.to(roomCode).emit('friendQuiz_newRound', { question, players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score})) });
 }
 
 function generateQuizBettingRanges(revealedPlayers) {
@@ -908,7 +1152,7 @@ function startMatchTheBlankRound(roomCode) {
 
     io.to(roomCode).emit('matchTheBlank_newRound', { 
         prompt: prompt, 
-        players: room.players.map(p => ({id: p.id, name: p.name, score: p.score})) 
+        players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score})) 
     });
 }
 
