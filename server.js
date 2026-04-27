@@ -21,6 +21,25 @@ app.get('/ping', (req, res) => {
 // ==========================================
 // GAME DATA
 // ==========================================
+const whoAmIData = {
+    general: ["ประยุทธ์", "ลุงตู่", "ชัชชาติ", "หนุ่ม กรรชัย", "พี่ตูน บอดี้สแลม", "ลิซ่า BLACKPINK", "หม่ำ จ๊กมก", "แจ๊ส ชวนชื่น", "โน้ต อุดม", "อีลอน มัสก์ (Elon Musk)", "มาร์ก ซักเคอร์เบิร์ก", "มิสเตอร์บีส (MrBeast)", "แฮร์รี่ พอตเตอร์", "เจมส์ บอนด์", "แจ็ค สแปร์โรว์"],
+    valo: ["Jett", "Reyna", "Raze", "Killjoy", "Viper", "Omen", "Brimstone", "Astra", "Phoenix", "Sova", "Breach", "Cypher", "Chamber", "Yoru", "Skye", "KAY/O", "Fade", "Neon", "Harbor", "Gekko", "Deadlock", "Iso", "Clove"],
+    marvel: [
+        "ไอรอนแมน (Iron Man)", "กัปตันอเมริกา (Captain America)", "ธอร์ (Thor)", "ฮัลค์ (Hulk)", "แบล็ควิโดว์ (Black Widow)",
+        "ฮอว์คอาย (Hawkeye)", "สไปเดอร์แมน (Spider-Man)", "ด็อกเตอร์สเตรนจ์ (Doctor Strange)", "แบล็คแพนเธอร์ (Black Panther)", "แอนท์แมน (Ant-Man)",
+        "กัปตันมาร์เวล (Captain Marvel)", "สการ์เล็ตวิทช์ (Scarlet Witch)", "วิชั่น (Vision)", "สตาร์ลอร์ด (Star-Lord)", "กรูท (Groot)",
+        "ร็อคเก็ต (Rocket)", "กาโมร่า (Gamora)", "แดร็กซ์ (Drax)", "ธานอส (Thanos)", "โลกิ (Loki)",
+        "เดดพูล (Deadpool)", "วูล์ฟเวอรีน (Wolverine)", "เวน่อม (Venom)", "แม็กนีโต้ (Magneto)", "โปรเฟสเซอร์ เอ็กซ์ (Professor X)"
+    ],
+    anime: [
+        "โงกุน (Dragon Ball)", "โดราเอมอน", "โคนัน (Detective Conan)", "ชินจัง", "ลูฟี่ (One Piece)",
+        "โซโล (One Piece)", "นารูโตะ (Naruto)", "ซาสึเกะ (Naruto)", "คาคาชิ (Naruto)", "ไซตามะ (One Punch Man)",
+        "เอเรน (Attack on Titan)", "รีไวล์ (Attack on Titan)", "ทันจิโร่ (Demon Slayer)", "เนซึโกะ (Demon Slayer)", "เซนอิทซึ (Demon Slayer)",
+        "โกโจ ซาโตรุ (Jujutsu Kaisen)", "อาเนีย (Spy x Family)", "คิรัวร์ (Hunter x Hunter)", "มิโดริยะ / เดกุ (My Hero Academia)", "โทโดโรกิ (My Hero Academia)",
+        "ซากุรางิ (Slam Dunk)", "เซเลอร์มูน (Sailor Moon)", "เอ็ดเวิร์ด เอลริค (Fullmetal Alchemist)", "กินโทกิ (Gintama)", "คุโรโร่ (Hunter x Hunter)"
+    ]
+};
+
 const wordGuessData = {
     general: ['คอมพิวเตอร์', 'หูฟัง', 'เมาส์', 'คีย์บอร์ด', 'ไมค์ช็อต', 'กล้วย', 'โรงเรียน', 'ตำรวจ', 'ดวงจันทร์', 'ทะเล', 'ภูเขา', 'โทรศัพท์', 'หนังสือ', 'ปากกา', 'รถไฟ', 'ช้าง', 'สิงโต', 'พิซซ่า', 'หมอ', 'พายุ', 'ดาวเคราะห์', 'แวมไพร์', 'ซอมบี้', 'ตู้เย็น', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ไดโนเสาร์', 'แม่มด', 'หุ่นยนต์'],
     valo: ['สไปค์', 'วานดัล', 'แฟนทอม', 'โอเปอเรเตอร์', 'เจ็ตต์', 'เรน่า', 'เรซ', 'โอมเมน', 'คิลจอย', 'ไซเฟอร์', 'สโมค', 'แฟลช', 'ฮีล', 'ชุบชีวิต', 'อัลติ', 'หัวร้อน', 'แลค', 'หลุด', 'ปิงปิง', 'ยิงนก', 'แครี่', 'ตัวถ่วง', 'เรเดียนต์', 'ไอรอน', 'บรอนซ์', 'บุกหลัง', 'ดักซุ่ม', 'แคมป์', 'วิ่งยิง', 'สไนเปอร์', 'มีด', 'ดิสคอร์ด', 'ปาร์ตี้', 'แร้งค์ตก', 'แรงค์ขึ้น']
@@ -128,9 +147,19 @@ function getGameData(dataset, packType, customWords = null) {
         return customWords;
     }
     
-    if (packType === 'general') return [...dataset.general];
-    if (packType === 'valo') return [...dataset.valo];
-    return [...dataset.general, ...(dataset.valo || [])]; 
+    let result = [];
+    if (packType === 'general' && dataset.general) result = [...dataset.general];
+    else if (packType === 'valo' && dataset.valo) result = [...dataset.valo];
+    else if (packType === 'marvel' && dataset.marvel) result = [...dataset.marvel];
+    else if (packType === 'anime' && dataset.anime) result = [...dataset.anime];
+    else {
+        // mixed: combine all available categories
+        if (dataset.general) result.push(...dataset.general);
+        if (dataset.valo) result.push(...dataset.valo);
+        if (dataset.marvel) result.push(...dataset.marvel);
+        if (dataset.anime) result.push(...dataset.anime);
+    }
+    return result;
 }
 
 function syncGameStateToPlayer(socket, room, roomCode) {
@@ -195,7 +224,56 @@ function syncGameStateToPlayer(socket, room, roomCode) {
         } else if (g.phase === 'voting') {
             socket.emit('spyfall_startVoting', { players: pList });
         }
+    } else if (room.gameType === 'who-am-i') {
+        if (g.phase === 'playing') {
+            const others = room.players.filter(pl => pl.id !== socket.id).map(pl => ({
+                id: pl.id,
+                name: pl.name,
+                avatar: pl.avatar,
+                character: g.playerCharacters[pl.id]
+            }));
+            socket.emit('whoAmI_newRound', { others });
+        }
     }
+}
+
+// ==========================================
+// WHO AM I LOGIC (ทายสิฉันคือใคร)
+// ==========================================
+
+function startWhoAmIRound(roomCode, pack, customWords) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        io.to(roomCode).emit('error', 'เกมทายสิฉันคือใคร ต้องมีผู้เล่นอย่างน้อย 2 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    const allData = getGameData(whoAmIData, pack, customWords);
+    if (!allData || allData.length === 0) return;
+
+    let charPool = [...allData].sort(() => Math.random() - 0.5);
+    const playerCharacters = {};
+    
+    room.players.forEach(p => {
+        if (charPool.length === 0) charPool = [...allData].sort(() => Math.random() - 0.5); 
+        playerCharacters[p.id] = charPool.pop();
+    });
+
+    room.game = {
+        phase: 'playing',
+        playerCharacters,
+        customWords // เก็บไว้ใช้ตาถัดไปได้ถ้าเป็นโหมดแต่งเอง
+    };
+
+    room.players.forEach(p => {
+        const others = room.players.filter(pl => pl.id !== p.id).map(pl => ({
+            id: pl.id,
+            name: pl.name,
+            avatar: pl.avatar,
+            character: playerCharacters[pl.id]
+        }));
+        io.to(p.id).emit('whoAmI_newRound', { others });
+    });
 }
 
 // ==========================================
@@ -765,6 +843,11 @@ io.on('connection', (socket) => {
                     room.game.votes[socket.id] = room.game.votes[oldId];
                     delete room.game.votes[oldId];
                 }
+            } else if (room.gameType === 'who-am-i' && room.game && room.game.playerCharacters) {
+                if (room.game.playerCharacters[oldId]) {
+                    room.game.playerCharacters[socket.id] = room.game.playerCharacters[oldId];
+                    delete room.game.playerCharacters[oldId];
+                }
             }
         } else {
             if (room.players.length < 16) {
@@ -947,10 +1030,78 @@ io.on('connection', (socket) => {
                 else if (room.gameType === 'truth-or-lie') startTruthOrLieRound(roomCode, pack, customWords);
                 else if (room.gameType === 'bluff-overthrow') startBluffRound(roomCode);
                 else if (room.gameType === 'secret-agent') startSpyfallRound(roomCode, pack, data.timerMin || 5, customWords);
+                else if (room.gameType === 'who-am-i') startWhoAmIRound(roomCode, pack, customWords);
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
                 io.to(roomCode).emit('error', 'เกิดข้อผิดพลาดร้ายแรงขณะเริ่มเกม');
             }
+        }
+    });
+
+    // --- Who Am I Events ---
+    socket.on('whoAmI_submitGuess', ({ guess }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'who-am-i' || room.game.phase !== 'playing') return;
+
+        const myChar = room.game.playerCharacters[socket.id];
+        if (!myChar) return;
+
+        // ลบช่องว่าง วงเล็บ และทำให้เป็นตัวพิมพ์เล็กทั้งหมด เพื่อให้เช็คได้ยืดหยุ่นขึ้น
+        const cleanStr = (str) => str.replace(/[\s\(\)]/g, '').toLowerCase();
+        
+        const cleanGuess = cleanStr(guess);
+        const cleanChar = cleanStr(myChar);
+        
+        // ถือว่าตอบถูกถ้าทายมาเกิน 2 ตัวอักษร และมีคำนี้อยู่ในชื่อตัวละคร (หรือชื่อตัวละครมีอยู่ในคำทาย)
+        const isCorrect = cleanGuess.length >= 2 && (cleanChar.includes(cleanGuess) || cleanGuess.includes(cleanChar));
+
+        if (isCorrect) {
+            room.game.phase = 'ended';
+            const winner = room.players.find(p => p.id === socket.id);
+            if (winner) winner.score += 3;
+            broadcastScores(roomCode);
+
+            const revealData = room.players.map(p => ({
+                id: p.id,
+                name: p.name,
+                avatar: p.avatar,
+                character: room.game.playerCharacters[p.id]
+            }));
+
+            io.to(roomCode).emit('whoAmI_endRound', { 
+                winnerId: winner.id, 
+                winnerName: winner.name, 
+                revealData 
+            });
+            systemChat(roomCode, `🎉 ${winner.name} ทายถูกเป็นคนแรก! (+3 แต้ม)`);
+        } else {
+            socket.emit('whoAmI_wrongGuess');
+        }
+    });
+
+    socket.on('whoAmI_skipRound', () => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'who-am-i' || room.game.phase !== 'playing' || room.players[0].id !== socket.id) return;
+
+        room.game.phase = 'ended';
+        const revealData = room.players.map(p => ({
+            id: p.id,
+            name: p.name,
+            avatar: p.avatar,
+            character: room.game.playerCharacters[p.id]
+        }));
+
+        io.to(roomCode).emit('whoAmI_endRound', { 
+            winnerId: null, 
+            revealData 
+        });
+        systemChat(roomCode, `⏩ หัวหน้าห้องกดข้ามรอบนี้!`);
+    });
+
+    socket.on('whoAmI_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            startWhoAmIRound(roomCode, room.currentPack, room.game.customWords);
         }
     });
 
@@ -1282,7 +1433,6 @@ io.on('connection', (socket) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id) {
             const customWords = room.currentPack === 'custom' ? room.game.prompt : null; 
-            // truthOrLie อาจจะไม่เหมาะกับ customWords แบบ list เท่าไหร่ ให้ใช้ pack เดิม
             startTruthOrLieRound(roomCode, room.currentPack, customWords);
         }
     });

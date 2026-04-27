@@ -178,14 +178,14 @@
             </button>
             <div class="flex flex-col w-24 sm:w-32">
                 <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wide">BGM Volume</span>
-                <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.3" class="w-full h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer">
+                <input type="range" id="bgm-volume" min="0" max="1" step="0.01" value="0.1" class="w-full h-1 bg-stone-300 rounded-lg appearance-none cursor-pointer">
             </div>
         </div>
         <!-- Host Controls for BGM -->
         <div id="bgm-host-controls" class="hidden border-t border-stone-200 dark:border-stone-700 pt-2 mt-1">
             <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wide">Host: Change Track</span>
             <select id="bgm-track-select" class="w-full text-xs p-1 mt-1 rounded bg-stone-100 dark:bg-stone-700 text-stone-800 dark:text-stone-200 border-none outline-none">
-                <option value="/music/song1.mp3"">Lofi Chill (Default)</option>
+                <option value="/music/song1.mp3">Lofi Chill (Default)</option>
                 <option value="">Tense / Mafia</option>
                 <option value="">Funny / Upbeat</option>
             </select>
@@ -344,6 +344,10 @@
                 </div>
                 
                 <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="who-am-i">
+                        <h3 class="text-lg font-bold text-yellow-600 dark:text-yellow-400">ทายสิฉันคือใคร? 👤</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">คุยในดิส ช่วยเพื่อนใบ้ตัวละคร!</p>
+                    </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="secret-agent">
                         <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400">สายลับแฝงตัว 🕵️‍♂️</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">ซักถามจับผิด หาตัวสายลับให้เจอ!</p>
@@ -390,10 +394,16 @@
                             🌪️ ผสมทั้งหมด
                         </button>
                         <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-[var(--heading-color)] text-sm sm:text-base" data-pack="general">
-                            ⭐ ทั่วไป (ไม่เกม)
+                            ⭐ ทั่วไป
                         </button>
                         <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-[var(--heading-color)] text-sm sm:text-base" data-pack="valo">
-                            🎮 เกมเมอร์/Valo
+                            🎮 Valo
+                        </button>
+                        <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-red-600 dark:text-red-400 text-sm sm:text-base" data-pack="marvel">
+                            🦸‍♂️ Marvel
+                        </button>
+                        <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-blue-600 dark:text-blue-400 text-sm sm:text-base" data-pack="anime">
+                            🎌 Anime
                         </button>
                         <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-indigo-600 dark:text-indigo-400 text-sm sm:text-base" data-pack="custom">
                             📝 พิมพ์เอง
@@ -406,7 +416,7 @@
                         <textarea id="custom-words-textarea" class="w-full h-32 p-3 rounded-lg input-field" placeholder="หมา&#10;แมว&#10;เพื่อนชื่อ A&#10;..."></textarea>
                     </div>
 
-                    <p class="text-xs text-stone-500 dark:text-stone-400 text-center mt-2">* มีผลเฉพาะเกมที่ใช้คำศัพท์ หรือประโยคคำถาม (เช่น สายลับแฝงตัว, รหัสคำทาย, ทายใจเพื่อน ฯลฯ)</p>
+                    <p class="text-xs text-stone-500 dark:text-stone-400 text-center mt-2">* มีผลเฉพาะเกมที่ใช้คำศัพท์ หรือประโยคคำถาม (เช่น ทายสิฉันคือใคร, สายลับแฝงตัว, รหัสคำทาย ฯลฯ)</p>
                 </div>
 
                 <!-- Spyfall Timer Setting -->
@@ -436,6 +446,49 @@
                         <p class="text-sm text-stone-500 dark:text-stone-400">จับเวลาสำหรับการแข่งขัน</p>
                     </div>
                  </div>
+            </div>
+        </div>
+
+        <!-- Who Am I Game Screen -->
+        <div id="who-am-i-screen" class="hidden w-full text-center">
+            <div class="mb-4 p-6 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-left">
+                    <h2 class="text-3xl font-bold" style="color: var(--primary-text-color);">ทายสิฉันคือใคร? 👤</h2>
+                    <p class="text-stone-500 dark:text-stone-400 mt-1">ใบ้ให้เพื่อนทาง Discord แล้วทายว่าตัวเองคือใคร!</p>
+                </div>
+                <button id="wai-host-skip-btn" class="hidden btn-secondary p-2 px-4 rounded-lg text-sm shadow-sm hover:scale-105 transition-transform">⏩ ข้ามตานี้ (Host)</button>
+            </div>
+
+            <!-- Playing Area -->
+            <div id="wai-playing-area" class="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-6">
+                <!-- Left: My Guess -->
+                <div class="w-full md:w-1/3 bg-white/80 dark:bg-stone-800/80 p-6 rounded-xl shadow-md border-4 border-[var(--primary-color)] flex flex-col justify-center">
+                    <h3 class="font-bold text-xl mb-4 text-stone-600 dark:text-stone-300">ตัวละครของคุณคือ...</h3>
+                    <div class="text-6xl mb-6 animate-pulse">❓</div>
+                    <p class="text-sm text-stone-500 mb-2">ทายชื่อตัวละครของคุณให้ถูกก่อนใคร!</p>
+                    <div class="flex flex-col gap-2">
+                        <input type="text" id="wai-guess-input" class="input-field p-3 rounded-lg text-center font-bold text-lg" placeholder="พิมพ์ชื่อตัวละคร...">
+                        <button id="wai-submit-guess-btn" class="btn-primary p-3 rounded-lg text-lg">ตอบ!</button>
+                    </div>
+                    <p id="wai-wrong-msg" class="hidden mt-3 text-red-500 font-bold animate-bounce bg-red-50 dark:bg-red-900/30 p-2 rounded">❌ ยังไม่ใช่นะ ลองใหม่!</p>
+                </div>
+
+                <!-- Right: Others -->
+                <div class="w-full md:w-2/3 bg-stone-100 dark:bg-[#3A322C] p-6 rounded-xl border border-stone-200 dark:border-stone-700">
+                    <h3 class="font-bold text-lg mb-4 text-left border-b border-stone-300 dark:border-stone-600 pb-2">ตัวละครของเพื่อน (ใบ้ให้เพื่อนด้วย!):</h3>
+                    <div id="wai-others-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left">
+                        <!-- Cards will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Area -->
+            <div id="wai-result-area" class="hidden w-full max-w-5xl mx-auto mt-6 bg-white/90 dark:bg-[#2C2621]/90 p-8 rounded-xl border-4 shadow-xl border-[var(--accent-color)]">
+                <h2 id="wai-result-title" class="text-4xl font-bold mb-6 text-[var(--accent-color)]"></h2>
+                
+                <div id="wai-reveal-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-8"></div>
+                
+                <button id="wai-next-round-btn" class="hidden p-4 px-10 text-lg rounded-xl btn-primary mx-auto shadow-md hover:scale-105 transition-transform">เล่นรอบต่อไป</button>
             </div>
         </div>
 
@@ -968,6 +1021,7 @@
 
         // --- Global Variables and Functions ---
         const gameNames = {
+            'who-am-i': 'ทายสิฉันคือใคร? 👤',
             'secret-agent': 'สายลับแฝงตัว 🕵️‍♂️',
             'bluff-overthrow': 'เหลี่ยมมาเฟีย 🕴️',
             'truth-or-lie': 'ความจริง 1 โกหก 1 🎭',
@@ -988,6 +1042,21 @@
         };
 
         const gameRules = {
+            'who-am-i': {
+                title: 'วิธีเล่น: ทายสิฉันคือใคร? 👤',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">ทายให้ถูกว่าตัวละครที่อยู่บนหน้าจอของคุณคือใคร โดยต้องพิมพ์ตอบให้เร็วกว่าเพื่อนคนอื่นๆ!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left mb-4">
+                        <li>ทุกคนจะเห็นชื่อตัวละครของเพื่อนๆ ในห้องทุกคน <strong>ยกเว้นของตัวเอง</strong></li>
+                        <li>ให้คุณคุยเปิดไมค์ (ใน Discord) แล้วช่วยกันใบ้ตัวละครให้เพื่อน <em>(ห้ามพูดชื่อตรงๆ นะ!)</em></li>
+                        <li>คุณต้องรวบรวมคำใบ้จากเพื่อน แล้วพิมพ์ชื่อตัวละครของคุณลงไปในช่องทายผล</li>
+                        <li><strong>ใครพิมพ์ทายตัวละครตัวเองถูกเป็นคนแรกของห้อง จะเป็นผู้ชนะในรอบนั้น รับไปเลย +3 แต้ม!</strong></li>
+                        <li>หัวหน้าห้องสามารถกด <strong>"ข้ามตานี้"</strong> ได้ หากทุกคนทายไม่ถูกหรือคิดไม่ออก (จะไม่มีใครได้คะแนน)</li>
+                    </ol>
+                `
+            },
             'secret-agent': {
                 title: 'วิธีเล่น: สายลับแฝงตัว 🕵️‍♂️',
                 content: `
@@ -1509,6 +1578,7 @@
         const screens = {
             entry: document.getElementById('entry-screen'),
             waiting: document.getElementById('waiting-screen'),
+            whoAmI: document.getElementById('who-am-i-screen'),
             secretAgent: document.getElementById('secret-agent-screen'),
             wordGuess: document.getElementById('word-guess-screen'),
             numberSort: document.getElementById('number-sort-screen'),
@@ -1577,7 +1647,8 @@
                     promptEl.className = "mb-6 p-4 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 font-bold text-xl";
                     
                     let minPlayers = 2;
-                    if (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie' || selectedGame === 'secret-agent' || selectedGame === 'secret-painter') minPlayers = 3;
+                    if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
+                    if (selectedGame === 'who-am-i') minPlayers = 2;
                     
                     startBtn.disabled = players.length < minPlayers;
                     startBtn.textContent = players.length < minPlayers ? `ต้องมี ${minPlayers} คนขึ้นไป` : '🚀 เริ่มเกมเลย!';
@@ -1629,7 +1700,8 @@
             const currentPlayersCount = parseInt(document.getElementById('playerCount').textContent) || 1;
             const startBtn = document.getElementById('startGameBtn');
             let minPlayers = 2;
-            if (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie' || selectedGame === 'secret-agent' || selectedGame === 'secret-painter') minPlayers = 3;
+            if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
+            if (selectedGame === 'who-am-i') minPlayers = 2;
             
             startBtn.disabled = currentPlayersCount < minPlayers;
             startBtn.textContent = currentPlayersCount < minPlayers ? `ต้องมี ${minPlayers} คนขึ้นไป` : '🚀 เริ่มเกมเลย!';
@@ -1781,7 +1853,7 @@
                 if (typeof payload === 'object') {
                     if(payload.timerMin) startData.timerMin = payload.timerMin;
                     if(payload.customWords) startData.customWords = payload.customWords;
-                } else if (selectedPack === 'custom') { // Fallback incase object parsing failed
+                } else if (selectedPack === 'custom') {
                     startData.customWords = document.getElementById('custom-words-textarea').value.split('\n').map(w => w.trim()).filter(w => w.length > 0);
                 }
 
@@ -1803,6 +1875,100 @@
         // ==========================================
         // GAME LOGIC CLIENT CODE 
         // ==========================================
+
+        // --- Who Am I Client Logic ---
+        (function initWhoAmI() {
+            const playingArea = document.getElementById('wai-playing-area');
+            const guessInput = document.getElementById('wai-guess-input');
+            const submitGuessBtn = document.getElementById('wai-submit-guess-btn');
+            const wrongMsg = document.getElementById('wai-wrong-msg');
+            const othersGrid = document.getElementById('wai-others-grid');
+            const hostSkipBtn = document.getElementById('wai-host-skip-btn');
+            
+            const resultArea = document.getElementById('wai-result-area');
+            const resultTitle = document.getElementById('wai-result-title');
+            const revealGrid = document.getElementById('wai-reveal-grid');
+            const nextRoundBtn = document.getElementById('wai-next-round-btn');
+
+            submitGuessBtn.addEventListener('click', () => {
+                const guess = guessInput.value.trim();
+                if (guess) {
+                    socket.emit('whoAmI_submitGuess', { guess });
+                    guessInput.value = '';
+                    submitGuessBtn.disabled = true;
+                    setTimeout(() => submitGuessBtn.disabled = false, 1000); 
+                }
+            });
+
+            guessInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') submitGuessBtn.click();
+            });
+
+            hostSkipBtn.addEventListener('click', () => {
+                if(isHost && confirm("ต้องการข้ามตานี้เลยใช่ไหม? (จะไม่มีใครได้คะแนน)")) {
+                    socket.emit('whoAmI_skipRound');
+                }
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if (isHost) socket.emit('whoAmI_nextRound');
+            });
+
+            socket.on('whoAmI_newRound', ({ others }) => {
+                playingArea.classList.remove('hidden');
+                resultArea.classList.add('hidden');
+                wrongMsg.classList.add('hidden');
+                guessInput.value = '';
+                guessInput.disabled = false;
+                submitGuessBtn.disabled = false;
+
+                if (isHost) hostSkipBtn.classList.remove('hidden');
+                else hostSkipBtn.classList.add('hidden');
+
+                othersGrid.innerHTML = '';
+                others.forEach(p => {
+                    if (p.id === socket.id) return; 
+                    const card = document.createElement('div');
+                    card.className = 'p-3 bg-white dark:bg-stone-800 rounded-lg shadow-sm border border-stone-200 dark:border-stone-600 flex flex-col gap-1';
+                    card.innerHTML = `
+                        <span class="text-xs text-stone-500 font-bold flex items-center gap-1">${renderAvatar(p.avatar, 'w-4 h-4 rounded-full')} ${p.name}</span>
+                        <span class="text-lg font-bold text-[var(--primary-text-color)]">${p.character}</span>
+                    `;
+                    othersGrid.appendChild(card);
+                });
+            });
+
+            socket.on('whoAmI_wrongGuess', () => {
+                wrongMsg.classList.remove('hidden');
+                setTimeout(() => wrongMsg.classList.add('hidden'), 3000);
+            });
+
+            socket.on('whoAmI_endRound', (data) => {
+                playingArea.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+
+                if (data.winnerId) {
+                    resultTitle.innerHTML = `🎉 <span class="text-green-500">${data.winnerName}</span> ทายถูกเป็นคนแรก!`;
+                } else {
+                    resultTitle.innerHTML = `⏩ ข้ามรอบนี้! (ไม่มีใครได้คะแนน)`;
+                }
+
+                revealGrid.innerHTML = '';
+                data.revealData.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = `p-4 rounded-xl border-2 shadow-sm flex flex-col items-center text-center ${p.id === data.winnerId ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-stone-300 bg-stone-50 dark:bg-stone-800'}`;
+                    card.innerHTML = `
+                        <div class="mb-2 flex items-center justify-center">${renderAvatar(p.avatar, 'avatar-img-lg')}</div>
+                        <span class="font-bold mb-1">${p.name}</span>
+                        <span class="text-sm font-bold px-2 py-1 bg-white dark:bg-stone-700 rounded-lg w-full text-[var(--primary-text-color)]">${p.character}</span>
+                    `;
+                    revealGrid.appendChild(card);
+                });
+
+                if (isHost) nextRoundBtn.classList.remove('hidden');
+                else nextRoundBtn.classList.add('hidden');
+            });
+        })();
         
         // --- Secret Agent (Spyfall) Client Logic ---
         (function initSecretAgent() {
@@ -3052,7 +3218,7 @@
             });
         })();
 
-        // --- Word Guess Client Logic ---
+        // --- Word Guess Game Screen ---
         (function initWordGuess() {
             const wgCoopInfoBar = document.getElementById('wg-coop-info-bar');
             const wgTeamInfoBar = document.getElementById('wg-team-info-bar');
@@ -3112,7 +3278,7 @@
                             if (player) {
                                 const li = document.createElement('li');
                                 li.className = "flex items-center gap-1";
-                                li.innerHTML = `${renderAvatar(player.avatar)} ${player.name} ${teamData.spymaster === pId ? ' (หัวหน้า)' : ''}`;
+                                li.innerHTML = `${renderAvatar(player.avatar, 'w-4 h-4 rounded-full')} ${player.name} ${teamData.spymaster === pId ? ' (หัวหน้า)' : ''}`;
                                 playersEl.appendChild(li);
                             }
                         });
