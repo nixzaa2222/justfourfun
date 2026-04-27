@@ -1,11 +1,12 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    pingTimeout: 60000 // ให้เวลาเน็ตหลุด 60 วินาทีก่อนตัดขาด
+});
 
 app.use(express.static(__dirname));
 
@@ -13,7 +14,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// --- Game Data (Expanded) ---
+// --- Game Data ---
 const wordGuessData = {
     words: [
         'กล้วย', 'โรงเรียน', 'ตำรวจ', 'ดวงจันทร์', 'ทะเล', 'ภูเขา', 'คอมพิวเตอร์', 'โทรศัพท์', 'หนังสือ', 'ปากกา',
@@ -23,10 +24,7 @@ const wordGuessData = {
         'ตู้เย็น', 'พัดลม', 'กระทะ', 'หม้อ', 'กรรไกร', 'ยางลบ', 'นาฬิกา', 'แว่นตา', 'สบู่', 'แชมพู',
         'ผ้าเช็ดตัว', 'หมอน', 'ผ้าห่ม', 'กระเป๋า', 'รองเท้า', 'ถุงเท้า', 'เสื้อยืด', 'กางเกง', 'กระโปรง', 'หมวก',
         'กุญแจ', 'ร่ม', 'เงิน', 'ทอง', 'เพชร', 'แหวน', 'สร้อย', 'กำไล', 'นาฬิกาข้อมือ', 'กระเป๋าตังค์',
-        'เมาส์', 'คีย์บอร์ด', 'ลำโพง', 'หูฟัง', 'กระจก', 'แปรงสีฟัน', 'ยาสีฟัน', 'ไม้กวาด', 'ถังขยะ', 'กระถางต้นไม้',
-        'ดินสอสี', 'ไม้บรรทัด', 'กระดาษทิชชู่', 'นิตยสาร', 'หนังสือพิมพ์', 'ปฏิทิน', 'แว่นกันแดด', 'เข็มขัด', 'เนคไท', 'ถุงมือ',
-        'รองเท้าแตะ', 'รองเท้าผ้าใบ', 'รองเท้าส้นสูง', 'เสื้อกันหนาว', 'เสื้อกันฝน', 'กางเกงขาสั้น', 'กางเกงยีนส์', 'ชุดว่ายน้ำ', 'ผ้าพันคอ', 'หมวกแก๊ป',
-        'หมวกกันน็อค', 'เต็นท์', 'ไฟฉาย', 'เข็มทิศ', 'กล้องส่องทางไกล', 'กล้องถ่ายรูป', 'ขาตั้งกล้อง', 'ไมโครโฟน', 'กีตาร์', 'เปียโน'
+        'เมาส์', 'คีย์บอร์ด', 'ลำโพง', 'หูฟัง', 'กระจก', 'แปรงสีฟัน', 'ยาสีฟัน', 'ไม้กวาด', 'ถังขยะ', 'กระถางต้นไม้'
     ]
 };
 const numberSortData = {
@@ -36,41 +34,27 @@ const numberSortData = {
         "ระดับความน่ากลัวของผี", "ความอร่อยของเมนูไข่", "ความลำบากในการตื่นตอนเช้า",
         "ระดับความขี้เกียจของตัวเอง", "ความเจ็บปวดตอนอกหัก", "ระดับความร้อนของประเทศไทย",
         "ความน่ารักของแมว", "ความหัวร้อนเวลาเล่นเกมแพ้", "ระดับความหิวตอนดึก",
-        "ความรกของห้องนอน", "ความอยากรวย", "ความกลัวแมลงสาบ", "ความบ้าบอของเพื่อนในกลุ่ม",
-        "ความอยากไปเที่ยวทะเล", "ระดับความอยากกินหมูกระทะ", "ความอยากลาออก", "ความน่ารำคาญของรถติด",
-        "ความยากของการลดน้ำหนัก", "ความสนุกของหนังผี", "ระดับความติ่งดารา", "ความกลัวความสูง",
-        "ความอยากถูกหวย", "ระดับความคลั่งรัก", "ความดองแชทเก่ง", "ความจำสั้น ขี้ลืม", "ความเซียนเกม",
-        "ความอร่อยของชาบู", "ความตื่นเต้นเวลาเปิดกล่องสุ่ม", "ความทรมานตอนปวดท้องเข้าห้องน้ำ",
-        "ระดับความหวงของกิน", "ความชอบใส่เสื้อสีดำ", "ความกลัวเข็มฉีดยา", "ความอยากรวยทางลัด"
+        "ความอยากรวย", "ความกลัวแมลงสาบ", "ความอยากไปเที่ยวทะเล", "ระดับความติ่งดารา"
     ]
 };
 const friendQuizData = {
     questions: [
         "คุณมีรองเท้ากี่คู่?", "คุณใช้เวลาอาบน้ำโดยเฉลี่ยกี่นาที?", "คุณดื่มกาแฟ/ชา วันละกี่แก้ว?",
-        "คุณนอนวันละกี่ชั่วโมง?", "คุณมีเพื่อนใน Facebook/IG กี่คน?", "คุณคิดว่าคุณจะอายุยืนกี่ปี?",
-        "คุณมีแอปในมือถือกี่แอป?", "คุณเคยแอบชอบคนอื่นมากี่ครั้งในชีวิต?", "เดือนนึงคุณกินชาบู/หมูกระทะกี่ครั้ง?",
-        "คุณให้คะแนนหน้าตาตัวเองเท่าไหร่ (1-100)?", "คุณมีเงินสดติดกระเป๋าตอนนี้กี่บาท?", "สัปดาห์นึงคุณออกกำลังกายกี่ชั่วโมง?",
-        "คุณตื่นนอนกี่โมง (ใส่เป็นตัวเลขเช่น 730 คือ 7:30 น.)?", "วันนึงคุณจับมือถือกี่ชั่วโมง?", "คุณเคยร้องไห้ดูหนังเศร้ามากี่เรื่อง?",
-        "คุณไปเที่ยวต่างจังหวัดปีละกี่ครั้ง?", "คุณมีเสื้อยืดในตู้กี่ตัว?", "คุณให้คะแนนความโสดของตัวเองเท่าไหร่ (1-100)?",
-        "คุณมีรูปในมือถือกี่รูป?", "คุณซื้อของออนไลน์เดือนละกี่ชิ้น?", "คุณเคยไปต่างประเทศกี่ครั้ง?",
-        "คุณเคยกินบุฟเฟต์คุ้มสุดกี่จาน?", "คุณตื่นกี่โมงในวันหยุด (ใส่ตัวเลข)?", "คุณมีเงินเก็บในบัญชีตอนนี้กี่บาท (คร่าวๆ)?",
-        "คุณมีแฟนมากี่คน?", "คุณเคยอกหักกี่ครั้ง?", "คุณดูซีรีส์จบไปแล้วกี่เรื่อง?",
-        "คุณฟังเพลงวันละกี่ชั่วโมง?", "คุณอาบน้ำนานสุดกี่นาที?", "คุณเคยคุยโทรศัพท์นานสุดกี่นาที?",
-        "คุณมีกรุ๊ปไลน์กี่กรุ๊ป?", "คุณเคยกด Snooze นาฬิกาปลุกกี่ครั้งต่อเช้า?", "คุณมีรูปสัตว์เลี้ยงในเครื่องกี่รูป?"
+        "คุณนอนวันละกี่ชั่วโมง?", "คุณคิดว่าคุณจะอายุยืนกี่ปี?",
+        "เดือนนึงคุณกินชาบู/หมูกระทะกี่ครั้ง?", "คุณให้คะแนนหน้าตาตัวเองเท่าไหร่ (1-100)?",
+        "คุณมีเงินสดติดกระเป๋าตอนนี้กี่บาท?", "สัปดาห์นึงคุณออกกำลังกายกี่ชั่วโมง?",
+        "คุณตื่นนอนกี่โมง (ใส่เป็นตัวเลขเช่น 730 คือ 7:30 น.)?", "คุณเคยร้องไห้ดูหนังเศร้ามากี่เรื่อง?",
+        "คุณไปเที่ยวต่างจังหวัดปีละกี่ครั้ง?", "คุณมีเสื้อยืดในตู้กี่ตัว?", "คุณให้คะแนนความโสดของตัวเองเท่าไหร่ (1-100)?"
     ]
 };
 const secretPainterData = {
     categories: [
-        { name: "สัตว์ป่า", words: ["ช้าง", "สิงโต", "ยีราฟ", "ลิง", "เสือ", "งู", "หมี", "จระเข้", "แรด", "นกฮูก", "ม้าลาย", "กวาง"] },
-        { name: "อาหาร", words: ["พิซซ่า", "แฮมเบอร์เกอร์", "ซูชิ", "ส้มตำ", "ชาบู", "ไข่ดาว", "ต้มยำกุ้ง", "ผัดไทย", "กะเพรา", "ข้าวผัด"] },
-        { name: "สถานที่", words: ["โรงพยาบาล", "โรงเรียน", "ชายหาด", "สวนสนุก", "ภูเขา", "สนามบิน", "ตลาดนัด", "วัด", "สถานีตำรวจ", "ธนาคาร"] },
-        { name: "อาชีพ", words: ["หมอ", "ตำรวจ", "ครู", "นักดับเพลิง", "ทหาร", "นักร้อง", "โปรแกรมเมอร์", "ช่างภาพ", "พยาบาล", "พ่อครัว"] },
-        { name: "ยานพาหนะ", words: ["รถไฟ", "เครื่องบิน", "เรือ", "จักรยาน", "รถมอเตอร์ไซค์", "รถถัง", "เฮลิคอปเตอร์", "รถบรรทุก", "รถตู้"] },
-        { name: "ผลไม้", words: ["แอปเปิ้ล", "กล้วย", "ส้ม", "แตงโม", "มะม่วง", "ทุเรียน", "สตรอว์เบอร์รี", "องุ่น", "สับปะรด", "มะละกอ"] },
-        { name: "กีฬา", words: ["ฟุตบอล", "บาสเกตบอล", "ว่ายน้ำ", "แบดมินตัน", "เทนนิส", "วอลเลย์บอล", "กอล์ฟ", "มวย", "วิ่ง", "ปิงปอง"] },
-        { name: "เครื่องใช้ไฟฟ้า", words: ["ทีวี", "ตู้เย็น", "เครื่องซักผ้า", "แอร์", "พัดลม", "หม้อหุงข้าว", "เตารีด", "ไมโครเวฟ", "ไดร์เป่าผม", "คอมพิวเตอร์"] },
-        { name: "อวัยวะ", words: ["ตา", "จมูก", "ปาก", "หู", "มือ", "เท้า", "หัวใจ", "สมอง", "ผม", "ลิ้น"] },
-        { name: "ของหวาน", words: ["เค้ก", "โดนัท", "ไอศกรีม", "ช็อกโกแลต", "เยลลี่", "บิงซู", "แพนเค้ก", "คุกกี้", "น้ำแข็งไส"] }
+        { name: "สัตว์ป่า", words: ["ช้าง", "สิงโต", "ยีราฟ", "ลิง", "เสือ", "งู", "หมี", "จระเข้", "นกฮูก"] },
+        { name: "อาหาร", words: ["พิซซ่า", "แฮมเบอร์เกอร์", "ซูชิ", "ส้มตำ", "ชาบู", "ไข่ดาว", "ต้มยำกุ้ง", "ผัดไทย"] },
+        { name: "สถานที่", words: ["โรงพยาบาล", "โรงเรียน", "ชายหาด", "สวนสนุก", "ภูเขา", "สนามบิน", "ตลาดนัด", "วัด"] },
+        { name: "อาชีพ", words: ["หมอ", "ตำรวจ", "ครู", "นักดับเพลิง", "ทหาร", "นักร้อง", "โปรแกรมเมอร์", "ช่างภาพ"] },
+        { name: "ยานพาหนะ", words: ["รถไฟ", "เครื่องบิน", "เรือ", "จักรยาน", "รถมอเตอร์ไซค์", "รถถัง", "เฮลิคอปเตอร์"] },
+        { name: "ของหวาน", words: ["เค้ก", "โดนัท", "ไอศกรีม", "ช็อกโกแลต", "เยลลี่", "บิงซู", "แพนเค้ก", "คุกกี้"] }
     ],
     colors: [
         '#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
@@ -81,26 +65,15 @@ const matchTheBlankData = {
     prompts: [
         "___ ย่าง", "น้ำ ___", "รัก ___", "___ สีทอง", "ผัด ___", "ไข่ ___", "เสื้อ ___", "___ กระโดด",
         "ข้าว ___", "ทะเล ___", "___ ใจ", "ใจ ___", "___ รถ", "ไฟ ___", "___ บิน", "หมู ___",
-        "___ หมา", "แมว ___", "เพื่อน ___", "___ ทิพย์", "คน ___", "รถ ___", "___ บ้าน", "___ แดง", 
-        "ดอก ___", "___ กิน", "___ นอน", "เด็ก ___", "___ เรียน", "___ โต", "หมี ___", "เสือ ___", 
-        "___ ป่า", "___ เขา", "___ ดำ", "___ สวย", "ช่าง ___", "___ ฟ้า", "แม่ ___", "พ่อ ___",
-        "___ แตก", "___ รั่ว", "หน้า ___", "___ หาย", "___ กรอบ", "ไก่ ___", "___ ชิ้น", "ยาง ___",
-        "___ เครื่อง", "ท้อง ___", "___ ดี", "___ กว้าง", "___ แคบ", "ตา ___", "___ บอด", "หู ___", 
-        "___ หนวก", "มือ ___", "___ ไว", "ขา ___", "___ สั้น", "___ ยาว", "___ ร้อน", "หนาว ___"
+        "___ หมา", "แมว ___", "เพื่อน ___", "___ ทิพย์", "คน ___", "รถ ___", "___ บ้าน", "___ แดง"
     ]
 };
 const uniqueClueData = {
     words: [
         'ไดโนเสาร์', 'แวมไพร์', 'ซอมบี้', 'แม่มด', 'นางเงือก', 'มนุษย์ต่างดาว', 'ผีดิบ', 'หุ่นยนต์',
         'พีระมิด', 'กำแพงเมืองจีน', 'หอไอเฟล', 'เทพเจ้า', 'มังกร', 'ยูนิคอร์น', 'กุหลาบ', 'ดอกทานตะวัน',
-        'แผ่นดินไหว', 'พายุ', 'สึนามิ', 'น้ำท่วม', 'ภูเขาไฟระเบิด', 'หิมะ', 'ทะเลทราย', 'ป่าดิบชื้น',
-        'ช็อกโกแลต', 'ไอศกรีม', 'เค้ก', 'คุกกี้', 'ขนมปัง', 'ลูกอม', 'เยลลี่', 'มาการอง', 'แพนเค้ก',
-        'โทรทัศน์', 'ตู้เย็น', 'ไมโครเวฟ', 'เครื่องซักผ้า', 'พัดลม', 'แอร์', 'เตารีด', 'เครื่องดูดฝุ่น',
-        'แว่นขยาย', 'กล้องโทรทรรศน์', 'กล้องจุลทรรศน์', 'แผนที่', 'เข็มทิศ', 'สมอเรือ', 'โจรสลัด', 'สมบัติ',
-        'นินจา', 'เอเลี่ยน', 'ขั้วโลกเหนือ', 'อวกาศ', 'ยานอวกาศ', 'มนุษย์อวกาศ', 'จรวด', 'ดาวเคราะห์', 
-        'ดวงอาทิตย์', 'ดาวเทียม', 'ดาวตก', 'หลุมดำ', 'กาแล็กซี', 'ทางช้างเผือก', 'จักรวาล', 'แม่เหล็ก', 
-        'ลูกโลก', 'กระเป๋าเดินทาง', 'พาสปอร์ต', 'ตั๋วเครื่องบิน', 'รีสอร์ท', 'แคมป์ปิ้ง', 'ถุงนอน', 'หน้ากาก',
-        'โล่', 'ดาบ', 'ธนู', 'ปืน', 'กระสุน', 'ระเบิด', 'รถถัง', 'เฮลิคอปเตอร์', 'เรือดำน้ำ', 'รถดับเพลิง'
+        'ช็อกโกแลต', 'ไอศกรีม', 'เค้ก', 'คุกกี้', 'โทรทัศน์', 'ตู้เย็น', 'ไมโครเวฟ', 'แว่นขยาย',
+        'แผนที่', 'เข็มทิศ', 'สมอเรือ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ดาวเคราะห์'
     ]
 };
 const truthOrLieData = {
@@ -114,16 +87,7 @@ const truthOrLieData = {
         "ของที่เคยแอบขโมย (หรือเกือบขโมย)",
         "เรื่องโกหกที่เคยแต่งขึ้นแล้วเนียนที่สุด",
         "ความสามารถพิเศษแปลกๆ ที่ไม่มีใครรู้",
-        "ของสะสมที่แปลกที่สุดในบ้าน",
-        "เรื่องพีคๆ ตอนไปเที่ยวต่างจังหวัด/ต่างประเทศ",
-        "ประสบการณ์เจอผี หรือสิ่งลี้ลับ (ที่คิดไปเอง)",
-        "ข้ออ้างตอนตื่นสายที่ใช้บ่อยสุด",
-        "วีรกรรมสุดฮาเกี่ยวกับแฟนเก่า (หรือคนคุยเก่า)",
-        "สัตว์เลี้ยงหรือสัตว์แปลกๆ ที่เคยเลี้ยง",
-        "เรื่องเข้าใจผิดที่ฝังใจมานาน",
-        "ของแพงที่สุดที่เคยซื้อแล้วเสียดายเงิน",
-        "อุบัติเหตุทางแฟชั่น (แต่งตัวพลาดที่สุด)",
-        "ข้อความแชทที่เคยส่งผิดคนแล้วโป๊ะแตก"
+        "เรื่องเข้าใจผิดที่ฝังใจมานาน"
     ]
 };
 
@@ -140,9 +104,131 @@ function broadcastScores(roomCode) {
     }
 }
 
+// ฟังก์ชันสำหรับส่งข้อมูลเกมให้ผู้เล่นที่เพิ่งกด Refresh (Reconnect)
+function syncGameStateToPlayer(socket, room) {
+    if (!room || !room.game || room.gameState !== 'playing') return;
+    const g = room.game;
+    const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }));
+    
+    if (room.gameType === 'word-guess') {
+        socket.emit('wordGuess_updateState', g);
+    } else if (room.gameType === 'number-sort') {
+        const player = room.players.find(p => p.id === socket.id);
+        if(player && g.theme) socket.emit('numberSort_newRound', { theme: g.theme, number: player.number, players: pList });
+    } else if (room.gameType === 'friend-quiz') {
+        if (g.phase === 'betting') socket.emit('friendQuiz_startBetting', { secretPlayer: g.secretPlayer, ranges: g.ranges });
+        else if (g.question) socket.emit('friendQuiz_newRound', { question: g.question, players: pList });
+    } else if (room.gameType === 'secret-painter') {
+        if (g.category) {
+             const info = g.playerInfo[socket.id];
+             if(info) {
+                 socket.emit('secretPainter_newRound', {
+                    category: g.category, word: info.isSecretPainter ? null : g.word,
+                    isSecretPainter: info.isSecretPainter, myColor: info.color,
+                    turnOrderNames: g.turnOrder.map(id => { const pt = room.players.find(pl => pl.id === id); return pt ? pt.name : '?'; }),
+                    currentTurnId: g.turnOrder[g.currentTurnIndex],
+                    currentTurnName: room.players.find(pl => pl.id === g.turnOrder[g.currentTurnIndex])?.name || '?',
+                    currentTurnAvatar: room.players.find(pl => pl.id === g.turnOrder[g.currentTurnIndex])?.avatar || '👤'
+                 });
+             }
+        }
+    } else if (room.gameType === 'match-the-blank') {
+        if (g.prompt) socket.emit('matchTheBlank_newRound', { prompt: g.prompt, players: pList });
+    } else if (room.gameType === 'unique-clue') {
+         if (g.phase === 'clue_giving') {
+              const guesser = room.players.find(p => p.id === g.guesserId);
+              socket.emit('uniqueClue_newRound', { guesser: guesser, word: g.word, players: pList });
+         } else if (g.phase === 'guessing') {
+              socket.emit('uniqueClue_startGuessing', { validClues: g.validClues, playerClues: g.playerClues });
+         }
+    } else if (room.gameType === 'truth-or-lie') {
+         if (g.phase === 'answering') {
+             socket.emit('truthOrLie_newRound', { prompt: g.prompt, players: pList });
+         } else if (g.phase === 'voting') {
+             const activePlayer = room.players.find(p => p.id === g.turnOrder[g.activePlayerIndex]);
+             const activeAnswers = g.answers[activePlayer.id];
+             if(activePlayer && activeAnswers) socket.emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
+         }
+    }
+}
+
+
 // --- Main Socket Logic ---
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
+
+    // --- RECONNECT LOGIC ---
+    socket.on('rejoinRoom', ({ roomCode, playerId, playerName, avatar }) => {
+        const room = rooms[roomCode];
+        if (room) {
+            let player = room.players.find(p => p.playerId === playerId);
+            if (player) {
+                player.id = socket.id; // อัปเดต socket id เป็นอันใหม่
+                player.isOnline = true;
+                player.name = playerName; // อัปเดตชื่อเผื่อแก้
+                player.avatar = avatar;
+            } else {
+                // ถ้าโดนเตะไปแล้ว ให้เข้าใหม่
+                if (room.players.length < 16) {
+                    player = { id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true };
+                    room.players.push(player);
+                } else {
+                    return socket.emit('error', 'ห้องเต็มแล้ว');
+                }
+            }
+            
+            socket.join(roomCode);
+            socket.emit('joinSuccess', { roomCode, players: room.players, gameType: room.gameType });
+            
+            if (room.gameState === 'playing') {
+                socket.emit('gameStarted', room.gameType);
+                syncGameStateToPlayer(socket, room); // ซิงค์ข้อมูลเกมที่ค้างอยู่
+            }
+            
+            io.to(roomCode).emit('updateLobby', room.players);
+            broadcastScores(roomCode);
+        } else {
+            socket.emit('clearSession'); // บอก Client ว่าห้องโดนยุบไปแล้ว
+        }
+    });
+
+    socket.on('disconnect', () => {
+        let foundRoomCode = null;
+        let foundPlayer = null;
+        
+        for (const code in rooms) {
+            const player = rooms[code].players.find(p => p.id === socket.id);
+            if (player) {
+                foundRoomCode = code;
+                foundPlayer = player;
+                break;
+            }
+        }
+
+        if (foundRoomCode && foundPlayer) {
+            foundPlayer.isOnline = false;
+            io.to(foundRoomCode).emit('updateLobby', rooms[foundRoomCode].players);
+            
+            // รอ 10 วิเผื่อรีเฟรชกลับมา ถ้าไม่กลับมาค่อยลบออกเฉพาะตอนอยู่ Lobby
+            setTimeout(() => {
+                const room = rooms[foundRoomCode];
+                if (room) {
+                    const p = room.players.find(p => p.playerId === foundPlayer.playerId);
+                    if (p && !p.isOnline) {
+                        if (room.gameState === 'waiting') {
+                            room.players = room.players.filter(pl => pl.playerId !== foundPlayer.playerId);
+                            if (room.players.length === 0) {
+                                delete rooms[foundRoomCode];
+                            } else {
+                                io.to(foundRoomCode).emit('updateLobby', room.players);
+                                broadcastScores(foundRoomCode);
+                            }
+                        }
+                    }
+                }
+            }, 10000); 
+        }
+    });
 
     // --- Room Chat & Reactions ---
     socket.on('sendChat', (message) => {
@@ -167,13 +253,13 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('createRoom', ({ playerName, avatar, gameType }) => {
+    socket.on('createRoom', ({ playerName, avatar, playerId }) => {
         let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
         while (rooms[roomCode]) { roomCode = Math.random().toString(36).substring(2, 6).toUpperCase(); }
         
         rooms[roomCode] = {
-            gameType: gameType,
-            players: [{ id: socket.id, name: playerName, avatar: avatar || '👤', score: 0 }],
+            gameType: null, 
+            players: [{ id: socket.id, playerId: playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true }],
             gameState: 'waiting',
             game: {}, 
         };
@@ -181,25 +267,56 @@ io.on('connection', (socket) => {
         socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
     });
 
-    socket.on('joinRoom', ({ playerName, avatar, roomCode }) => {
+    socket.on('joinRoom', ({ playerName, avatar, roomCode, playerId }) => {
         const room = rooms[roomCode];
         if (room && room.players.length < 16 && room.gameState === 'waiting') {
-            room.players.push({ id: socket.id, name: playerName, avatar: avatar || '👤', score: 0 });
-            socket.join(roomCode);
+            // เช็คว่าเคยมีชื่อนี้ไหม
+            const existingPlayer = room.players.find(p => p.playerId === playerId);
+            if(existingPlayer) {
+                existingPlayer.id = socket.id;
+                existingPlayer.isOnline = true;
+                existingPlayer.name = playerName;
+                existingPlayer.avatar = avatar;
+            } else {
+                room.players.push({ id: socket.id, playerId: playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true });
+            }
             
+            socket.join(roomCode);
             socket.emit('joinSuccess', { roomCode, players: room.players, gameType: room.gameType });
             io.to(roomCode).emit('updateLobby', room.players);
             broadcastScores(roomCode);
         } else {
-            socket.emit('error', 'ไม่สามารถเข้าร่วมห้องได้ (อาจจะเต็ม, รหัสผิด, หรือเกมเริ่มไปแล้ว)');
+            socket.emit('error', 'ไม่สามารถเข้าร่วมห้องได้ (ห้องอาจเต็ม, รหัสผิด, หรือเกมเริ่มไปแล้ว)');
+        }
+    });
+
+    // หัวหน้าห้องเลือกเกมจาก Lobby
+    socket.on('host_selectGame', (gameType) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            room.gameType = gameType;
+            io.to(roomCode).emit('gameSelected', gameType);
         }
     });
     
     socket.on('startGame', (roomCode) => {
         const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) {
+        if (room && room.players[0].id === socket.id && room.gameType) {
             room.gameState = 'playing';
             io.to(roomCode).emit('gameStarted', room.gameType);
+        }
+    });
+
+    // ระบบกลับสู่ Lobby
+    socket.on('returnToLobby', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            room.gameState = 'waiting';
+            room.gameType = null;
+            room.game = {};
+            io.to(roomCode).emit('backToLobby', room.players);
         }
     });
 
@@ -233,30 +350,27 @@ io.on('connection', (socket) => {
         }
     });
 
+    // ==========================================
+    // ALL GAME LISTENERS
+    // ==========================================
+
     // --- Truth or Lie Listeners ---
     socket.on('truthOrLie_submitAnswer', ({ truth, lie }) => {
         const roomCode = findRoomBySocketId(socket.id);
         const room = rooms[roomCode];
         if (!room || !room.game || room.gameType !== 'truth-or-lie' || room.game.phase !== 'answering') return;
 
-        // สุ่มสลับ A B
         const isTruthA = Math.random() > 0.5;
         const optionA = isTruthA ? truth : lie;
         const optionB = isTruthA ? lie : truth;
         const lieOption = isTruthA ? 'B' : 'A';
 
-        room.game.answers[socket.id] = {
-            truth: truth.trim(),
-            lie: lie.trim(),
-            optionA: optionA.trim(),
-            optionB: optionB.trim(),
-            lieOption: lieOption
-        };
+        room.game.answers[socket.id] = { truth: truth.trim(), lie: lie.trim(), optionA: optionA.trim(), optionB: optionB.trim(), lieOption: lieOption };
 
-        // ถ้าทุกคนตอบครบแล้ว
-        if (Object.keys(room.game.answers).length === room.players.length) {
-            startTruthOrLieVoting(roomCode);
-        }
+        const submittedCount = Object.keys(room.game.answers).length;
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: room.players.length, text: 'รอเพื่อนแต่งเรื่อง...' });
+
+        if (submittedCount === room.players.length) startTruthOrLieVoting(roomCode);
     });
 
     socket.on('truthOrLie_submitVote', ({ vote }) => {
@@ -265,14 +379,16 @@ io.on('connection', (socket) => {
         if (!room || !room.game || room.gameType !== 'truth-or-lie' || room.game.phase !== 'voting') return;
 
         const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
-        if (socket.id === activePlayerId) return; // เจ้าของคำตอบห้ามโหวตตัวเอง
+        if (socket.id === activePlayerId) return;
 
         room.game.votes[socket.id] = vote;
 
-        // ถ้าคนที่ต้องโหวต (ทุกคนลบ 1) โหวตครบแล้ว
-        if (Object.keys(room.game.votes).length === room.players.length - 1) {
-            truthOrLie_revealVote(roomCode);
-        }
+        const votersCount = room.players.length - 1;
+        const submittedCount = Object.keys(room.game.votes).length;
+        
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: votersCount, text: 'รอเพื่อนจับผิด...' });
+
+        if (submittedCount === votersCount) truthOrLie_revealVote(roomCode);
     });
 
     socket.on('truthOrLie_nextPlayer', () => {
@@ -283,35 +399,31 @@ io.on('connection', (socket) => {
             if (room.game.activePlayerIndex < room.players.length) {
                 startTruthOrLieVoting(roomCode);
             } else {
-                // จบรอบ แสดงสรุป
                 room.game.phase = 'summary';
-                io.to(roomCode).emit('truthOrLie_endRound', { 
-                    players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
-                });
+                io.to(roomCode).emit('truthOrLie_endRound', { players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score })) });
             }
         }
     });
 
     socket.on('truthOrLie_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startTruthOrLieRound(roomCode);
-        }
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startTruthOrLieRound(roomCode);
     });
-
 
     // --- Unique Clue Listeners ---
     socket.on('uniqueClue_submitClue', ({ clue }) => {
         const roomCode = findRoomBySocketId(socket.id);
         const room = rooms[roomCode];
         if (!room || !room.game || room.gameType !== 'unique-clue' || room.game.phase !== 'clue_giving') return;
-
         if (socket.id === room.game.guesserId) return;
 
         room.game.clues[socket.id] = clue.trim();
         const clueGiversCount = room.players.length - 1;
+        const submittedCount = Object.keys(room.game.clues).length;
 
-        if (Object.keys(room.game.clues).length === clueGiversCount) {
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: clueGiversCount, text: 'รอเพื่อนเขียนคำใบ้...' });
+
+        if (submittedCount === clueGiversCount) {
             const clueCounts = {};
             Object.values(room.game.clues).forEach(c => {
                 const normalized = c.toLowerCase();
@@ -327,15 +439,14 @@ io.on('connection', (socket) => {
                 const isDuplicate = clueCounts[normalized] > 1;
 
                 playerClues.push({ playerId: pId, playerName: player.name, playerAvatar: player.avatar, clue: c, isValid: !isDuplicate });
-                if (!isDuplicate) {
-                    validClues.push(c);
-                }
+                if (!isDuplicate) validClues.push(c);
             }
 
             room.game.phase = 'guessing';
             room.game.validClues = validClues;
             room.game.playerClues = playerClues;
-
+            
+            io.to(roomCode).emit('updateProgress', { hide: true });
             io.to(roomCode).emit('uniqueClue_startGuessing', { validClues, playerClues });
         }
     });
@@ -344,7 +455,6 @@ io.on('connection', (socket) => {
         const roomCode = findRoomBySocketId(socket.id);
         const room = rooms[roomCode];
         if (!room || !room.game || room.gameType !== 'unique-clue' || room.game.phase !== 'guessing') return;
-
         if (socket.id !== room.game.guesserId) return;
 
         const isCorrect = guess.trim().toLowerCase() === room.game.word.toLowerCase();
@@ -352,7 +462,6 @@ io.on('connection', (socket) => {
         if (isCorrect) {
             const guesser = room.players.find(p => p.id === socket.id);
             if (guesser) guesser.score += 2;
-            
             room.game.playerClues.forEach(pc => {
                 if (pc.isValid) {
                     const giver = room.players.find(p => p.id === pc.playerId);
@@ -364,9 +473,7 @@ io.on('connection', (socket) => {
         
         room.game.phase = 'result';
         io.to(roomCode).emit('uniqueClue_showResult', {
-            isCorrect,
-            word: room.game.word,
-            guess: guess.trim(),
+            isCorrect, word: room.game.word, guess: guess.trim(),
             playerClues: room.game.playerClues,
             players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score}))
         });
@@ -374,9 +481,7 @@ io.on('connection', (socket) => {
 
     socket.on('uniqueClue_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startUniqueClueRound(roomCode);
-        }
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startUniqueClueRound(roomCode);
     });
 
     // --- Match The Blank Listeners ---
@@ -386,11 +491,13 @@ io.on('connection', (socket) => {
         if (!room || !room.game || room.gameType !== 'match-the-blank') return;
 
         room.game.answers[socket.id] = answer.trim();
+        const submittedCount = Object.keys(room.game.answers).length;
+        
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
 
-        if (Object.keys(room.game.answers).length === room.players.length) {
+        if (submittedCount === room.players.length) {
             const wordCounts = {};
             const playerWords = {};
-            
             room.players.forEach(p => {
                 const w = room.game.answers[p.id];
                 playerWords[p.id] = w;
@@ -401,44 +508,28 @@ io.on('connection', (socket) => {
             room.players.forEach(p => {
                 const w = playerWords[p.id];
                 let pointsEarned = 0;
-                
-                if (wordCounts[w] === 2) {
-                    pointsEarned = 3;
-                } else if (wordCounts[w] > 2) {
-                    pointsEarned = 1;
-                } else {
-                    pointsEarned = 0;
-                }
+                if (wordCounts[w] === 2) pointsEarned = 3;
+                else if (wordCounts[w] > 2) pointsEarned = 1;
                 
                 p.score += pointsEarned;
-                results.push({
-                    id: p.id,
-                    name: p.name,
-                    avatar: p.avatar,
-                    word: w,
-                    points: pointsEarned,
-                    totalScore: p.score
-                });
+                results.push({ id: p.id, name: p.name, avatar: p.avatar, word: w, points: pointsEarned, totalScore: p.score });
             });
 
             broadcastScores(roomCode);
+            io.to(roomCode).emit('updateProgress', { hide: true });
             io.to(roomCode).emit('matchTheBlank_showResult', { results });
         }
     });
 
     socket.on('matchTheBlank_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startMatchTheBlankRound(roomCode);
-        }
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startMatchTheBlankRound(roomCode);
     });
 
     // --- Secret Painter Listeners ---
     socket.on('secretPainter_drawLine', (data) => {
         const roomCode = findRoomBySocketId(socket.id);
-        if (roomCode) {
-            socket.to(roomCode).emit('secretPainter_onDraw', data);
-        }
+        if (roomCode) socket.to(roomCode).emit('secretPainter_onDraw', data);
     });
 
     socket.on('secretPainter_endTurn', () => {
@@ -468,10 +559,8 @@ io.on('connection', (socket) => {
         const nextPlayer = room.players.find(p => p.id === nextPlayerId);
         
         io.to(roomCode).emit('secretPainter_updateTurn', {
-            currentTurnId: nextPlayerId,
-            currentTurnName: nextPlayer.name,
-            currentTurnAvatar: nextPlayer.avatar,
-            round: game.round
+            currentTurnId: nextPlayerId, currentTurnName: nextPlayer.name,
+            currentTurnAvatar: nextPlayer.avatar, round: game.round
         });
     });
 
@@ -481,37 +570,28 @@ io.on('connection', (socket) => {
         if (!room || !room.game || room.game.phase !== 'voting') return;
 
         room.game.votes[socket.id] = votedId;
+        const submittedCount = Object.keys(room.game.votes).length;
 
-        if (Object.keys(room.game.votes).length === room.players.length) {
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: room.players.length, text: 'รอเพื่อนโหวตจับผิด...' });
+
+        if (submittedCount === room.players.length) {
             room.game.phase = 'reveal';
-            
             const voteCounts = {};
-            Object.values(room.game.votes).forEach(id => {
-                voteCounts[id] = (voteCounts[id] || 0) + 1;
-            });
+            Object.values(room.game.votes).forEach(id => { voteCounts[id] = (voteCounts[id] || 0) + 1; });
 
-            let maxVotes = 0;
-            let mostVotedId = null;
-            let isTie = false;
-
+            let maxVotes = 0, mostVotedId = null, isTie = false;
             for (const [id, count] of Object.entries(voteCounts)) {
-                if (count > maxVotes) {
-                    maxVotes = count;
-                    mostVotedId = id;
-                    isTie = false;
-                } else if (count === maxVotes) {
-                    isTie = true;
-                }
+                if (count > maxVotes) { maxVotes = count; mostVotedId = id; isTie = false; }
+                else if (count === maxVotes) isTie = true;
             }
 
             const secretPainter = room.players.find(p => p.id === room.game.secretPainterId);
             const isPainterCaught = (!isTie && mostVotedId === room.game.secretPainterId);
 
+            io.to(roomCode).emit('updateProgress', { hide: true });
             io.to(roomCode).emit('secretPainter_reveal', {
-                votes: voteCounts,
-                secretPainterId: room.game.secretPainterId,
-                secretPainterName: secretPainter.name,
-                secretPainterAvatar: secretPainter.avatar,
+                votes: voteCounts, secretPainterId: room.game.secretPainterId,
+                secretPainterName: secretPainter.name, secretPainterAvatar: secretPainter.avatar,
                 isPainterCaught: isPainterCaught
             });
         }
@@ -521,35 +601,126 @@ io.on('connection', (socket) => {
         const roomCode = findRoomBySocketId(socket.id);
         const room = rooms[roomCode];
         if (!room || !room.game || room.game.phase !== 'reveal') return;
-
         if (socket.id !== room.game.secretPainterId) return;
 
         const isCorrect = guessWord.trim() === room.game.word;
-        
         if (isCorrect) {
             const painter = room.players.find(p => p.id === room.game.secretPainterId);
             if (painter) painter.score += 5;
         } else {
-            room.players.forEach(p => {
-                if (p.id !== room.game.secretPainterId) p.score += 2;
-            });
+            room.players.forEach(p => { if (p.id !== room.game.secretPainterId) p.score += 2; });
         }
         broadcastScores(roomCode);
 
         io.to(roomCode).emit('secretPainter_gameOver', {
-            isCorrect: isCorrect,
-            actualWord: room.game.word,
-            category: room.game.category
+            isCorrect: isCorrect, actualWord: room.game.word, category: room.game.category
         });
     });
     
     socket.on('secretPainter_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startSecretPainterRound(roomCode);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startSecretPainterRound(roomCode);
+    });
+
+    // --- Number Sort Listeners ---
+    socket.on('numberSort_submitOrder', ({ orderedPlayerIds }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game) return;
+        
+        const correctOrder = room.players.slice().sort((a, b) => a.number - b.number);
+        let success = true;
+        for (let i = 0; i < orderedPlayerIds.length; i++) {
+            if (orderedPlayerIds[i] !== correctOrder[i].id) {
+                success = false; break;
+            }
         }
+
+        if (success) {
+            room.players.forEach(p => p.score += 2);
+            broadcastScores(roomCode);
+        }
+
+        const results = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, number: p.number }));
+        io.to(roomCode).emit('numberSort_showResults', { results, success });
     });
     
+    socket.on('numberSort_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startNumberSortRound(roomCode);
+    });
+
+    // --- Friend Quiz Listeners ---
+    socket.on('friendQuiz_submitAnswer', ({ answer }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+        if (player) player.answer = answer;
+
+        const submittedCount = room.players.filter(p => p.hasOwnProperty('answer')).length;
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: room.players.length, text: 'รอเพื่อนตอบคำถาม...' });
+
+        if (submittedCount === room.players.length) {
+            const secretPlayerIndex = Math.floor(Math.random() * room.players.length);
+            room.game.secretPlayerId = room.players[secretPlayerIndex].id;
+
+            const revealedPlayers = room.players
+                .filter(p => p.id !== room.game.secretPlayerId)
+                .sort((a, b) => a.answer - b.answer);
+            
+            room.game.ranges = generateQuizBettingRanges(revealedPlayers);
+
+            io.to(roomCode).emit('updateProgress', { hide: true }); 
+            io.to(roomCode).emit('friendQuiz_startBetting', {
+                secretPlayer: { id: room.game.secretPlayerId, name: room.players[secretPlayerIndex].name, avatar: room.players[secretPlayerIndex].avatar },
+                ranges: room.game.ranges
+            });
+        }
+    });
+
+    socket.on('friendQuiz_placeBet', ({ betOnRangeIndex }) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (!room || !room.game) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+        if (player && player.id !== room.game.secretPlayerId) player.bet = betOnRangeIndex;
+
+        const bettingPlayers = room.players.filter(p => p.id !== room.game.secretPlayerId);
+        const submittedCount = bettingPlayers.filter(p => p.hasOwnProperty('bet')).length;
+        
+        io.to(roomCode).emit('updateProgress', { current: submittedCount, total: bettingPlayers.length, text: 'รอเพื่อนโหวตทายใจ...' });
+
+        if (submittedCount === bettingPlayers.length) {
+            const secretPlayer = room.players.find(p => p.id === room.game.secretPlayerId);
+            const secretAnswer = secretPlayer.answer;
+            const correctRangeIndex = findQuizCorrectRangeIndex(secretAnswer, room.game.ranges);
+            
+            const winners = [];
+            room.players.forEach(p => {
+                if (p.bet === correctRangeIndex) {
+                    p.score += 10; winners.push(p.id);
+                }
+            });
+
+            broadcastScores(roomCode);
+            io.to(roomCode).emit('updateProgress', { hide: true });
+            io.to(roomCode).emit('friendQuiz_showResult', {
+                allPlayers: room.players.map(p => ({
+                    id: p.id, name: p.name, avatar: p.avatar, answer: p.answer, score: p.score, isSecret: p.id === secretPlayer.id
+                })),
+                correctRangeIndex, winners
+            });
+        }
+    });
+
+    socket.on('friendQuiz_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) startFriendQuizRound(roomCode);
+    });
+
     // --- Word Guess Listeners ---
     socket.on('wordGuess_joinTeam', ({ team }) => {
         const roomCode = findRoomBySocketId(socket.id);
@@ -609,9 +780,7 @@ io.on('connection', (socket) => {
                     io.to(roomCode).emit('wordGuess_gameOver', { winner: 'players', reason: 'หาเจอครบแล้ว!', isCoop: true });
                     return;
                 }
-                if (room.game.guessesLeft === 0) {
-                    switchWordGuessTurn(roomCode);
-                }
+                if (room.game.guessesLeft === 0) switchWordGuessTurn(roomCode);
             } else {
                 switchWordGuessTurn(roomCode);
             }
@@ -626,13 +795,9 @@ io.on('connection', (socket) => {
                 room.game.guessesLeft--;
                 room.game.teams[room.game.turn].score++;
                 if (checkWordGuessWin(roomCode)) return;
-                if (room.game.guessesLeft === 0) {
-                    switchWordGuessTurn(roomCode);
-                }
+                if (room.game.guessesLeft === 0) switchWordGuessTurn(roomCode);
             } else {
-                if (card.type === 'red' || card.type === 'blue') {
-                    room.game.teams[card.type].score++;
-                }
+                if (card.type === 'red' || card.type === 'blue') room.game.teams[card.type].score++;
                 if (checkWordGuessWin(roomCode)) return;
                 switchWordGuessTurn(roomCode);
             }
@@ -649,137 +814,12 @@ io.on('connection', (socket) => {
         }
     });
 
-    // --- Number Sort Listeners ---
-    socket.on('numberSort_submitOrder', ({ orderedPlayerIds }) => {
-        const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (!room || !room.game) return;
-        
-        const correctOrder = room.players.slice().sort((a, b) => a.number - b.number);
-        let success = true;
-        for (let i = 0; i < orderedPlayerIds.length; i++) {
-            if (orderedPlayerIds[i] !== correctOrder[i].id) {
-                success = false;
-                break;
-            }
-        }
-
-        if (success) {
-            room.players.forEach(p => p.score += 2);
-            broadcastScores(roomCode);
-        }
-
-        const results = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, number: p.number }));
-        io.to(roomCode).emit('numberSort_showResults', { results, success });
-    });
-    
-    socket.on('numberSort_nextRound', () => {
-        const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startNumberSortRound(roomCode);
-        }
-    });
-
-    // --- Friend Quiz Listeners ---
-    socket.on('friendQuiz_submitAnswer', ({ answer }) => {
-        const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (!room || !room.game) return;
-
-        const player = room.players.find(p => p.id === socket.id);
-        if (player) {
-            player.answer = answer;
-        }
-
-        const allAnswered = room.players.every(p => p.hasOwnProperty('answer'));
-        if (allAnswered) {
-            const secretPlayerIndex = Math.floor(Math.random() * room.players.length);
-            room.game.secretPlayerId = room.players[secretPlayerIndex].id;
-
-            const revealedPlayers = room.players
-                .filter(p => p.id !== room.game.secretPlayerId)
-                .sort((a, b) => a.answer - b.answer);
-            
-            room.game.ranges = generateQuizBettingRanges(revealedPlayers);
-
-            io.to(roomCode).emit('friendQuiz_startBetting', {
-                secretPlayer: { id: room.game.secretPlayerId, name: room.players[secretPlayerIndex].name, avatar: room.players[secretPlayerIndex].avatar },
-                ranges: room.game.ranges
-            });
-        }
-    });
-
-    socket.on('friendQuiz_placeBet', ({ betOnRangeIndex }) => {
-        const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (!room || !room.game) return;
-
-        const player = room.players.find(p => p.id === socket.id);
-        if (player && player.id !== room.game.secretPlayerId) {
-            player.bet = betOnRangeIndex;
-        }
-
-        const bettingPlayers = room.players.filter(p => p.id !== room.game.secretPlayerId);
-        const allBetted = bettingPlayers.every(p => p.hasOwnProperty('bet'));
-
-        if (allBetted) {
-            const secretPlayer = room.players.find(p => p.id === room.game.secretPlayerId);
-            const secretAnswer = secretPlayer.answer;
-            const correctRangeIndex = findQuizCorrectRangeIndex(secretAnswer, room.game.ranges);
-            
-            const winners = [];
-            room.players.forEach(p => {
-                if (p.bet === correctRangeIndex) {
-                    p.score += 10;
-                    winners.push(p.id);
-                }
-            });
-
-            broadcastScores(roomCode);
-
-            io.to(roomCode).emit('friendQuiz_showResult', {
-                allPlayers: room.players.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    avatar: p.avatar,
-                    answer: p.answer,
-                    score: p.score,
-                    isSecret: p.id === secretPlayer.id
-                })),
-                correctRangeIndex,
-                winners
-            });
-        }
-    });
-
-    socket.on('friendQuiz_nextRound', () => {
-        const roomCode = findRoomBySocketId(socket.id);
-        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
-            startFriendQuizRound(roomCode);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
-        const roomCode = findRoomBySocketId(socket.id);
-        if (roomCode && rooms[roomCode]) {
-            const room = rooms[roomCode];
-            const playerIndex = room.players.findIndex(p => p.id === socket.id);
-            if (playerIndex !== -1) {
-                room.players.splice(playerIndex, 1);
-                if (room.players.length === 0) {
-                    console.log(`Room ${roomCode} is empty, deleting.`);
-                    delete rooms[roomCode];
-                } else {
-                    io.to(roomCode).emit('updateLobby', room.players);
-                    broadcastScores(roomCode);
-                }
-            }
-        }
-    });
 });
 
-// --- Truth or Lie Logic Functions ---
+// ==========================================
+// GAME LOGIC FUNCTIONS
+// ==========================================
+
 function startTruthOrLieRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
@@ -789,41 +829,31 @@ function startTruthOrLieRound(roomCode) {
         return;
     }
     
-    // สุ่มโจทย์
     const promptIndex = Math.floor(Math.random() * truthOrLieData.prompts.length);
     const prompt = truthOrLieData.prompts[promptIndex];
-
     const turnOrder = [...room.players].sort(() => 0.5 - Math.random()).map(p => p.id);
 
-    room.game = {
-        phase: 'answering',
-        prompt: prompt,
-        answers: {},
-        votes: {},
-        turnOrder: turnOrder,
-        activePlayerIndex: 0
-    };
+    room.game = { phase: 'answering', prompt: prompt, answers: {}, votes: {}, turnOrder: turnOrder, activePlayerIndex: 0 };
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('truthOrLie_newRound', {
-        prompt: prompt,
-        players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
+        prompt: prompt, players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }))
     });
 }
 
 function startTruthOrLieVoting(roomCode) {
     const room = rooms[roomCode];
     room.game.phase = 'voting';
-    room.game.votes = {}; // เคลียร์โหวตของรอบผู้เล่นก่อนหน้า
+    room.game.votes = {};
 
     const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
     const activePlayer = room.players.find(p => p.id === activePlayerId);
     const activeAnswers = room.game.answers[activePlayerId];
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('truthOrLie_startVoting', {
         activePlayer: { id: activePlayer.id, name: activePlayer.name, avatar: activePlayer.avatar },
-        optionA: activeAnswers.optionA,
-        optionB: activeAnswers.optionB,
-        playerCount: room.players.length
+        optionA: activeAnswers.optionA, optionB: activeAnswers.optionB, playerCount: room.players.length
     });
 }
 
@@ -835,48 +865,31 @@ function truthOrLie_revealVote(roomCode) {
     const activePlayer = room.players.find(p => p.id === activePlayerId);
     const activeAnswers = room.game.answers[activePlayerId];
     
-    const lieOption = activeAnswers.lieOption; // 'A' or 'B'
+    const lieOption = activeAnswers.lieOption; 
     let fooledCount = 0;
-    const voteDetails = []; // เก็บว่าใครโหวตอะไร
+    const voteDetails = [];
 
-    // ตรวจสอบคะแนน
     for (const [voterId, vote] of Object.entries(room.game.votes)) {
         const voter = room.players.find(p => p.id === voterId);
         if (!voter) continue;
 
         voteDetails.push({ name: voter.name, avatar: voter.avatar, vote: vote });
-
-        if (vote !== lieOption) {
-            // โดนหลอก! (โหวตผิด)
-            fooledCount++;
-        } else {
-            // จับโกหกได้!
-            voter.score += 1;
-        }
+        if (vote !== lieOption) fooledCount++;
+        else voter.score += 1;
     }
 
-    // ให้คะแนนคนตอบ
     activePlayer.score += fooledCount;
-    // โบนัสถ้าหลอกได้ทุกคน (ทุกคนลบ 1 คือตัวคนตอบเอง)
-    if (fooledCount > 0 && fooledCount === (room.players.length - 1)) {
-        activePlayer.score += 2; 
-    }
+    if (fooledCount > 0 && fooledCount === (room.players.length - 1)) activePlayer.score += 2; 
 
     broadcastScores(roomCode);
-
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('truthOrLie_showVoteResult', {
         activePlayer: { name: activePlayer.name, avatar: activePlayer.avatar },
-        truth: activeAnswers.truth,
-        lie: activeAnswers.lie,
-        lieOption: lieOption, // ข้อที่โกหก
-        fooledCount: fooledCount,
-        voteDetails: voteDetails,
-        totalVoters: room.players.length - 1
+        truth: activeAnswers.truth, lie: activeAnswers.lie, lieOption: lieOption,
+        fooledCount: fooledCount, voteDetails: voteDetails, totalVoters: room.players.length - 1
     });
 }
 
-
-// --- Unique Clue Logic Functions ---
 function startUniqueClueRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
@@ -890,27 +903,19 @@ function startUniqueClueRound(roomCode) {
     const guesserIndex = Math.floor(Math.random() * room.players.length);
     const guesserId = room.players[guesserIndex].id;
 
-    room.game = {
-        phase: 'clue_giving',
-        word: word,
-        guesserId: guesserId,
-        clues: {}
-    };
+    room.game = { phase: 'clue_giving', word: word, guesserId: guesserId, clues: {} };
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('uniqueClue_newRound', {
         guesser: { id: guesserId, name: room.players[guesserIndex].name, avatar: room.players[guesserIndex].avatar },
-        word: word,
-        players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score}))
+        word: word, players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score}))
     });
 }
 
-// --- Secret Painter Logic Functions ---
 function startSecretPainterRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
-        room.gameState = 'waiting';
-        io.to(roomCode).emit('updateLobby', room.players);
-        return;
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
 
     const catIndex = Math.floor(Math.random() * secretPainterData.categories.length);
@@ -922,47 +927,32 @@ function startSecretPainterRound(roomCode) {
     const secretPainterId = room.players[secretPainterIndex].id;
 
     const shuffledColors = [...secretPainterData.colors].sort(() => 0.5 - Math.random());
-    const playerInfo = {};
-    const turnOrder = [];
-
+    const playerInfo = {}; const turnOrder = [];
     const shuffledPlayers = [...room.players].sort(() => 0.5 - Math.random());
     
     shuffledPlayers.forEach((p, index) => {
-        playerInfo[p.id] = {
-            color: shuffledColors[index % shuffledColors.length],
-            isSecretPainter: p.id === secretPainterId
-        };
+        playerInfo[p.id] = { color: shuffledColors[index % shuffledColors.length], isSecretPainter: p.id === secretPainterId };
         turnOrder.push(p.id);
     });
 
     room.game = {
-        category: categoryObj.name,
-        word: word,
-        secretPainterId: secretPainterId,
-        playerInfo: playerInfo,
-        turnOrder: turnOrder,
-        currentTurnIndex: 0,
-        round: 1, 
-        votes: {},
-        phase: 'drawing'
+        category: categoryObj.name, word: word, secretPainterId: secretPainterId, playerInfo: playerInfo,
+        turnOrder: turnOrder, currentTurnIndex: 0, round: 1, votes: {}, phase: 'drawing'
     };
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     room.players.forEach(p => {
         const info = playerInfo[p.id];
         io.to(p.id).emit('secretPainter_newRound', {
-            category: categoryObj.name,
-            word: info.isSecretPainter ? null : word, 
-            isSecretPainter: info.isSecretPainter,
-            myColor: info.color,
+            category: categoryObj.name, word: info.isSecretPainter ? null : word, 
+            isSecretPainter: info.isSecretPainter, myColor: info.color,
             turnOrderNames: turnOrder.map(id => room.players.find(player => player.id === id).name),
-            currentTurnId: turnOrder[0],
-            currentTurnName: room.players.find(player => player.id === turnOrder[0]).name,
+            currentTurnId: turnOrder[0], currentTurnName: room.players.find(player => player.id === turnOrder[0]).name,
             currentTurnAvatar: room.players.find(player => player.id === turnOrder[0]).avatar
         });
     });
 }
 
-// --- Word Guess Logic Functions ---
 function startWordGuessTeamGame(roomCode) {
     const room = rooms[roomCode];
     const words = [...wordGuessData.words].sort(() => 0.5 - Math.random()).slice(0, 25);
@@ -976,15 +966,14 @@ function startWordGuessTeamGame(roomCode) {
     room.players.forEach(p => { p.team = null; p.isSpymaster = false; });
 
     room.game = {
-        isCoop: false,
-        board: words.map((word, i) => ({ word, type: shuffledTypes[i], revealed: false })),
+        isCoop: false, board: words.map((word, i) => ({ word, type: shuffledTypes[i], revealed: false })),
         teams: {
             red: { players: [], spymaster: null, score: 0, goal: firstTurn === 'red' ? 9 : 8 },
             blue: { players: [], spymaster: null, score: 0, goal: firstTurn === 'blue' ? 9 : 8 }
         },
-        turn: firstTurn,
-        clue: {}, guessesLeft: 0, players: room.players
+        turn: firstTurn, clue: {}, guessesLeft: 0, players: room.players
     };
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('wordGuess_updateState', room.game);
 }
 
@@ -997,33 +986,25 @@ function startWordGuessCoopGame(roomCode) {
     types.push(...Array(7).fill('neutral'));
     const shuffledTypes = types.sort(() => 0.5 - Math.random());
     
-    room.players.forEach((p, index) => {
-        p.isSpymaster = (index === 0);
-    });
+    room.players.forEach((p, index) => { p.isSpymaster = (index === 0); });
 
     room.game = {
-        isCoop: true,
-        board: words.map((word, i) => ({ word, type: shuffledTypes[i], revealed: false })),
-        wordsToFind: 15,
-        wordsFound: 0,
-        turnsLeft: 9,
-        clue: {}, guessesLeft: 0, players: room.players
+        isCoop: true, board: words.map((word, i) => ({ word, type: shuffledTypes[i], revealed: false })),
+        wordsToFind: 15, wordsFound: 0, turnsLeft: 9, clue: {}, guessesLeft: 0, players: room.players
     };
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('wordGuess_updateState', room.game);
 }
 
 function switchWordGuessTurn(roomCode) {
     const room = rooms[roomCode];
     if (!room || !room.game) return;
-    
-    room.game.clue = {};
-    room.game.guessesLeft = 0;
+    room.game.clue = {}; room.game.guessesLeft = 0;
 
     if (room.game.isCoop) {
         room.game.turnsLeft--;
         if (room.game.turnsLeft < 0) {
-            io.to(roomCode).emit('wordGuess_gameOver', { winner: 'game', reason: 'เทิร์นหมดแล้ว!', isCoop: true });
-            return;
+            io.to(roomCode).emit('wordGuess_gameOver', { winner: 'game', reason: 'เทิร์นหมดแล้ว!', isCoop: true }); return;
         }
     } else {
         room.game.turn = room.game.turn === 'red' ? 'blue' : 'red';
@@ -1035,124 +1016,92 @@ function checkWordGuessWin(roomCode) {
     if (!room || !room.game || room.game.isCoop) return false;
     const gameState = room.game;
     if (gameState.teams.red.score >= gameState.teams.red.goal) {
-        io.to(roomCode).emit('wordGuess_gameOver', { winner: 'red', reason: 'ทีมสีแดงหาคำศัพท์เจอครบแล้ว!', isCoop: false });
-        return true;
+        io.to(roomCode).emit('wordGuess_gameOver', { winner: 'red', reason: 'ทีมสีแดงหาคำศัพท์เจอครบแล้ว!', isCoop: false }); return true;
     }
     if (gameState.teams.blue.score >= gameState.teams.blue.goal) {
-        io.to(roomCode).emit('wordGuess_gameOver', { winner: 'blue', reason: 'ทีมสีน้ำเงินหาคำศัพท์เจอครบแล้ว!', isCoop: false });
-        return true;
+        io.to(roomCode).emit('wordGuess_gameOver', { winner: 'blue', reason: 'ทีมสีน้ำเงินหาคำศัพท์เจอครบแล้ว!', isCoop: false }); return true;
     }
     return false;
 }
 
-// --- Number Sort Logic Functions ---
 function startNumberSortRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
-        room.gameState = 'waiting';
-        io.to(roomCode).emit('updateLobby', room.players);
-        return;
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
     room.game = {};
-    
     const themeIndex = Math.floor(Math.random() * numberSortData.themes.length);
     const theme = numberSortData.themes[themeIndex];
-
     const numbers = [];
     while (numbers.length < room.players.length) {
         const num = Math.floor(Math.random() * 100) + 1;
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
+        if (!numbers.includes(num)) numbers.push(num);
     }
     
+    io.to(roomCode).emit('updateProgress', { hide: true });
     room.players.forEach((player, index) => {
         player.number = numbers[index];
         io.to(player.id).emit('numberSort_newRound', {
-            theme: theme,
-            number: player.number,
-            players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }))
+            theme: theme, number: player.number, players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }))
         });
     });
 }
 
-// --- Friend Quiz Logic Functions ---
 function startFriendQuizRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
         io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
-        room.gameState = 'waiting';
-        io.to(roomCode).emit('updateLobby', room.players);
-        return;
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
-    room.game = {
-        secretPlayerId: null,
-        ranges: []
-    };
-    room.players.forEach(p => {
-        delete p.answer;
-        delete p.bet;
-    });
+    room.game = { secretPlayerId: null, ranges: [] };
+    room.players.forEach(p => { delete p.answer; delete p.bet; });
 
     const question = friendQuizData.questions[Math.floor(Math.random() * friendQuizData.questions.length)];
     room.game.question = question;
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('friendQuiz_newRound', { question, players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score})) });
 }
 
 function generateQuizBettingRanges(revealedPlayers) {
     const ranges = [];
     if (revealedPlayers.length === 0) {
-        ranges.push({ label: 'ทายได้เลย!', min: -Infinity, max: Infinity });
-        return ranges;
+        ranges.push({ label: 'ทายได้เลย!', min: -Infinity, max: Infinity }); return ranges;
     }
-
     revealedPlayers.sort((a,b) => a.answer - b.answer);
-
     ranges.push({ label: `< ${revealedPlayers[0].answer}`, min: -Infinity, max: revealedPlayers[0].answer - 1 });
-
     for (let i = 0; i < revealedPlayers.length; i++) {
-        const current = revealedPlayers[i];
-        const next = revealedPlayers[i + 1];
+        const current = revealedPlayers[i]; const next = revealedPlayers[i + 1];
         if (next) {
             if (current.answer === next.answer) continue; 
             ranges.push({ label: `${current.answer} - ${next.answer - 1}`, min: current.answer, max: next.answer - 1 });
         }
     }
     ranges.push({ label: `≥ ${revealedPlayers[revealedPlayers.length - 1].answer}`, min: revealedPlayers[revealedPlayers.length - 1].answer, max: Infinity });
-    
-    return ranges.filter((range, index, self) => 
-        index === self.findIndex((r) => (r.label === range.label))
-    );
+    return ranges.filter((range, index, self) => index === self.findIndex((r) => (r.label === range.label)));
 }
 
 function findQuizCorrectRangeIndex(secretAnswer, ranges) {
     return ranges.findIndex(range => secretAnswer >= range.min && secretAnswer <= range.max);
 }
 
-// --- Match The Blank Logic Functions ---
 function startMatchTheBlankRound(roomCode) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
         io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
-        room.gameState = 'waiting';
-        io.to(roomCode).emit('updateLobby', room.players);
-        return;
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
     const promptIndex = Math.floor(Math.random() * matchTheBlankData.prompts.length);
     const prompt = matchTheBlankData.prompts[promptIndex];
 
-    room.game = {
-        prompt: prompt,
-        answers: {}
-    };
+    room.game = { prompt: prompt, answers: {} };
 
+    io.to(roomCode).emit('updateProgress', { hide: true });
     io.to(roomCode).emit('matchTheBlank_newRound', { 
-        prompt: prompt, 
-        players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score})) 
+        prompt: prompt, players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, score: p.score})) 
     });
 }
 
