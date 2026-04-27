@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    pingTimeout: 60000 // ให้เวลาเน็ตหลุด 60 วินาทีก่อนตัดขาด
+    pingTimeout: 60000 
 });
 
 app.use(express.static(__dirname));
@@ -14,12 +14,11 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// เพิ่ม API สำหรับให้ฝั่งหน้าบ้านคอยสะกิด (Ping) ไม่ให้เซิร์ฟเวอร์หลับ
 app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
-// --- Game Data (Expanded) ---
+// --- Game Data ---
 const wordGuessData = {
     words: [
         'สไปค์', 'วานดัล', 'แฟนทอม', 'โอเปอเรเตอร์', 'เจ็ตต์', 'เรน่า', 'เรซ', 'โอมเมน', 'คิลจอย', 'ไซเฟอร์',
@@ -96,6 +95,12 @@ const truthOrLieData = {
     ]
 };
 
+// --- Bluff Overthrow (Coup) Data ---
+const bluffData = {
+    deck: ['sniper','sniper','sniper','assassin','assassin','assassin','hacker','hacker','hacker','spy','spy','spy','healer','healer','healer'],
+    roleNames: { 'sniper': '🔫 สไนเปอร์', 'assassin': '🔪 นักฆ่า', 'hacker': '💻 แฮกเกอร์', 'spy': '🕶️ สายลับ', 'healer': '💉 หมอ' }
+};
+
 const rooms = {};
 
 // --- Helper Functions ---
@@ -109,7 +114,10 @@ function broadcastScores(roomCode) {
     }
 }
 
-// ฟังก์ชันสำหรับส่งข้อมูลเกมให้ผู้เล่นที่เพิ่งกด Refresh (Reconnect)
+function systemChat(roomCode, msg) {
+    io.to(roomCode).emit('receiveChat', { sender: 'ระบบเกม', avatar: '🤖', message: msg, senderId: 'system' });
+}
+
 function syncGameStateToPlayer(socket, room) {
     if (!room || !room.game || room.gameState !== 'playing') return;
     const g = room.game;
@@ -154,9 +162,10 @@ function syncGameStateToPlayer(socket, room) {
              const activeAnswers = g.answers[activePlayer.id];
              if(activePlayer && activeAnswers) socket.emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
          }
+    } else if (room.gameType === 'bluff-overthrow') {
+         syncBluffState(roomCode, socket.id);
     }
 }
-
 
 // --- Main Socket Logic ---
 io.on('connection', (socket) => {
@@ -166,24 +175,30 @@ io.on('connection', (socket) => {
     socket.on('rejoinRoom', ({ roomCode, playerId, playerName, avatar }) => {
         let room = rooms[roomCode];
         if (!room) {
-            // ถ้าระบบ Render รีสตาร์ทและลบ memory ไปแล้ว ให้สร้างห้องใหม่ด้วยรหัสเดิมทันที
-            rooms[roomCode] = {
-                gameType: null,
-                players: [],
-                gameState: 'waiting',
-                game: {},
-            };
+            rooms[roomCode] = { gameType: null, players: [], gameState: 'waiting', game: {} };
             room = rooms[roomCode];
         }
 
         let player = room.players.find(p => p.playerId === playerId);
         if (player) {
-            player.id = socket.id; // อัปเดต socket id เป็นอันใหม่
+            // Update mapping in games if id changes
+            const oldId = player.id;
+            player.id = socket.id;
             player.isOnline = true;
-            player.name = playerName; // อัปเดตชื่อเผื่อแก้
+            player.name = playerName;
             player.avatar = avatar;
+            
+            // Fix references in Bluff game
+            if (room.gameType === 'bluff-overthrow' && room.game && room.game.players) {
+                if (room.game.players[oldId]) {
+                    room.game.players[socket.id] = room.game.players[oldId];
+                    room.game.players[socket.id].id = socket.id;
+                    delete room.game.players[oldId];
+                }
+                const turnIdx = room.game.turnOrder.indexOf(oldId);
+                if(turnIdx !== -1) room.game.turnOrder[turnIdx] = socket.id;
+            }
         } else {
-            // ถ้าโดนเตะไปแล้ว หรือเข้าครั้งแรกหลังเซิร์ฟรีสตาร์ท
             if (room.players.length < 16) {
                 player = { id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true };
                 room.players.push(player);
@@ -197,7 +212,7 @@ io.on('connection', (socket) => {
         
         if (room.gameState === 'playing') {
             socket.emit('gameStarted', room.gameType);
-            syncGameStateToPlayer(socket, room); // ซิงค์ข้อมูลเกมที่ค้างอยู่
+            syncGameStateToPlayer(socket, room);
         }
         
         io.to(roomCode).emit('updateLobby', room.players);
@@ -205,23 +220,16 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        let foundRoomCode = null;
-        let foundPlayer = null;
-        
+        let foundRoomCode = null; let foundPlayer = null;
         for (const code in rooms) {
             const player = rooms[code].players.find(p => p.id === socket.id);
-            if (player) {
-                foundRoomCode = code;
-                foundPlayer = player;
-                break;
-            }
+            if (player) { foundRoomCode = code; foundPlayer = player; break; }
         }
 
         if (foundRoomCode && foundPlayer) {
             foundPlayer.isOnline = false;
             io.to(foundRoomCode).emit('updateLobby', rooms[foundRoomCode].players);
             
-            // รอ 10 วิเผื่อรีเฟรชกลับมา ถ้าไม่กลับมาค่อยลบออกเฉพาะตอนอยู่ Lobby
             setTimeout(() => {
                 const room = rooms[foundRoomCode];
                 if (room) {
@@ -229,76 +237,53 @@ io.on('connection', (socket) => {
                     if (p && !p.isOnline) {
                         if (room.gameState === 'waiting') {
                             room.players = room.players.filter(pl => pl.playerId !== foundPlayer.playerId);
-                            if (room.players.length === 0) {
-                                delete rooms[foundRoomCode];
-                            } else {
+                            if (room.players.length === 0) delete rooms[foundRoomCode];
+                            else {
                                 io.to(foundRoomCode).emit('updateLobby', room.players);
                                 broadcastScores(foundRoomCode);
                             }
                         }
                     }
-                    
-                    // หากห้องว่างเปล่าจริงๆ (ทุกคนออฟไลน์หมด) ให้ลบห้องทิ้งเพื่อคืน Memory
                     if (room && room.players.length > 0) {
-                        const allOffline = room.players.every(pl => !pl.isOnline);
-                        if (allOffline) delete rooms[foundRoomCode];
+                        if (room.players.every(pl => !pl.isOnline)) delete rooms[foundRoomCode];
                     }
                 }
             }, 10000); 
         }
     });
 
-    // --- Room Chat & Reactions ---
     socket.on('sendChat', (message) => {
         const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (room) {
-            const player = room.players.find(p => p.id === socket.id);
-            if (player) {
-                io.to(roomCode).emit('receiveChat', { sender: player.name, avatar: player.avatar, message: message.trim(), senderId: player.id });
-            }
+        if (rooms[roomCode]) {
+            const player = rooms[roomCode].players.find(p => p.id === socket.id);
+            if (player) io.to(roomCode).emit('receiveChat', { sender: player.name, avatar: player.avatar, message: message.trim(), senderId: player.id });
         }
     });
 
     socket.on('sendReaction', ({ emoji }) => {
         const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (room) {
-            const player = room.players.find(p => p.id === socket.id);
-            if (player) {
-                io.to(roomCode).emit('receiveReaction', { emoji, senderName: player.name, avatar: player.avatar });
-            }
+        if (rooms[roomCode]) {
+            const player = rooms[roomCode].players.find(p => p.id === socket.id);
+            if (player) io.to(roomCode).emit('receiveReaction', { emoji, senderName: player.name, avatar: player.avatar });
         }
     });
 
     socket.on('createRoom', ({ playerName, avatar, playerId }) => {
         let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-        while (rooms[roomCode]) { roomCode = Math.random().toString(36).substring(2, 6).toUpperCase(); }
-        
-        rooms[roomCode] = {
-            gameType: null, 
-            players: [{ id: socket.id, playerId: playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true }],
-            gameState: 'waiting',
-            game: {}, 
-        };
-        socket.join(roomCode);
-        socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
+        while (rooms[roomCode]) roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+        rooms[roomCode] = { gameType: null, players: [{ id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true }], gameState: 'waiting', game: {} };
+        socket.join(roomCode); socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
     });
 
     socket.on('joinRoom', ({ playerName, avatar, roomCode, playerId }) => {
         const room = rooms[roomCode];
         if (room && room.players.length < 16 && room.gameState === 'waiting') {
-            // เช็คว่าเคยมีชื่อนี้ไหม
             const existingPlayer = room.players.find(p => p.playerId === playerId);
             if(existingPlayer) {
-                existingPlayer.id = socket.id;
-                existingPlayer.isOnline = true;
-                existingPlayer.name = playerName;
-                existingPlayer.avatar = avatar;
+                existingPlayer.id = socket.id; existingPlayer.isOnline = true; existingPlayer.name = playerName; existingPlayer.avatar = avatar;
             } else {
-                room.players.push({ id: socket.id, playerId: playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true });
+                room.players.push({ id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true });
             }
-            
             socket.join(roomCode);
             socket.emit('joinSuccess', { roomCode, players: room.players, gameType: room.gameType });
             io.to(roomCode).emit('updateLobby', room.players);
@@ -308,32 +293,25 @@ io.on('connection', (socket) => {
         }
     });
 
-    // หัวหน้าห้องเลือกเกมจาก Lobby
     socket.on('host_selectGame', (gameType) => {
         const roomCode = findRoomBySocketId(socket.id);
-        const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) {
-            room.gameType = gameType;
-            io.to(roomCode).emit('gameSelected', gameType);
+        if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
+            rooms[roomCode].gameType = gameType; io.to(roomCode).emit('gameSelected', gameType);
         }
     });
     
     socket.on('startGame', (roomCode) => {
         const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id && room.gameType) {
-            room.gameState = 'playing';
-            io.to(roomCode).emit('gameStarted', room.gameType);
+            room.gameState = 'playing'; io.to(roomCode).emit('gameStarted', room.gameType);
         }
     });
 
-    // ระบบกลับสู่ Lobby
     socket.on('returnToLobby', () => {
         const roomCode = findRoomBySocketId(socket.id);
         const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id) {
-            room.gameState = 'waiting';
-            room.gameType = null;
-            room.game = {};
+            room.gameState = 'waiting'; room.gameType = null; room.game = {};
             io.to(roomCode).emit('backToLobby', room.players);
         }
     });
@@ -343,24 +321,15 @@ io.on('connection', (socket) => {
         if (room && room.players.length > 0 && room.players[0].id === socket.id) {
             try {
                 if (room.gameType === 'word-guess') {
-                    if (room.players.length >= 2 && room.players.length <= 2) {
-                        startWordGuessCoopGame(roomCode);
-                    } else {
-                        startWordGuessTeamGame(roomCode);
-                    }
-                } else if (room.gameType === 'number-sort') {
-                    startNumberSortRound(roomCode);
-                } else if (room.gameType === 'friend-quiz') {
-                    startFriendQuizRound(roomCode);
-                } else if (room.gameType === 'secret-painter') {
-                    startSecretPainterRound(roomCode);
-                } else if (room.gameType === 'match-the-blank') {
-                    startMatchTheBlankRound(roomCode);
-                } else if (room.gameType === 'unique-clue') {
-                    startUniqueClueRound(roomCode);
-                } else if (room.gameType === 'truth-or-lie') {
-                    startTruthOrLieRound(roomCode);
-                }
+                    if (room.players.length >= 2 && room.players.length <= 2) startWordGuessCoopGame(roomCode);
+                    else startWordGuessTeamGame(roomCode);
+                } else if (room.gameType === 'number-sort') startNumberSortRound(roomCode);
+                else if (room.gameType === 'friend-quiz') startFriendQuizRound(roomCode);
+                else if (room.gameType === 'secret-painter') startSecretPainterRound(roomCode);
+                else if (room.gameType === 'match-the-blank') startMatchTheBlankRound(roomCode);
+                else if (room.gameType === 'unique-clue') startUniqueClueRound(roomCode);
+                else if (room.gameType === 'truth-or-lie') startTruthOrLieRound(roomCode);
+                else if (room.gameType === 'bluff-overthrow') startBluffRound(roomCode);
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
                 io.to(roomCode).emit('error', 'เกิดข้อผิดพลาดร้ายแรงขณะเริ่มเกม');
@@ -371,6 +340,133 @@ io.on('connection', (socket) => {
     // ==========================================
     // ALL GAME LISTENERS
     // ==========================================
+
+    // --- Bluff Overthrow Listeners ---
+    socket.on('bluff_action', ({ type, targetId }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'action') return;
+        if (room.game.turnOrder[room.game.currentTurnIndex] !== socket.id) return;
+
+        const player = room.game.players[socket.id];
+        const g = room.game;
+        const pName = room.players.find(p=>p.id===socket.id).name;
+
+        // Validation
+        if (type === 'coup' && player.coins < 7) return socket.emit('error', 'เครดิตไม่พอสำหรับรัฐประหาร');
+        if (type === 'assassinate' && player.coins < 3) return socket.emit('error', 'เครดิตไม่พอสำหรับจ้างนักฆ่า');
+        if (player.coins >= 10 && type !== 'coup') return socket.emit('error', 'เครดิตถึง 10 แล้ว บังคับต้องทำรัฐประหารเท่านั้น!');
+
+        g.pendingAction = { type, source: socket.id, target: targetId, claim: getClaimForAction(type) };
+        g.responses = {};
+
+        if (type === 'income') {
+            player.coins += 1; systemChat(roomCode, `${pName} รับรายได้ปกติ (+1 เครดิต)`);
+            advanceBluffTurn(roomCode);
+        } else if (type === 'coup') {
+            player.coins -= 7; systemChat(roomCode, `💥 ${pName} ทำรัฐประหาร (Coup) ใส่ ${room.players.find(p=>p.id===targetId).name}!`);
+            g.phase = 'lose_card'; g.playerLosingCard = targetId; g.afterLoseCard = () => advanceBluffTurn(roomCode);
+            syncBluffState(roomCode);
+        } else {
+            // Actions that can be blocked/challenged
+            if (type === 'assassinate') player.coins -= 3;
+            g.phase = 'reaction';
+            const actionText = getActionText(type, targetId, room);
+            systemChat(roomCode, `⚡ ${pName} ต้องการ: ${actionText}`);
+            syncBluffState(roomCode);
+        }
+    });
+
+    socket.on('bluff_react', ({ response, claimRole }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'bluff-overthrow') return;
+        const g = room.game;
+        if (g.players[socket.id].isEliminated) return;
+
+        if (g.phase === 'reaction') {
+            if (response === 'challenge') {
+                handleChallenge(roomCode, socket.id, g.pendingAction.source, g.pendingAction.claim, 
+                    () => { // Claimer had the card (Challenger failed)
+                        if (g.pendingAction.type === 'foreign_aid') {
+                            g.players[g.pendingAction.source].coins += 2; advanceBluffTurn(roomCode);
+                        } else {
+                            g.phase = 'block_reaction'; g.responses = {}; syncBluffState(roomCode); // Now ask for blocks
+                        }
+                    },
+                    () => advanceBluffTurn(roomCode) // Claimer lied, action canceled
+                );
+            } else if (response === 'block') {
+                g.pendingBlock = { source: socket.id, claim: claimRole };
+                g.phase = 'block_challenge_reaction'; g.responses = {};
+                systemChat(roomCode, `🛡️ ${room.players.find(p=>p.id===socket.id).name} ประกาศบล็อก! (อ้างเป็น ${bluffData.roleNames[claimRole]})`);
+                syncBluffState(roomCode);
+            } else {
+                g.responses[socket.id] = 'pass';
+                checkReactionsComplete(roomCode);
+            }
+        } else if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
+            if (response === 'challenge') {
+                handleChallenge(roomCode, socket.id, g.pendingBlock.source, g.pendingBlock.claim,
+                    () => advanceBluffTurn(roomCode), // Blocker was telling truth, action is blocked
+                    () => resolveAction(roomCode) // Blocker lied, action goes through
+                );
+            } else {
+                g.responses[socket.id] = 'pass';
+                if (Object.keys(g.responses).length === getAlivePlayersCount(room) - 1) {
+                    if (g.phase === 'block_challenge_reaction') {
+                         systemChat(roomCode, `✅ บล็อกสำเร็จ!`); advanceBluffTurn(roomCode);
+                    } else if (g.phase === 'block_reaction') {
+                         resolveAction(roomCode); // No blocks
+                    }
+                } else {
+                     syncBluffState(roomCode);
+                }
+            }
+        }
+    });
+
+    socket.on('bluff_loseCard', ({ cardIndex }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'lose_card') return;
+        if (socket.id !== room.game.playerLosingCard) return;
+
+        const p = room.game.players[socket.id];
+        if (!p.cards[cardIndex] || p.cards[cardIndex].dead) return;
+
+        p.cards[cardIndex].dead = true;
+        systemChat(roomCode, `💀 ${room.players.find(x=>x.id===socket.id).name} เสียชีวิต 1 ตัว: เปิดไพ่ ${bluffData.roleNames[p.cards[cardIndex].role]}`);
+        
+        if (p.cards.every(c => c.dead)) {
+            p.isEliminated = true;
+            systemChat(roomCode, `☠️ ${room.players.find(x=>x.id===socket.id).name} ถูกคัดออกจากเกม!`);
+            checkBluffWin(roomCode);
+        }
+
+        if (room.gameState === 'playing') {
+            if (room.game.afterLoseCard) room.game.afterLoseCard();
+            else advanceBluffTurn(roomCode);
+        }
+    });
+
+    socket.on('bluff_exchange', ({ keepIndices }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'exchange') return;
+        if (socket.id !== room.game.pendingAction.source) return;
+
+        const p = room.game.players[socket.id];
+        const newCards = [];
+        const returnToDeck = [];
+        
+        for (let i=0; i<p.cards.length + 2; i++) {
+            if (keepIndices.includes(i)) newCards.push(room.game.exchangeOptions[i]);
+            else returnToDeck.push(room.game.exchangeOptions[i].role);
+        }
+        
+        p.cards = newCards;
+        room.game.deck.push(...returnToDeck);
+        room.game.deck.sort(() => 0.5 - Math.random());
+        systemChat(roomCode, `🔄 ${room.players.find(x=>x.id===socket.id).name} เปลี่ยนไพ่เสร็จสิ้น`);
+        advanceBluffTurn(roomCode);
+    });
 
     // --- Truth or Lie Listeners ---
     socket.on('truthOrLie_submitAnswer', ({ truth, lie }) => {
@@ -837,6 +933,189 @@ io.on('connection', (socket) => {
 // ==========================================
 // GAME LOGIC FUNCTIONS
 // ==========================================
+
+// --- Bluff Overthrow (Coup) Logic ---
+function getAlivePlayersCount(room) {
+    return Object.values(room.game.players).filter(p => !p.isEliminated).length;
+}
+
+function syncBluffState(roomCode, specificSocketId = null) {
+    const room = rooms[roomCode];
+    if (!room || !room.game) return;
+    const g = room.game;
+
+    const globalState = {
+        turnOrder: g.turnOrder,
+        currentTurnId: g.turnOrder[g.currentTurnIndex],
+        phase: g.phase,
+        pendingAction: g.pendingAction,
+        pendingBlock: g.pendingBlock,
+        playerLosingCard: g.playerLosingCard,
+        playersStatus: Object.keys(g.players).map(pId => {
+            const pt = room.players.find(x => x.id === pId);
+            return {
+                id: pId,
+                name: pt ? pt.name : 'Unknown',
+                avatar: pt ? pt.avatar : '👤',
+                coins: g.players[pId].coins,
+                cardsCount: g.players[pId].cards.filter(c => !c.dead).length,
+                deadCards: g.players[pId].cards.filter(c => c.dead).map(c => c.role),
+                isEliminated: g.players[pId].isEliminated
+            };
+        })
+    };
+
+    if (specificSocketId) {
+        io.to(specificSocketId).emit('coup_updateState', { myState: g.players[specificSocketId], globalState });
+    } else {
+        room.players.forEach(p => {
+            io.to(p.id).emit('coup_updateState', { myState: g.players[p.id], globalState });
+        });
+    }
+}
+
+function advanceBluffTurn(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    let nextIdx = (g.currentTurnIndex + 1) % g.turnOrder.length;
+    while(g.players[g.turnOrder[nextIdx]].isEliminated) {
+        nextIdx = (nextIdx + 1) % g.turnOrder.length;
+    }
+    g.currentTurnIndex = nextIdx;
+    g.phase = 'action';
+    g.pendingAction = null;
+    g.pendingBlock = null;
+    g.responses = {};
+    syncBluffState(roomCode);
+}
+
+function getClaimForAction(type) {
+    if(type === 'tax') return 'sniper';
+    if(type === 'assassinate') return 'assassin';
+    if(type === 'steal') return 'hacker';
+    if(type === 'exchange') return 'spy';
+    return null;
+}
+
+function getActionText(type, targetId, room) {
+    const targetName = targetId ? room.players.find(p=>p.id===targetId).name : '';
+    if(type === 'foreign_aid') return 'รับของสนับสนุน (+2 เครดิต)';
+    if(type === 'tax') return 'อ้างสไนเปอร์ หยิบเงิน (+3 เครดิต)';
+    if(type === 'assassinate') return `อ้างนักฆ่า ลอบสังหาร ${targetName}`;
+    if(type === 'steal') return `อ้างแฮกเกอร์ ขโมยเงินจาก ${targetName}`;
+    if(type === 'exchange') return 'อ้างสายลับ เปลี่ยนไพ่ในมือ';
+    return '';
+}
+
+function checkReactionsComplete(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const requiredResponses = getAlivePlayersCount(room) - 1;
+    if (Object.keys(g.responses).length >= requiredResponses) {
+        // All passed the challenge
+        if (g.phase === 'reaction') {
+            const type = g.pendingAction.type;
+            if (['foreign_aid', 'assassinate', 'steal'].includes(type)) {
+                // Need to ask for blocks now
+                g.phase = 'block_reaction';
+                g.responses = {};
+                syncBluffState(roomCode);
+            } else {
+                resolveAction(roomCode);
+            }
+        }
+    } else {
+        syncBluffState(roomCode);
+    }
+}
+
+function resolveAction(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const action = g.pendingAction;
+    const sourcePlayer = g.players[action.source];
+    const targetPlayer = action.target ? g.players[action.target] : null;
+
+    if (action.type === 'foreign_aid') {
+        sourcePlayer.coins += 2; systemChat(roomCode, `💰 ของสนับสนุนส่งถึงมือ! (+2 เครดิต)`); advanceBluffTurn(roomCode);
+    } else if (action.type === 'tax') {
+        sourcePlayer.coins += 3; systemChat(roomCode, `💰 สไนเปอร์ทำงาน! (+3 เครดิต)`); advanceBluffTurn(roomCode);
+    } else if (action.type === 'assassinate') {
+        systemChat(roomCode, `🔪 ลอบสังหารสำเร็จ!`);
+        g.phase = 'lose_card'; g.playerLosingCard = action.target; g.afterLoseCard = () => advanceBluffTurn(roomCode);
+        syncBluffState(roomCode);
+    } else if (action.type === 'steal') {
+        const stolen = Math.min(2, targetPlayer.coins);
+        targetPlayer.coins -= stolen; sourcePlayer.coins += stolen;
+        systemChat(roomCode, `💻 ขโมยเงินสำเร็จ! (+${stolen} เครดิต)`); advanceBluffTurn(roomCode);
+    } else if (action.type === 'exchange') {
+        systemChat(roomCode, `🕶️ สายลับกำลังเลือกไพ่...`);
+        g.phase = 'exchange';
+        g.exchangeOptions = [...sourcePlayer.cards.filter(c=>!c.dead), {role: g.deck.pop(), dead: false}, {role: g.deck.pop(), dead: false}];
+        syncBluffState(roomCode);
+    }
+}
+
+function handleChallenge(roomCode, challengerId, claimedId, claimRole, onSuccess, onFail) {
+    const room = rooms[roomCode]; const g = room.game;
+    const claimer = g.players[claimedId];
+    systemChat(roomCode, `🚨 ${room.players.find(p=>p.id===challengerId).name} สั่งจับโกหก ${room.players.find(p=>p.id===claimedId).name}!`);
+
+    const hasCardIndex = claimer.cards.findIndex(c => !c.dead && c.role === claimRole);
+    
+    if (hasCardIndex !== -1) {
+        // Claimer telling truth -> Challenger loses card
+        systemChat(roomCode, `✅ มีของจริง! โชว์ไพ่ ${bluffData.roleNames[claimRole]} ให้ดูเลย! คนจับผิดต้องเสีย 1 ชีวิต`);
+        // Claimer swaps card
+        g.deck.push(claimer.cards[hasCardIndex].role);
+        g.deck.sort(() => 0.5 - Math.random());
+        claimer.cards[hasCardIndex].role = g.deck.pop();
+
+        g.phase = 'lose_card'; g.playerLosingCard = challengerId; g.afterLoseCard = onSuccess;
+        syncBluffState(roomCode);
+    } else {
+        // Claimer lied -> Claimer loses card
+        systemChat(roomCode, `❌ โป๊ะแตก!! ไม่มีไพ่ ${bluffData.roleNames[claimRole]} จริงๆ ด้วย! คนโกหกต้องเสีย 1 ชีวิต`);
+        g.phase = 'lose_card'; g.playerLosingCard = claimedId; g.afterLoseCard = onFail;
+        syncBluffState(roomCode);
+    }
+}
+
+function checkBluffWin(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const alive = Object.values(g.players).filter(p => !p.isEliminated);
+    if (alive.length === 1) {
+        const winner = room.players.find(p => p.id === alive[0].id);
+        winner.score += 5; broadcastScores(roomCode);
+        systemChat(roomCode, `🏆 ${winner.name} คือผู้ชนะ โค่นอำนาจทุกคนได้สำเร็จ!`);
+        room.gameState = 'waiting';
+        setTimeout(() => io.to(roomCode).emit('backToLobby', room.players), 5000);
+    }
+}
+
+function startBluffRound(roomCode) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2 || room.players.length > 6) {
+        io.to(roomCode).emit('error', 'เกมบลัฟโค่นอำนาจ รองรับผู้เล่น 2-6 คนครับ');
+        room.gameState = 'waiting';
+        io.to(roomCode).emit('updateLobby', room.players);
+        return;
+    }
+
+    let deck = [...bluffData.deck].sort(() => 0.5 - Math.random());
+    const gamePlayers = {};
+    const turnOrder = [...room.players].sort(() => 0.5 - Math.random()).map(p => p.id);
+
+    room.players.forEach(p => {
+        gamePlayers[p.id] = { id: p.id, coins: 2, cards: [{ role: deck.pop(), dead: false }, { role: deck.pop(), dead: false }], isEliminated: false };
+    });
+
+    room.game = { phase: 'action', deck: deck, players: gamePlayers, turnOrder: turnOrder, currentTurnIndex: 0, pendingAction: null, responses: {} };
+
+    io.to(roomCode).emit('updateProgress', { hide: true });
+    io.to(roomCode).emit('bluff_newRound');
+    systemChat(roomCode, '⚔️ เริ่มเกมบลัฟโค่นอำนาจ! ใครจะเหลือรอดเป็นคนสุดท้าย?');
+    syncBluffState(roomCode);
+}
+
+// --- Other Logic Functions ---
 
 function startTruthOrLieRound(roomCode) {
     const room = rooms[roomCode];

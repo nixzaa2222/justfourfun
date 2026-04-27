@@ -97,7 +97,6 @@
         #rules-modal-content { background-color: var(--card-bg-color); border: 2px solid var(--primary-text-color); }
         #rules-title, .rule-header { color: var(--primary-text-color); }
         
-        /* Game Specific Styles */
         .wg-card { background-color: var(--card-bg-color); color: var(--text-color); border: 2px solid var(--border-color); font-weight: 600; cursor: pointer; }
         .wg-card.revealed.red { background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color); }
         .wg-card.revealed.blue { background-color: #93c5fd; color: #1e40af; border-color: #3b82f6; }
@@ -133,22 +132,12 @@
         .spinner-container::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 2.5rem; color: var(--accent-color); }
         #stopwatch-time { font-family: 'monospace'; }
 
-        /* Chat scrollbar */
         #chat-messages::-webkit-scrollbar { width: 6px; }
         #chat-messages::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
-        
-        /* Avatar button styles */
         .avatar-btn.selected { border-color: var(--primary-color); transform: scale(1.15); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-
-        /* Quick Chat & Reaction Styles */
         .quick-btn { white-space: nowrap; transition: all 0.1s; }
         .quick-btn:hover { transform: scale(1.05); background-color: var(--border-color); }
-        
-        /* Reaction Floating Animation */
-        .reaction-float {
-            position: fixed; z-index: 9999; pointer-events: none;
-            animation: floatUp 1.5s ease-out forwards; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
-        }
+        .reaction-float { position: fixed; z-index: 9999; pointer-events: none; animation: floatUp 1.5s ease-out forwards; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
 
         @keyframes floatUp {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
@@ -171,16 +160,12 @@
 
     <!-- Leaderboard Widget -->
     <div id="leaderboard-widget" class="fixed top-16 right-4 z-40 hidden">
-        <button id="leaderboard-toggle-btn" class="bg-[var(--secondary-color)] text-[var(--heading-color)] p-3 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center font-bold text-xl relative">
-            🏆
-        </button>
+        <button id="leaderboard-toggle-btn" class="bg-[var(--secondary-color)] text-[var(--heading-color)] p-3 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center font-bold text-xl relative">🏆</button>
         <div id="leaderboard-box" class="absolute top-14 right-0 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg shadow-xl w-64 flex flex-col hidden transition-all">
             <div class="p-3 border-b border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 rounded-t-lg">
                 <h3 class="font-bold text-stone-800 dark:text-stone-200 text-center">🏆 กระดานคะแนนรวม</h3>
             </div>
-            <div id="leaderboard-list" class="p-3 max-h-64 overflow-y-auto flex flex-col gap-2 text-sm text-stone-800 dark:text-stone-200">
-                <!-- Scores go here -->
-            </div>
+            <div id="leaderboard-list" class="p-3 max-h-64 overflow-y-auto flex flex-col gap-2 text-sm text-stone-800 dark:text-stone-200"></div>
         </div>
     </div>
 
@@ -191,18 +176,14 @@
                 <h3 class="font-bold text-stone-800 dark:text-stone-200">แชทห้อง 💬</h3>
                 <button id="close-chat-btn" class="text-stone-500 hover:text-stone-800 dark:hover:text-white font-bold text-lg leading-none">&times;</button>
             </div>
-            
-            <!-- Quick Reactions -->
             <div class="flex overflow-x-auto gap-2 p-2 bg-stone-50 dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 scrollbar-hide">
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="👍">👍</button>
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="😂">😂</button>
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="🤡">🤡</button>
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="🤯">🤯</button>
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="👀">👀</button>
-                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-600 transition" data-emoji="🤬">🤬</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="👍">👍</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="😂">😂</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="🤡">🤡</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="🤯">🤯</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="👀">👀</button>
+                <button class="quick-reaction-btn text-xl bg-white dark:bg-stone-700 rounded-full px-2 shadow-sm border border-stone-200 dark:border-stone-600 hover:bg-stone-100 transition" data-emoji="🤬">🤬</button>
             </div>
-
-            <!-- Quick Chat -->
             <div class="flex overflow-x-auto gap-2 p-2 bg-stone-100 dark:bg-stone-900 border-b border-stone-200 dark:border-stone-700 scrollbar-hide">
                 <button class="quick-chat-btn text-xs quick-btn bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded px-2 py-1">55555</button>
                 <button class="quick-chat-btn text-xs quick-btn bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded px-2 py-1">เอ้า!</button>
@@ -211,10 +192,7 @@
                 <button class="quick-chat-btn text-xs quick-btn bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded px-2 py-1">แตกก</button>
                 <button class="quick-chat-btn text-xs quick-btn bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 rounded px-2 py-1">อะไรวะนั่น</button>
             </div>
-
-            <div id="chat-messages" class="flex-grow p-3 h-52 overflow-y-auto flex flex-col gap-2 text-sm">
-                <!-- Messages go here -->
-            </div>
+            <div id="chat-messages" class="flex-grow p-3 h-52 overflow-y-auto flex flex-col gap-2 text-sm"></div>
             <div class="p-2 border-t border-stone-200 dark:border-stone-700 flex gap-2">
                 <input type="text" id="chat-input" class="flex-grow p-2 rounded-md input-field text-sm" placeholder="พิมพ์คุยกับเพื่อน...">
                 <button id="send-chat-btn" class="btn-primary px-3 py-2 rounded-md text-sm">ส่ง</button>
@@ -251,20 +229,20 @@
         <!-- Entry Screen -->
         <div id="entry-screen" class="text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors max-w-xl mx-auto">
             <h1 class="text-4xl sm:text-5xl font-bold mb-2" style="color: var(--primary-text-color);">Cozy Corner</h1>
-            <p class="text-stone-500 dark:text-stone-400 mb-8">คอมมูนิตี้เล่นเกมสนุกๆ รองรับสูงสุด 16 คน</p>
+            <p class="text-stone-500 dark:text-stone-400 mb-8">โซนพักตับจากแร้งค์เดือด แวะมาปั่นประสาทเพื่อนแทน</p>
             
             <div id="player-entry" class="space-y-4">
                 <div class="mb-4">
                     <p class="text-sm font-semibold text-stone-600 dark:text-stone-400 mb-2">เลือกตัวละครของคุณ:</p>
                     <div id="avatar-selection" class="flex justify-center flex-wrap gap-2 text-2xl mb-4">
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition selected" data-avatar="🐶" style="border-color: var(--primary-color);">🐶</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐱">🐱</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🦊">🦊</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐻">🐻</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐸">🐸</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐼">🐼</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐯">🐯</button>
-                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 transition" data-avatar="🐷">🐷</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition selected" data-avatar="🎮" style="border-color: var(--primary-color);">🎮</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="⚔️">⚔️</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="🛡️">🛡️</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="👽">👽</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="😈">😈</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="👻">👻</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="💩">💩</button>
+                        <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="🤡">🤡</button>
                     </div>
                 </div>
 
@@ -306,6 +284,10 @@
                 </div>
                 
                 <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="bluff-overthrow">
+                        <h3 class="text-lg font-bold text-red-600 dark:text-red-400">บลัฟโค่นอำนาจ ⚔️ <span class="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full ml-1">NEW!</span></h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">อ้างบทบาท โกหก และกำจัดศัตรูให้หมด!</p>
+                    </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="truth-or-lie">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">ความจริง 1 โกหก 1 🎭</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แต่งเรื่องหลอกเพื่อนให้เนียนที่สุด!</p>
@@ -356,11 +338,19 @@
             </div>
         </div>
 
+        <!-- Bluff Overthrow (Coup) Screen (Placeholder UI) -->
+        <div id="bluff-overthrow-screen" class="hidden w-full text-center">
+            <h2 class="text-4xl font-bold mb-4 text-red-600">บลัฟโค่นอำนาจ ⚔️</h2>
+            <div class="bg-stone-100 dark:bg-stone-800 p-8 rounded-xl max-w-2xl mx-auto border-2 border-stone-300 dark:border-stone-600">
+                <p class="text-xl font-semibold mb-4 text-stone-600 dark:text-stone-400 animate-pulse">กำลังเตรียมหน้าจอควบคุมและกระดานเกมในอัปเดตถัดไป...</p>
+                <p class="text-sm text-stone-500">ระบบเซิร์ฟเวอร์พร้อมแล้ว กดกลับล็อบบี้ไปเล่นเกมอื่นรอไปก่อนนะ!</p>
+            </div>
+        </div>
+
         <!-- Truth Or Lie Game Screen -->
         <div id="truth-or-lie-screen" class="hidden w-full text-center">
             <div id="tol-scoreboard" class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-4 text-sm"></div>
 
-            <!-- Phase: Answering (แต่งเรื่องโกหก) -->
             <div id="tol-answering-area" class="hidden w-full max-w-2xl mx-auto">
                 <div class="mb-6 p-6 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors shadow-sm">
                     <p class="text-stone-500 dark:text-stone-400 mb-2 font-semibold">โจทย์ประจำรอบนี้:</p>
@@ -382,7 +372,6 @@
                 </div>
             </div>
 
-            <!-- Phase: Voting (จับผิด) -->
             <div id="tol-voting-area" class="hidden w-full max-w-3xl mx-auto">
                 <div class="mb-6 p-6 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors shadow-sm">
                     <h3 class="text-2xl font-bold mb-2">ตาของ: <span id="tol-active-player" style="color: var(--accent-color);"></span></h3>
@@ -404,7 +393,6 @@
                 <p id="tol-vote-wait-msg" class="hidden text-stone-500 mt-6 animate-pulse">โหวตแล้ว! รอคนอื่นโหวต...</p>
             </div>
 
-            <!-- Phase: Reveal (เฉลย) -->
             <div id="tol-result-area" class="hidden w-full max-w-4xl mx-auto mt-6">
                 <div class="bg-white/80 dark:bg-[#2C2621]/80 p-8 rounded-xl border-2 border-stone-200 dark:border-stone-700 shadow-lg">
                     <h3 class="text-3xl font-bold mb-6" style="color: var(--primary-text-color);">เปิดเผยความจริง!</h3>
@@ -428,7 +416,6 @@
                 </div>
             </div>
 
-            <!-- Phase: End Round Summary -->
             <div id="tol-summary-area" class="hidden w-full max-w-3xl mx-auto mt-6 p-6 rounded-xl bg-stone-100 dark:bg-[#3A322C] shadow-lg">
                 <h3 class="text-3xl font-bold mb-4" style="color: var(--accent-color);">จบโจทย์รอบนี้!</h3>
                 <div id="tol-summary-list" class="space-y-2 mb-6"></div>
@@ -445,7 +432,6 @@
             
             <div id="uc-scoreboard" class="flex justify-center flex-wrap gap-x-4 gap-y-2 mb-6 text-sm"></div>
 
-            <!-- สำหรับคนใบ้ -->
             <div id="uc-clue-area" class="hidden max-w-md mx-auto bg-white/50 dark:bg-[#2C2621]/50 p-6 rounded-xl border border-stone-200 dark:border-stone-700">
                 <p class="mb-4 font-semibold text-lg" style="color: var(--heading-color);">พิมพ์คำใบ้ของคุณ (1 คำเท่านั้น):</p>
                 <div class="flex flex-col gap-3">
@@ -455,7 +441,6 @@
                 <p id="uc-clue-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">ส่งแล้ว! รอเพื่อนคนอื่น...</p>
             </div>
 
-            <!-- สำหรับคนทาย -->
             <div id="uc-guess-area" class="hidden max-w-4xl mx-auto mt-6">
                 <h3 class="text-2xl font-bold mb-4" style="color: var(--accent-color);">คำใบ้ที่รอดจากการซ้ำ:</h3>
                 <div id="uc-valid-clues" class="flex flex-wrap justify-center gap-3 mb-6"></div>
@@ -471,7 +456,6 @@
 
             <p id="uc-guess-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">กำลังรอคนทายตอบคำถาม...</p>
 
-            <!-- สรุปผล Unique Clue -->
             <div id="uc-result-area" class="hidden w-full max-w-4xl mx-auto mt-6 p-6 rounded-xl border-2 border-stone-200 dark:border-stone-700 bg-white/80 dark:bg-[#2C2621]/80">
                 <h3 id="uc-result-title" class="text-4xl font-bold mb-4"></h3>
                 <p class="text-xl mb-2">คำศัพท์ที่ถูกต้องคือ: <span id="uc-result-word" class="font-bold underline text-[var(--primary-text-color)]"></span></p>
@@ -568,6 +552,54 @@
             </div>
         </div>
 
+        <!-- Friend Quiz Game Screen -->
+        <div id="friend-quiz-screen" class="hidden w-full text-center">
+            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
+                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
+                <h2 id="fq-question-display" class="text-2xl sm:text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
+            </div>
+
+            <div id="fq-answer-input-area" class="mb-8 max-w-md mx-auto">
+                <p class="mb-2">คำตอบของคุณ (ตัวเลขเท่านั้น)</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="number" id="fq-my-answer" class="input-field p-3 w-full rounded-lg text-center" placeholder="ใส่คำตอบของคุณ...">
+                    <button id="fq-submit-answer-btn" class="btn-primary p-3 rounded-lg whitespace-nowrap disabled:opacity-50">ส่งคำตอบ</button>
+                </div>
+                <p id="fq-answer-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">ส่งแล้ว รอเพื่อนๆ...</p>
+            </div>
+
+            <div id="fq-betting-area" class="hidden mb-8">
+                <p id="fq-betting-info" class="text-xl text-stone-600 dark:text-stone-400 mb-4"></p>
+                <div id="fq-bet-options" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap"></div>
+                <p id="fq-bet-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">โหวตแล้ว รอเพื่อนๆ...</p>
+            </div>
+
+            <div id="fq-results-area" class="hidden mb-8">
+                 <p id="fq-result-info" class="text-xl mb-4" style="color: var(--primary-text-color);"></p>
+                 <div id="fq-result-cards" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap"></div>
+                 <button id="fq-next-round-btn" class="hidden mt-4 p-3 px-8 rounded-lg btn-primary mx-auto">รอบต่อไป</button>
+            </div>
+        </div>
+
+        <!-- Number Sort Game Screen -->
+        <div id="number-sort-screen" class="hidden w-full text-center">
+            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
+                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
+                <h2 id="ns-theme-display" class="text-2xl sm:text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
+            </div>
+            <div class="mb-8">
+                <p class="mb-2">การ์ดของคุณ (เห็นเฉพาะคุณ)</p>
+                <div id="ns-my-number-card" class="w-32 h-20 sm:w-40 sm:h-24 mx-auto bg-white dark:bg-[#2C2621] text-stone-900 dark:text-stone-100 rounded-lg flex items-center justify-center text-3xl sm:text-4xl font-bold shadow-lg border-2 border-stone-300 dark:border-stone-600 transition-colors">?</div>
+            </div>
+            <div class="mb-4">
+                <p id="ns-ordering-info" class="mb-2">ช่วยกันลากการ์ดเพื่อนๆ มาเรียงลำดับจาก **น้อยไปมาก**</p>
+                <div id="ns-player-ordering-area" class="p-4 rounded-lg flex justify-center items-center gap-3 flex-wrap min-h-[80px]"></div>
+            </div>
+            <button id="ns-lock-order-btn" class="p-3 px-8 rounded-lg btn-primary hidden">ยืนยันลำดับ</button>
+            <p id="ns-host-only-msg" class="text-sm text-stone-500 dark:text-stone-400 italic mb-2">เฉพาะหัวหน้าห้องที่กดยืนยันลำดับได้</p>
+            <button id="ns-next-round-btn" class="hidden mt-4 p-3 px-8 rounded-lg btn-primary mx-auto">รอบต่อไป</button>
+        </div>
+
         <!-- Word Guess Game Screen -->
         <div id="word-guess-screen" class="hidden w-full">
             <div id="wg-info-container" class="mb-4">
@@ -614,54 +646,6 @@
                     </div>
                     <div id="wg-board" class="grid grid-cols-5 gap-2"></div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Number Sort Game Screen -->
-        <div id="number-sort-screen" class="hidden w-full text-center">
-            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
-                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
-                <h2 id="ns-theme-display" class="text-2xl sm:text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
-            </div>
-            <div class="mb-8">
-                <p class="mb-2">การ์ดของคุณ (เห็นเฉพาะคุณ)</p>
-                <div id="ns-my-number-card" class="w-32 h-20 sm:w-40 sm:h-24 mx-auto bg-white dark:bg-[#2C2621] text-stone-900 dark:text-stone-100 rounded-lg flex items-center justify-center text-3xl sm:text-4xl font-bold shadow-lg border-2 border-stone-300 dark:border-stone-600 transition-colors">?</div>
-            </div>
-            <div class="mb-4">
-                <p id="ns-ordering-info" class="mb-2">ช่วยกันลากการ์ดเพื่อนๆ มาเรียงลำดับจาก **น้อยไปมาก**</p>
-                <div id="ns-player-ordering-area" class="p-4 rounded-lg flex justify-center items-center gap-3 flex-wrap min-h-[80px]"></div>
-            </div>
-            <button id="ns-lock-order-btn" class="p-3 px-8 rounded-lg btn-primary hidden">ยืนยันลำดับ</button>
-            <p id="ns-host-only-msg" class="text-sm text-stone-500 dark:text-stone-400 italic mb-2">เฉพาะหัวหน้าห้องที่กดยืนยันลำดับได้</p>
-            <button id="ns-next-round-btn" class="hidden mt-4 p-3 px-8 rounded-lg btn-primary mx-auto">รอบต่อไป</button>
-        </div>
-
-        <!-- Friend Quiz Game Screen -->
-        <div id="friend-quiz-screen" class="hidden w-full text-center">
-            <div class="mb-6 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors">
-                <p class="text-stone-500 dark:text-stone-400">โจทย์รอบนี้</p>
-                <h2 id="fq-question-display" class="text-2xl sm:text-3xl font-bold" style="color: var(--primary-text-color);"></h2>
-            </div>
-
-            <div id="fq-answer-input-area" class="mb-8 max-w-md mx-auto">
-                <p class="mb-2">คำตอบของคุณ (ตัวเลขเท่านั้น)</p>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="number" id="fq-my-answer" class="input-field p-3 w-full rounded-lg text-center" placeholder="ใส่คำตอบของคุณ...">
-                    <button id="fq-submit-answer-btn" class="btn-primary p-3 rounded-lg whitespace-nowrap disabled:opacity-50">ส่งคำตอบ</button>
-                </div>
-                <p id="fq-answer-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">ส่งแล้ว รอเพื่อนๆ...</p>
-            </div>
-
-            <div id="fq-betting-area" class="hidden mb-8">
-                <p id="fq-betting-info" class="text-xl text-stone-600 dark:text-stone-400 mb-4"></p>
-                <div id="fq-bet-options" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap"></div>
-                <p id="fq-bet-wait-msg" class="hidden mt-4 text-stone-500 dark:text-stone-400 animate-pulse">โหวตแล้ว รอเพื่อนๆ...</p>
-            </div>
-
-            <div id="fq-results-area" class="hidden mb-8">
-                 <p id="fq-result-info" class="text-xl mb-4" style="color: var(--primary-text-color);"></p>
-                 <div id="fq-result-cards" class="p-4 rounded-lg flex justify-center items-center gap-4 flex-wrap"></div>
-                 <button id="fq-next-round-btn" class="hidden mt-4 p-3 px-8 rounded-lg btn-primary mx-auto">รอบต่อไป</button>
             </div>
         </div>
 
@@ -725,6 +709,7 @@
     <script>
         // --- Global Methods for HTML attributes ---
         const gameNames = {
+            'bluff-overthrow': 'บลัฟโค่นอำนาจ ⚔️',
             'truth-or-lie': 'ความจริง 1 โกหก 1 🎭',
             'unique-clue': 'คำใบ้ใจตรงกัน 🧠',
             'match-the-blank': 'เติมคำหาคู่ 🧩',
@@ -776,7 +761,7 @@
 
         // --- Persistent Profile & Reconnect Logic ---
         const playerNameInput = document.getElementById('playerName');
-        let selectedAvatar = '🐶';
+        let selectedAvatar = '🎮';
         
         let myPlayerId = localStorage.getItem('cozyPlayerId');
         if (!myPlayerId) {
@@ -891,10 +876,21 @@
 
         socket.on('receiveChat', ({ sender, avatar, message, senderId }) => {
             const isMe = senderId === socket.id;
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `max-w-[80%] p-2 rounded-lg text-sm shadow-sm ${isMe ? 'bg-[var(--primary-color)] text-[var(--primary-text-color)] self-end rounded-tr-none' : 'bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-stone-200 self-start rounded-tl-none'}`;
-            msgDiv.innerHTML = `<span class="text-[10px] opacity-70 block mb-1 font-bold">${avatar} ${sender}</span><span>${message}</span>`;
-            chatMessages.appendChild(msgDiv);
+            let msgHTML = '';
+            
+            // ระบบส่งแชทให้เอง จะใช้สีเทา
+            if (senderId === 'system') {
+                msgHTML = `<div class="w-full text-center my-1"><span class="bg-stone-200 dark:bg-stone-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">${avatar} ${message}</span></div>`;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = msgHTML;
+                chatMessages.appendChild(tempDiv.firstChild);
+            } else {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `max-w-[80%] p-2 rounded-lg text-sm shadow-sm ${isMe ? 'bg-[var(--primary-color)] text-[var(--primary-text-color)] self-end rounded-tr-none' : 'bg-stone-200 dark:bg-stone-700 text-stone-800 dark:text-stone-200 self-start rounded-tl-none'}`;
+                msgDiv.innerHTML = `<span class="text-[10px] opacity-70 block mb-1 font-bold">${avatar} ${sender}</span><span>${message}</span>`;
+                chatMessages.appendChild(msgDiv);
+            }
+            
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             if (!isChatOpen) {
@@ -1018,6 +1014,29 @@
 
         // --- Game Rules Data ---
         const gameRules = {
+            'bluff-overthrow': {
+                title: 'วิธีเล่น: บลัฟโค่นอำนาจ ⚔️',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">กำจัดผู้เล่นคนอื่นให้หมด ใครเหลือรอดคนสุดท้ายเป็นผู้ชนะ!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">แอคชันทั่วไป (ไม่ถูกจับโกหก):</h4>
+                    <ul class="list-disc list-inside ml-4 mb-4">
+                        <li><strong>รับรายได้:</strong> หยิบ 1 เครดิต</li>
+                        <li><strong>รับของสนับสนุน:</strong> หยิบ 2 เครดิต (สไนเปอร์บล็อกได้)</li>
+                        <li><strong>รัฐประหาร (Coup):</strong> จ่าย 7 เครดิต เลือกกำจัด 1 ชีวิตของเพื่อน (บล็อกไม่ได้)</li>
+                    </ul>
+                    <h4 class="font-bold text-lg mb-2 rule-header">แอคชันตัวละคร (โกหกได้ / ถูกจับโกหกได้):</h4>
+                    <ul class="list-disc list-inside ml-4 mb-4">
+                        <li><strong>🔫 สไนเปอร์:</strong> หยิบ 3 เครดิต | <em>บล็อกรับของสนับสนุนได้</em></li>
+                        <li><strong>🔪 นักฆ่า:</strong> จ่าย 3 เครดิต ฆ่าเพื่อน 1 ชีวิต</li>
+                        <li><strong>💻 แฮกเกอร์:</strong> ขโมย 2 เครดิตจากเพื่อน | <em>บล็อกขโมยได้</em></li>
+                        <li><strong>🕶️ สายลับ:</strong> จั่วการ์ดใหม่ 2 ใบ เลือกเก็บ 2 ใบ (เปลี่ยนไพ่) | <em>บล็อกขโมยได้</em></li>
+                        <li><strong>💉 หมอ:</strong> <em>บล็อกการฆ่าจากนักฆ่าได้</em></li>
+                    </ul>
+                    <h4 class="font-bold text-lg mb-2 rule-header">การจับโกหก (Challenge):</h4>
+                    <p>ถ้าคิดว่าเพื่อนไม่มีการ์ดใบนั้นจริง ให้กด "จับโกหก!" ถ้าเพื่อนมีจริง เราเสีย 1 ชีวิต แต่ถ้าเพื่อนโกหก เพื่อนเสีย 1 ชีวิต!</p>
+                `
+            },
             'truth-or-lie': {
                 title: 'วิธีเล่น: ความจริง 1 โกหก 1 🎭',
                 content: `
@@ -1144,6 +1163,7 @@
             matchTheBlank: document.getElementById('match-the-blank-screen'),
             uniqueClue: document.getElementById('unique-clue-screen'),
             truthOrLie: document.getElementById('truth-or-lie-screen'),
+            bluffOverthrow: document.getElementById('bluff-overthrow-screen'),
             spinner: document.getElementById('spinner-screen'),
             stopwatch: document.getElementById('stopwatch-screen'),
         };
@@ -1168,12 +1188,14 @@
             playerList.innerHTML = '';
             players.forEach(p => {
                 const playerDiv = document.createElement('div');
+                // โชว์ว่า Offline หรือไม่ (สีจางลง)
                 playerDiv.className = `p-2 px-3 ${p.isOnline === false ? 'bg-stone-300 dark:bg-stone-800 opacity-50' : 'bg-white dark:bg-stone-700'} rounded-full text-sm font-bold shadow-sm flex items-center gap-2`;
                 playerDiv.innerHTML = `<span>${p.avatar} ${p.name} ${p.isOnline === false ? '(หลุด)' : ''}</span> <span class="bg-stone-200 dark:bg-stone-600 rounded-full px-2 text-xs">${p.score}</span>`;
                 if(p.id === socket.id) playerDiv.classList.add('ring-2', 'ring-[var(--primary-color)]');
                 playerList.appendChild(playerDiv);
             });
             
+            // นับจำนวนคนทั้งหมดในห้อง
             document.getElementById('playerCount').textContent = players.length;
             
             const promptEl = document.getElementById('action-prompt');
@@ -1206,6 +1228,7 @@
                     promptEl.className = "mb-6 p-4 rounded-lg bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 font-bold text-xl animate-pulse";
                 }
             }
+            
             updateLeaderboardUI(players);
         }
 
@@ -1243,7 +1266,7 @@
             if (document.getElementById('createRoomBtn').disabled) return;
             const playerName = playerNameInput.value.trim();
             socket.emit('createRoom', { playerName, avatar: selectedAvatar, playerId: myPlayerId });
-            sessionStorage.setItem('cozyRoomCode', 'creating...');
+            sessionStorage.setItem('cozyRoomCode', 'creating...'); // Flag to wait
             isHost = true;
             document.getElementById('entry-screen').classList.add('hidden');
         });
@@ -1323,7 +1346,9 @@
         socket.on('error', (message) => {
             alert(`เกิดข้อผิดพลาด: ${message}`);
             sessionStorage.removeItem('cozyRoomCode');
-            showScreen('entry');
+            if(!document.getElementById('waiting-screen').classList.contains('hidden')) {
+                 showScreen('entry');
+            }
         });
 
         // ==========================================
@@ -2399,7 +2424,7 @@
         })();
 
         // --- Render Keep-Alive ---
-        // ป้องกัน Render Free Tier แอบหลับเมื่อไม่มี HTTP Request (Socket ไม่นับ)
+        // ป้องกัน Render Free Tier แอบหลับเมื่อไม่มี HTTP Request
         setInterval(() => {
             fetch('/ping').catch(err => console.log('Ping failed', err));
         }, 5 * 60 * 1000); // ส่งรีเควสไปกวนทุกๆ 5 นาที
