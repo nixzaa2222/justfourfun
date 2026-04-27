@@ -204,8 +204,11 @@ function syncGameStateToPlayer(socket, room, roomCode) {
              socket.emit('truthOrLie_newRound', { prompt: g.prompt, players: pList });
          } else if (g.phase === 'voting') {
              const activePlayer = room.players.find(p => p.id === g.turnOrder[g.activePlayerIndex]);
-             const activeAnswers = g.answers[activePlayer.id];
-             if(activePlayer && activeAnswers) socket.emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
+             // FIX 1: Check if activePlayer exists before accessing its id
+             if (activePlayer) {
+                 const activeAnswers = g.answers[activePlayer.id];
+                 if(activeAnswers) socket.emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
+             }
          }
     } else if (room.gameType === 'bluff-overthrow') {
          syncBluffState(roomCode, socket.id);
@@ -1687,7 +1690,12 @@ io.on('connection', (socket) => {
 
         const results = orderedPlayerIds.map(id => {
             const p = room.players.find(pl => pl.id === id);
-            return { id, name: p.name, avatar: p.avatar, number: room.game.playerNumbers[id] };
+            return { 
+                id, 
+                name: p ? p.name : 'Unknown (หลุด)', 
+                avatar: p ? p.avatar : '👤', 
+                number: room.game.playerNumbers[id] 
+            };
         });
 
         if (isCorrect) {
