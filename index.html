@@ -230,12 +230,12 @@
         <!-- Entry Screen -->
         <div id="entry-screen" class="text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors max-w-xl mx-auto">
             <h1 class="text-4xl sm:text-5xl font-bold mb-2" style="color: var(--primary-text-color);">Cozy Corner</h1>
-            <p class="text-stone-500 dark:text-stone-400 mb-8">โซนพักตับจากแร้งค์เดือด แวะมาปั่นประสาทเพื่อนแทน</p>
+            <p class="text-stone-500 dark:text-stone-400 mb-8">โซนพักตับ แวะมาปั่นประสาทเพื่อนแทน</p>
             
             <div id="player-entry" class="space-y-4">
                 <div class="mb-4">
                     <p class="text-sm font-semibold text-stone-600 dark:text-stone-400 mb-2">เลือกตัวละครของคุณ:</p>
-                    <div id="avatar-selection" class="flex justify-center flex-wrap gap-2 text-2xl mb-4">
+                    <div id="avatar-selection" class="flex justify-center flex-wrap gap-2 text-2xl mb-4 max-h-40 overflow-y-auto p-2 border border-stone-200 dark:border-stone-700 rounded-lg bg-white/50 dark:bg-stone-800/50">
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition selected" data-avatar="🎮" style="border-color: var(--primary-color);">🎮</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="⚔️">⚔️</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="🛡️">🛡️</button>
@@ -244,6 +244,7 @@
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="👻">👻</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="💩">💩</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="🤡">🤡</button>
+                        <!-- สัตว์น่ารักจะถูกโหลดผ่าน JavaScript ด้านล่าง -->
                     </div>
                 </div>
 
@@ -318,6 +319,16 @@
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม หรือช่วยกันทายคำใบ้</p>
                     </div>
                 </div>
+
+                <div id="word-pack-selection" class="hidden mt-6 bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-200 dark:border-stone-700 shadow-inner">
+                    <p class="font-bold text-lg mb-3" style="color: var(--heading-color);">เลือกหมวดหมู่คำศัพท์ / ธีมเกม:</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-[var(--primary-color)] ring-2 ring-[var(--primary-color)] shadow-md selected" data-pack="mixed">🌪️ ผสมทั้งหมด</button>
+                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-transparent" data-pack="general">⭐ ทั่วไป (ไม่เกม)</button>
+                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-transparent" data-pack="valo">🎮 เกมเมอร์/Valo</button>
+                    </div>
+                    <p class="text-xs text-stone-500 mt-3">* มีผลเฉพาะเกมที่ใช้คำศัพท์ หรือประโยคคำถามเท่านั้น (เช่น รหัสคำทาย, ทายใจเพื่อน, จิตรกร ฯลฯ)</p>
+                </div>
                 
                 <div class="mt-8">
                     <button id="startGameBtn" class="w-full max-w-md p-4 text-xl rounded-lg btn-primary shadow-lg hover:shadow-xl disabled:opacity-50" disabled>เริ่มเกม (ต้องเลือกเกมก่อน)</button>
@@ -362,8 +373,8 @@
                 <h3 class="text-xl font-bold mb-4">เลือกแอคชันของคุณ</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="income">💰 รับรายได้ (+1)</button>
-                    <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="foreign_aid">🎁 รับของสนับสนุน (+2)</button>
-                    <button class="bo-action-btn btn-primary p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white border-red-700" data-action="coup">💥 รัฐประหาร (-7)</button>
+                    <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="foreign_aid">🎁 รับเงินสนับสนุน (+2)</button>
+                    <button class="bo-action-btn btn-primary p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white border-red-700" data-action="coup">💥 โค่นอำนาจ (-7)</button>
                 </div>
                 <h4 class="font-bold text-sm mb-2 text-left text-stone-500">อ้างบทบาท (ไม่ต้องมีไพ่จริงก็ได้ แต่ระวังโดนจับได้!)</h4>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -797,12 +808,12 @@
                     <h4 class="font-bold text-lg mb-2 rule-header">แอคชันทั่วไป (ไม่ถูกจับโกหก):</h4>
                     <ul class="list-disc list-inside ml-4 mb-4">
                         <li><strong>รับรายได้:</strong> หยิบ 1 เครดิต</li>
-                        <li><strong>รับของสนับสนุน:</strong> หยิบ 2 เครดิต (สไนเปอร์บล็อกได้)</li>
-                        <li><strong>รัฐประหาร (Coup):</strong> จ่าย 7 เครดิต เลือกกำจัด 1 ชีวิตของเพื่อน (บล็อกไม่ได้)</li>
+                        <li><strong>รับเงินสนับสนุน:</strong> หยิบ 2 เครดิต (สไนเปอร์บล็อกได้)</li>
+                        <li><strong>โค่นอำนาจ:</strong> จ่าย 7 เครดิต เลือกกำจัด 1 ชีวิตของเพื่อน (บล็อกไม่ได้)</li>
                     </ul>
                     <h4 class="font-bold text-lg mb-2 rule-header">แอคชันตัวละคร (โกหกได้ / ถูกจับโกหกได้):</h4>
                     <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><strong>🔫 สไนเปอร์:</strong> หยิบ 3 เครดิต | <em>บล็อกรับของสนับสนุนได้</em></li>
+                        <li><strong>🔫 สไนเปอร์:</strong> หยิบ 3 เครดิต | <em>บล็อกรับเงินสนับสนุนได้</em></li>
                         <li><strong>🔪 นักฆ่า:</strong> จ่าย 3 เครดิต ฆ่าเพื่อน 1 ชีวิต</li>
                         <li><strong>💻 แฮกเกอร์:</strong> ขโมย 2 เครดิตจากเพื่อน | <em>บล็อกขโมยได้</em></li>
                         <li><strong>🕶️ สายลับ:</strong> จั่วการ์ดใหม่ 2 ใบ เลือกเก็บ 2 ใบ (เปลี่ยนไพ่) | <em>บล็อกขโมยได้</em></li>
@@ -957,11 +968,22 @@
             }
         });
 
-        // --- Socket & Initialization ---
-        const socket = io();
-
+        // --- Avatar Generation ---
+        const avatarSelection = document.getElementById('avatar-selection');
         const playerNameInput = document.getElementById('playerName');
         let selectedAvatar = '🎮';
+        
+        const extraAvatars = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🐓','🦃','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🐿️','🦔'];
+        extraAvatars.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition';
+            btn.dataset.avatar = emoji;
+            btn.textContent = emoji;
+            avatarSelection.appendChild(btn);
+        });
+
+        // --- Socket & Initialization ---
+        const socket = io();
         
         let myPlayerId = localStorage.getItem('cozyPlayerId');
         if (!myPlayerId) {
@@ -979,6 +1001,7 @@
                     b.classList.remove('selected'); b.style.borderColor = 'transparent';
                     if (b.dataset.avatar === savedAvatar) {
                         b.classList.add('selected'); b.style.borderColor = 'var(--primary-color)';
+                        b.scrollIntoView({ behavior: 'smooth', block: 'center' }); // เลื่อนไปที่ตัวละครที่เคยเลือก
                     }
                 });
             }
@@ -1114,6 +1137,7 @@
                 document.getElementById('startGameBtn').disabled = true;
                 selectedGame = null;
                 document.querySelectorAll('#game-selection-area .card').forEach(c => c.classList.remove('selected'));
+                document.getElementById('word-pack-selection').classList.add('hidden');
                 promptEl.textContent = "เลือกเกมที่จะเล่นด้านล่างได้เลย!";
                 promptEl.className = "mb-6 p-4 rounded-lg bg-[var(--primary-color)]/20 border-2 border-[var(--primary-color)] text-[var(--primary-text-color)] font-bold text-xl animate-pulse";
             } else {
@@ -1186,6 +1210,7 @@
         let myRoomCode = '';
         let isHost = false;
         let selectedGame = null;
+        let selectedPack = 'mixed'; // ค่าเริ่มต้นของหมวดหมู่
 
         function showScreen(screenName) {
             Object.values(screens).forEach(s => { if (s) s.classList.add('hidden'); });
@@ -1247,6 +1272,19 @@
         }
         document.getElementById('roomCodeInput').addEventListener('input', updateButtonStates);
 
+        // Word Pack Selection Click
+        document.querySelectorAll('.pack-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.pack-btn').forEach(b => {
+                    b.classList.remove('selected', 'ring-2', 'ring-[var(--primary-color)]', 'border-[var(--primary-color)]');
+                    b.classList.add('border-transparent');
+                });
+                btn.classList.add('selected', 'ring-2', 'ring-[var(--primary-color)]', 'border-[var(--primary-color)]');
+                btn.classList.remove('border-transparent');
+                selectedPack = btn.dataset.pack;
+            });
+        });
+
         document.getElementById('game-selection-area').addEventListener('click', (e) => {
             if (!isHost) return;
             const card = e.target.closest('.card');
@@ -1255,6 +1293,14 @@
             card.classList.add('selected');
             selectedGame = card.dataset.game;
             document.getElementById('how-to-play-btn').disabled = false;
+            
+            // แสดง Word Pack Selection สำหรับเกมคำศัพท์
+            if(selectedGame !== 'bluff-overthrow') {
+                document.getElementById('word-pack-selection').classList.remove('hidden');
+            } else {
+                document.getElementById('word-pack-selection').classList.add('hidden');
+            }
+
             socket.emit('host_selectGame', selectedGame); 
             
             const currentPlayersCount = parseInt(document.getElementById('playerCount').textContent) || 1;
@@ -1297,7 +1343,10 @@
         });
         
         document.getElementById('startGameBtn').addEventListener('click', () => {
-            if (isHost && selectedGame) socket.emit('startGame', myRoomCode);
+            if (isHost && selectedGame) {
+                // ส่งค่า pack ที่เลือกไปด้วย
+                socket.emit('startGame', { roomCode: myRoomCode, pack: selectedPack });
+            }
         });
 
         document.getElementById('how-to-play-btn').addEventListener('click', () => {
@@ -1340,11 +1389,11 @@
             }
         });
 
-        socket.on('gameStarted', (gameType) => {
+        socket.on('gameStarted', ({ gameType, pack }) => {
             showScreen(gameType);
             if (isHost) {
                 returnLobbyBtn.classList.remove('hidden');
-                socket.emit('host_gameLogicStart', myRoomCode);
+                socket.emit('host_gameLogicStart', { roomCode: myRoomCode, pack: pack });
             }
         });
 
@@ -1511,16 +1560,18 @@
                             });
                         } else { btnBlock.classList.add('hidden'); }
 
-                        let sourceName = globalState.playersStatus.find(p=>p.id===action.source).name;
+                        let sourcePlayerInfo = globalState.playersStatus.find(p=>p.id===action.source);
+                        let sourceName = sourcePlayerInfo ? sourcePlayerInfo.name : 'Unknown';
                         reactionMsg.textContent = `${sourceName} อ้างสิทธิ์ ${roleNames[action.claim] || 'ทำแอคชัน'}`;
                     }
                 }
-                else if (globalState.phase === 'block_reaction') {
+                else if (globalState.phase === 'block_reaction' || globalState.phase === 'block_challenge_reaction') {
                     if (globalState.pendingBlock && globalState.pendingBlock.source !== socket.id && !myState.isEliminated) {
                         reactionArea.classList.remove('hidden'); reactionWait.classList.add('hidden');
                         btnPass.classList.remove('hidden'); btnChallenge.classList.remove('hidden');
                         btnBlock.classList.add('hidden'); blockOptions.classList.add('hidden');
-                        let sourceName = globalState.playersStatus.find(p=>p.id===globalState.pendingBlock.source).name;
+                        let sourcePlayerInfo = globalState.playersStatus.find(p=>p.id===globalState.pendingBlock.source);
+                        let sourceName = sourcePlayerInfo ? sourcePlayerInfo.name : 'Unknown';
                         reactionMsg.textContent = `${sourceName} กำลังบล็อกด้วย ${roleNames[globalState.pendingBlock.claim]}`;
                     }
                 }
