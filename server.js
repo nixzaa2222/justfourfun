@@ -19,68 +19,124 @@ app.get('/ping', (req, res) => {
 });
 
 // ==========================================
-// GAME DATA
+// GAME DATA (Updated 20+ Items)
 // ==========================================
 const whoAmIData = {
-    general: ["ประยุทธ์", "ลุงตู่", "ชัชชาติ", "หนุ่ม กรรชัย", "พี่ตูน บอดี้สแลม", "ลิซ่า BLACKPINK", "หม่ำ จ๊กมก", "แจ๊ส ชวนชื่น", "โน้ต อุดม", "อีลอน มัสก์ (Elon Musk)", "มาร์ก ซักเคอร์เบิร์ก", "มิสเตอร์บีส (MrBeast)", "แฮร์รี่ พอตเตอร์", "เจมส์ บอนด์", "แจ็ค สแปร์โรว์"],
-    valo: ["Jett", "Reyna", "Raze", "Killjoy", "Viper", "Omen", "Brimstone", "Astra", "Phoenix", "Sova", "Breach", "Cypher", "Chamber", "Yoru", "Skye", "KAY/O", "Fade", "Neon", "Harbor", "Gekko", "Deadlock", "Iso", "Clove"],
+    general: [
+        "ประยุทธ์", "ลุงตู่", "ชัชชาติ", "หนุ่ม กรรชัย", "พี่ตูน บอดี้สแลม", "ลิซ่า BLACKPINK", "หม่ำ จ๊กมก", "แจ๊ส ชวนชื่น", "โน้ต อุดม", "อีลอน มัสก์ (Elon Musk)", 
+        "มาร์ก ซักเคอร์เบิร์ก", "มิสเตอร์บีส (MrBeast)", "แฮร์รี่ พอตเตอร์", "เจมส์ บอนด์", "แจ็ค สแปร์โรว์", "เทย์เลอร์ สวิฟต์", "จัสติน บีเบอร์", "คริสเตียโน โรนัลโด", "ลิโอเนล เมสซี",
+        "ซุปเปอร์แมน (Superman)", "แบทแมน (Batman)", "วันเดอร์วูแมน (Wonder Woman)", "เดอะแฟลช (The Flash)", "อควาแมน (Aquaman)", "โจ๊กเกอร์ (Joker)", "ฮาร์ลีย์ ควินน์ (Harley Quinn)",
+        "ชาแซม (Shazam)", "อัลเบิร์ต ไอน์สไตน์", "ไมเคิล แจ็คสัน", "สไปร์ท SPD", "เก๋ไก๋ สไลเดอร์", "บัวขาว"
+    ],
+    valo: [
+        "Jett", "Reyna", "Raze", "Killjoy", "Viper", "Omen", "Brimstone", "Astra", "Phoenix", "Sova", "Breach", "Cypher", "Chamber", "Yoru", "Skye", "KAY/O", "Fade", "Neon", "Harbor", "Gekko", "Deadlock", "Iso", "Clove"
+    ],
     marvel: [
-        "ไอรอนแมน (Iron Man)", "กัปตันอเมริกา (Captain America)", "ธอร์ (Thor)", "ฮัลค์ (Hulk)", "แบล็ควิโดว์ (Black Widow)",
-        "ฮอว์คอาย (Hawkeye)", "สไปเดอร์แมน (Spider-Man)", "ด็อกเตอร์สเตรนจ์ (Doctor Strange)", "แบล็คแพนเธอร์ (Black Panther)", "แอนท์แมน (Ant-Man)",
-        "กัปตันมาร์เวล (Captain Marvel)", "สการ์เล็ตวิทช์ (Scarlet Witch)", "วิชั่น (Vision)", "สตาร์ลอร์ด (Star-Lord)", "กรูท (Groot)",
-        "ร็อคเก็ต (Rocket)", "กาโมร่า (Gamora)", "แดร็กซ์ (Drax)", "ธานอส (Thanos)", "โลกิ (Loki)",
-        "เดดพูล (Deadpool)", "วูล์ฟเวอรีน (Wolverine)", "เวน่อม (Venom)", "แม็กนีโต้ (Magneto)", "โปรเฟสเซอร์ เอ็กซ์ (Professor X)"
+        "ไอรอนแมน (Iron Man)", "กัปตันอเมริกา (Captain America)", "ธอร์ (Thor)", "ฮัลค์ (Hulk)", "แบล็ควิโดว์ (Black Widow)", "ฮอว์คอาย (Hawkeye)", 
+        "สไปเดอร์แมน (Spider-Man)", "ด็อกเตอร์สเตรนจ์ (Doctor Strange)", "แบล็คแพนเธอร์ (Black Panther)", "แอนท์แมน (Ant-Man)", "กัปตันมาร์เวล (Captain Marvel)", 
+        "สการ์เล็ตวิทช์ (Scarlet Witch)", "วิชั่น (Vision)", "สตาร์ลอร์ด (Star-Lord)", "กรูท (Groot)", "ร็อคเก็ต (Rocket)", "กาโมร่า (Gamora)", "แดร็กซ์ (Drax)", 
+        "ธานอส (Thanos)", "โลกิ (Loki)", "เดดพูล (Deadpool)", "วูล์ฟเวอรีน (Wolverine)", "เวน่อม (Venom)", "แม็กนีโต้ (Magneto)", "โปรเฟสเซอร์ เอ็กซ์ (Professor X)",
+        "นิค ฟิวรี่ (Nick Fury)", "ฟอลคอน (Falcon)", "วินเทอร์โซลเยอร์ (Winter Soldier)", "ซุปเปอร์แมน (Superman)", "แบทแมน (Batman)"
     ],
     anime: [
-        "โงกุน (Dragon Ball)", "โดราเอมอน", "โคนัน (Detective Conan)", "ชินจัง", "ลูฟี่ (One Piece)",
-        "โซโล (One Piece)", "นารูโตะ (Naruto)", "ซาสึเกะ (Naruto)", "คาคาชิ (Naruto)", "ไซตามะ (One Punch Man)",
-        "เอเรน (Attack on Titan)", "รีไวล์ (Attack on Titan)", "ทันจิโร่ (Demon Slayer)", "เนซึโกะ (Demon Slayer)", "เซนอิทซึ (Demon Slayer)",
-        "โกโจ ซาโตรุ (Jujutsu Kaisen)", "อาเนีย (Spy x Family)", "คิรัวร์ (Hunter x Hunter)", "มิโดริยะ / เดกุ (My Hero Academia)", "โทโดโรกิ (My Hero Academia)",
-        "ซากุรางิ (Slam Dunk)", "เซเลอร์มูน (Sailor Moon)", "เอ็ดเวิร์ด เอลริค (Fullmetal Alchemist)", "กินโทกิ (Gintama)", "คุโรโร่ (Hunter x Hunter)"
+        "โงกุน (Dragon Ball)", "โดราเอมอน", "โคนัน (Detective Conan)", "ชินจัง", "ลูฟี่ (One Piece)", "โซโล (One Piece)", "นารูโตะ (Naruto)", "ซาสึเกะ (Naruto)", 
+        "คาคาชิ (Naruto)", "ไซตามะ (One Punch Man)", "เอเรน (Attack on Titan)", "รีไวล์ (Attack on Titan)", "ทันจิโร่ (Demon Slayer)", "เนซึโกะ (Demon Slayer)", 
+        "เซนอิทซึ (Demon Slayer)", "โกโจ ซาโตรุ (Jujutsu Kaisen)", "อาเนีย (Spy x Family)", "คิรัวร์ (Hunter x Hunter)", "มิโดริยะ / เดกุ (My Hero Academia)", 
+        "โทโดโรกิ (My Hero Academia)", "ซากุรางิ (Slam Dunk)", "เซเลอร์มูน (Sailor Moon)", "เอ็ดเวิร์ด เอลริค (Fullmetal Alchemist)", "กินโทกิ (Gintama)", 
+        "คุโรโร่ (Hunter x Hunter)", "ชิโนบุ (Demon Slayer)", "เรนโงคุ (Demon Slayer)", "คิริโตะ (SAO)", "อาสึนะ (SAO)", "นัตสึ (Fairy Tail)", "ลูซี่ (Fairy Tail)",
+        "โจทาโร่ (Jojo)", "ดีโอ (Dio)", "ไลท์ ยางามิ (Death Note)", "แอล (L - Death Note)"
     ]
 };
 
 const wordGuessData = {
-    general: ['คอมพิวเตอร์', 'หูฟัง', 'เมาส์', 'คีย์บอร์ด', 'ไมค์ช็อต', 'กล้วย', 'โรงเรียน', 'ตำรวจ', 'ดวงจันทร์', 'ทะเล', 'ภูเขา', 'โทรศัพท์', 'หนังสือ', 'ปากกา', 'รถไฟ', 'ช้าง', 'สิงโต', 'พิซซ่า', 'หมอ', 'พายุ', 'ดาวเคราะห์', 'แวมไพร์', 'ซอมบี้', 'ตู้เย็น', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ไดโนเสาร์', 'แม่มด', 'หุ่นยนต์'],
-    valo: ['สไปค์', 'วานดัล', 'แฟนทอม', 'โอเปอเรเตอร์', 'เจ็ตต์', 'เรน่า', 'เรซ', 'โอมเมน', 'คิลจอย', 'ไซเฟอร์', 'สโมค', 'แฟลช', 'ฮีล', 'ชุบชีวิต', 'อัลติ', 'หัวร้อน', 'แลค', 'หลุด', 'ปิงปิง', 'ยิงนก', 'แครี่', 'ตัวถ่วง', 'เรเดียนต์', 'ไอรอน', 'บรอนซ์', 'บุกหลัง', 'ดักซุ่ม', 'แคมป์', 'วิ่งยิง', 'สไนเปอร์', 'มีด', 'ดิสคอร์ด', 'ปาร์ตี้', 'แร้งค์ตก', 'แรงค์ขึ้น']
+    general: [
+        'คอมพิวเตอร์', 'หูฟัง', 'เมาส์', 'คีย์บอร์ด', 'ไมค์ช็อต', 'กล้วย', 'โรงเรียน', 'ตำรวจ', 'ดวงจันทร์', 'ทะเล', 'ภูเขา', 'โทรศัพท์', 'หนังสือ', 'ปากกา', 'รถไฟ', 'ช้าง', 'สิงโต', 'พิซซ่า', 'หมอ', 'พายุ', 'ดาวเคราะห์', 'แวมไพร์', 'ซอมบี้', 'ตู้เย็น', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ไดโนเสาร์', 'แม่มด', 'หุ่นยนต์',
+        'มหาสมุทร', 'ทะเลทราย', 'ป่าไม้', 'น้ำตก', 'เครื่องบิน', 'รถบรรทุก', 'เรือสำราญ', 'จักรยาน', 'ไฟฉาย', 'นาฬิกา', 'แว่นตา', 'กระเป๋า', 'รองเท้า', 'เสื้อโค้ท', 'กางเกง', 'หมวก', 'แว่นขยาย', 'กล้องจุลทรรศน์', 'กล้องโทรทรรศน์', 'ไมโครเวฟ', 'เตาอบ', 'เครื่องซักผ้า', 'เตารีด', 'พัดลม', 'แอร์'
+    ],
+    valo: [
+        'สไปค์', 'วานดัล', 'แฟนทอม', 'โอเปอเรเตอร์', 'เจ็ตต์', 'เรน่า', 'เรซ', 'โอมเมน', 'คิลจอย', 'ไซเฟอร์', 'สโมค', 'แฟลช', 'ฮีล', 'ชุบชีวิต', 'อัลติ', 'หัวร้อน', 'แลค', 'หลุด', 'ปิงปิง', 'ยิงนก', 'แครี่', 'ตัวถ่วง', 'เรเดียนต์', 'ไอรอน', 'บรอนซ์', 'บุกหลัง', 'ดักซุ่ม', 'แคมป์', 'วิ่งยิง', 'สไนเปอร์', 'มีด', 'ดิสคอร์ด', 'ปาร์ตี้', 'แร้งค์ตก', 'แรงค์ขึ้น',
+        'วอลล์บัง', 'สเมิร์ฟ', 'เอซ', 'คลัตช์', 'อีโค่', 'ฟูลบาย', 'โทรลล์', 'ทีแบ็ก', 'แฟลชเพื่อน', 'สโมคขัดใจ', 'ยิงเท้า', 'รันแอนด์กัน', 'พีค', 'จิ๊กเกิ้ลพีค', 'โฮลด์', 'รีเทค', 'แฟลงค์', 'เครดิต', 'สเปรย์', 'ครอสแฮร์'
+    ]
 };
 
 const numberSortData = {
-    general: ["ระดับความดองแชท", "ความง่วงเวลาตื่นตอนเช้า", "ระดับความขี้เกียจตื่น", "ระดับความกลัวผี", "ความอยากกินหมูกระทะตอนนี้", "ระดับความติ่งซีรีส์", "ความขี้ลืมของตัวเอง"],
-    valo: ["ระดับความหัวร้อนเวลาเล่นเกมแพ้", "ความน่ารำคาญของสเมิร์ฟ (Smurf)", "ระดับความอยากกดลบเกมทิ้ง", "ความแม่นยำของตัวเองในวันนี้", "ความเกลือเวลาเปิดกล่องสุ่ม", "ความยากของการปีนแร้งค์", "ความปวดหลังจากการแบกทีม"]
+    general: [
+        "ระดับความดองแชท", "ความง่วงเวลาตื่นตอนเช้า", "ระดับความขี้เกียจตื่น", "ระดับความกลัวผี", "ความอยากกินหมูกระทะตอนนี้", "ระดับความติ่งซีรีส์", "ความขี้ลืมของตัวเอง",
+        "ระดับความหิวตอนนี้", "ความเร็วในการตอบแชทของคนคุย", "ความชอบกินผัก", "ระดับความติดมือถือ", "ความอยากไปเที่ยวทะเล", "ความเบื่อหน่ายในตอนนี้", "ระดับความติ่งเกาหลี", "ความบ้าจี้ของตัวเอง", "ความชอบดูหนังสยองขวัญ", "ระดับความเปย์เก่ง", "ความขี้งอน", "ความปากแข็ง", "ความชอบกินของหวาน", "ความขี้เซา", "ระดับความคลั่งรัก", "ความกลัวแมลงสาบ", "ระดับความดวงซวยในชีวิต", "ความอินดี้ของตัวเอง", "ความชอบฟังเพลงเศร้า", "ระดับความเฟรนด์ลี่"
+    ],
+    valo: [
+        "ระดับความหัวร้อนเวลาเล่นเกมแพ้", "ความน่ารำคาญของสเมิร์ฟ (Smurf)", "ระดับความอยากกดลบเกมทิ้ง", "ความแม่นยำของตัวเองในวันนี้", "ความเกลือเวลาเปิดกล่องสุ่ม", "ความยากของการปีนแร้งค์", "ความปวดหลังจากการแบกทีม",
+        "ความหัวร้อนตอนเจอคนท็อกซิก", "ความเกลือของ Night Market", "ความยากในการเล่น Duelist", "ความน่าเบื่อตอนเพื่อน AFK", "ความอยากเล่นตัว Sentinel", "ระดับความรวยเครดิตในรอบสุดท้าย", "ความกังวลตอนเหลือ 1v5", "ความแม่นของการพ่นสเปรย์", "ความตกใจตอนโดนแฟลช", "ความหงุดหงิดตอนปิงขึ้น", "ระดับความชอบสกินปืนมังกร", "ความอยากด่าเพื่อนที่แจก", "ระดับความเกรงใจตอนขอปืนเพื่อน", "ความดีใจตอนทำ Ace ได้"
+    ]
 };
 
 const friendQuizData = {
-    general: ["ถ้าเกิดซอมบี้บุก ใครในแก๊งนี้จะรอดเป็นคนสุดท้าย?", "ใครคือคนที่ตอบแชทช้าที่สุด?", "คุณมีเพื่อนในโซเชียลทั้งหมดกี่คน?", "เดือนนึงคุณกินชาบู/หมูกระทะกี่ครั้ง?", "คุณให้คะแนนหน้าตาตัวเองเท่าไหร่ (1-100)?", "คุณตื่นนอนกี่โมงในวันหยุด (เช่น 1030)?"],
-    valo: ["ใครในห้องนี้หัวร้อนง่ายที่สุดเวลาเล่นแร้งค์?", "ใครในห้องนี้ชอบทำทรงบอกว่า 'เน็ตปิง/เมาส์หลอน' เวลาตาย?", "ใครในห้องนี้แบกทีมบ่อยที่สุด?", "ใครในห้องนี้เป็นตัวแจก (ตายคนแรก) บ่อยที่สุด?", "คุณให้คะแนนความแม่น (Aim) ของตัวเองเท่าไหร่ (1-100)?", "วันนึงคุณเล่นเกมนานสุดกี่ชั่วโมง?"]
+    general: [
+        "ถ้าเกิดซอมบี้บุก ใครในแก๊งนี้จะรอดเป็นคนสุดท้าย?", "ใครคือคนที่ตอบแชทช้าที่สุด?", "คุณมีเพื่อนในโซเชียลทั้งหมดกี่คน?", "เดือนนึงคุณกินชาบู/หมูกระทะกี่ครั้ง?", "คุณให้คะแนนหน้าตาตัวเองเท่าไหร่ (1-100)?", "คุณตื่นนอนกี่โมงในวันหยุด (เช่น 1030)?",
+        "ใครในห้องนี้น่าจะแต่งงานคนแรก?", "ใครในห้องนี้มีโอกาสโดนหลอกโอนเงินมากที่สุด?", "คุณหมดเงินไปกับของกินเดือนละกี่บาท?", "ใครในห้องนี้อาบน้ำนานที่สุด?", "ใครคือคนที่นอนดึกที่สุดในกลุ่ม?", "คุณมีเสื้อสีดำกี่ตัวในตู้?", "ใครในห้องนี้น่าจะเอาตัวรอดในป่าได้นานสุด?", "คุณดูซีรีส์ไปแล้วกี่เรื่องในปีนี้?", "ใครน่าจะถูกหวยรางวัลที่ 1 มากที่สุด?", "ใครในห้องนี้ปากไม่ตรงกับใจที่สุด?", "ใครในห้องนี้น่าจะร้องไห้ตอนดูหนังเศร้ามากที่สุด?", "ใครในห้องนี้น่าจะลืมวันเกิดเพื่อนมากที่สุด?", "คุณเปลี่ยนมือถือมากี่เครื่องแล้วในชีวิต?", "ใครในห้องนี้น่าจะตื่นสายจนตกรถไฟ/เครื่องบิน?", "ใครในห้องนี้ถ่ายรูปเก่งที่สุด?", "ใครในห้องนี้บ้างานที่สุด?", "ใครในห้องนี้กินเผ็ดเก่งที่สุด?", "คุณเคยกินหมูกระทะติดกันมากสุดกี่วัน?", "ใครในห้องนี้มีโอกาสเป็นประธานบริษัทมากที่สุด?", "ใครในห้องนี้เก็บความลับเก่งที่สุด?"
+    ],
+    valo: [
+        "ใครในห้องนี้หัวร้อนง่ายที่สุดเวลาเล่นแร้งค์?", "ใครในห้องนี้ชอบทำทรงบอกว่า 'เน็ตปิง/เมาส์หลอน' เวลาตาย?", "ใครในห้องนี้แบกทีมบ่อยที่สุด?", "ใครในห้องนี้เป็นตัวแจก (ตายคนแรก) บ่อยที่สุด?", "คุณให้คะแนนความแม่น (Aim) ของตัวเองเท่าไหร่ (1-100)?", "วันนึงคุณเล่นเกมนานสุดกี่ชั่วโมง?",
+        "คุณเติมเงินกับเกมนี้ไปแล้วกี่บาท?", "ใครในห้องนี้ชอบแย่งล็อคตัว Duelist ที่สุด?", "ใครในห้องนี้ซื้อสกินปืนบ่อยที่สุด?", "ใครในห้องนี้แฟลชโดนเพื่อนบ่อยที่สุด?", "คุณเล่นเกมนี้มาแล้วกี่ชั่วโมง?", "ใครในห้องนี้น่าจะเลิกเล่น Valo เป็นคนแรก?", "ใครในห้องนี้บ่นเรื่องทีมบ่อยที่สุด?", "ใครในห้องนี้ชอบทำเสียงดังโวยวายตอนตาย?", "คุณมีสกิน Vandal กี่กระบอก?", "ใครในห้องนี้เล่นตำแหน่ง Controller ได้ดีที่สุด?", "ใครในห้องนี้ชอบ lurk ไปตายฟรีบ่อยที่สุด?", "ใครในห้องนี้น่าจะพาเพื่อนแรงค์ตกมากที่สุด?", "ใครในห้องนี้มีโอกาสกด Surrender เร็วที่สุด?", "ใครในห้องนี้ชอบพูดว่า 'เกือบตายแล้ว' ทั้งที่ยิงไม่โดนสักนัด?", "ใครในห้องนี้ชอบลืมซื้อสกิลตอนเริ่มเกม?", "คุณฆ่าศัตรูได้มากสุดกี่ตัวในเกมเดียว?", "ใครในห้องนี้ชอบซื้อปืนแปลกๆ มาเล่น?", "ใครในห้องนี้โดนมีดแทงตายบ่อยที่สุด?", "ใครในห้องนี้มีโอกาสจะหักหลังทีมไปช่วยฝั่งนู้นมากที่สุด?", "ใครในห้องนี้น่าจะโดนแบนแชทมากที่สุด?"
+    ]
 };
 
 const secretPainterData = {
     general: [
-        { name: "สัตว์ป่า", words: ["ช้าง", "สิงโต", "ยีราฟ", "ลิง", "เสือ", "งู", "หมี", "จระเข้"] },
-        { name: "อาหาร", words: ["พิซซ่า", "แฮมเบอร์เกอร์", "ซูชิ", "ส้มตำ", "ชาบู", "ไข่ดาว", "ต้มยำกุ้ง", "หมูกระทะ"] },
-        { name: "อาชีพ", words: ["หมอ", "ตำรวจ", "ครู", "สตรีมเมอร์", "นักกีฬา E-sports", "โปรแกรมเมอร์"] }
+        { name: "สัตว์ป่า", words: ["ช้าง", "สิงโต", "ยีราฟ", "ลิง", "เสือ", "งู", "หมี", "จระเข้", "ม้าลาย", "แรด"] },
+        { name: "อาหาร", words: ["พิซซ่า", "แฮมเบอร์เกอร์", "ซูชิ", "ส้มตำ", "ชาบู", "ไข่ดาว", "ต้มยำกุ้ง", "หมูกระทะ", "ก๋วยเตี๋ยว", "ผัดไทย"] },
+        { name: "อาชีพ", words: ["หมอ", "ตำรวจ", "ครู", "สตรีมเมอร์", "นักกีฬา", "โปรแกรมเมอร์", "เชฟ", "นักบิน", "ทหาร", "ช่างภาพ"] },
+        { name: "สถานที่เที่ยว", words: ["ทะเล", "ภูเขา", "น้ำตก", "วัด", "สวนสนุก", "สวนสัตว์", "พิพิธภัณฑ์", "ตลาดนัด", "ห้างสรรพสินค้า", "สวนสาธารณะ"] },
+        { name: "เครื่องใช้ไฟฟ้า", words: ["ทีวี", "ตู้เย็น", "พัดลม", "เตารีด", "เครื่องซักผ้า", "หม้อหุงข้าว", "ไดร์เป่าผม", "คอมพิวเตอร์", "ไมโครเวฟ", "แอร์"] },
+        { name: "พาหนะ", words: ["รถยนต์", "มอเตอร์ไซค์", "จักรยาน", "เครื่องบิน", "เรือ", "รถไฟ", "เฮลิคอปเตอร์", "รถถัง", "รถเมล์", "จรวด"] }
     ],
     valo: [
-        { name: "ในเกม Valorant", words: ["สไปค์", "ปืน Vandal", "มีด", "สไนเปอร์ Operator", "หุ่นบอทในห้องซ้อม", "โดรนของ Sova", "ป้อมปืน Killjoy", "กำแพง Sage"] },
-        { name: "อุปกรณ์เกมเมอร์", words: ["เมาส์", "คีย์บอร์ดเรืองแสง", "หูฟังแมว", "เก้าอี้เกมมิ่ง", "ไมโครโฟน", "หน้าจอคอม"] }
+        { name: "ในเกม Valorant", words: ["สไปค์", "ปืน Vandal", "มีด", "สไนเปอร์", "หุ่นบอทในห้องซ้อม", "โดรนของ Sova", "ป้อมปืน Killjoy", "กำแพง Sage", "กล้อง Cypher", "สุนัข Skye"] },
+        { name: "อุปกรณ์เกมเมอร์", words: ["เมาส์", "คีย์บอร์ดเรืองแสง", "หูฟังแมว", "เก้าอี้เกมมิ่ง", "ไมโครโฟน", "หน้าจอคอม", "แผ่นรองเมาส์", "เคสคอมพิวเตอร์"] },
+        { name: "อาวุธในเกม", words: ["Classic", "Ghost", "Sheriff", "Vandal", "Phantom", "Odin", "Operator", "Ares", "Judge", "Bucky"] },
+        { name: "สกิลตัวละคร", words: ["บอลควัน", "กำแพงน้ำแข็ง", "ลูกธนูโซว่า", "โดรนโซว่า", "ป้อมปืนคิลจอย", "สุนัขของสกาย", "มีดเจ็ตต์", "บอลไฟฟีนิกซ์", "วาร์ปโอเมน", "ดูดเลือดเรน่า"] },
+        { name: "เหตุการณ์ในเกม", words: ["วางสไปค์", "กู้สไปค์", "โดนแฟลชตาบอด", "ยิงปืนทะลุกำแพง", "เอซ (Ace)", "แอบซุ่ม", "วิ่งหนี", "โดนมีดแทง", "กระโดดยิง", "พ่นสเปรย์"] }
     ]
 };
 
 const matchTheBlankData = {
-    general: ["ข้าว ___", "น้ำ ___", "รัก ___", "เพื่อน ___", "คน ___", "รถ ___", "ใจ ___", "___ บอด", "หู ___", "หน้า ___", "หัว ___"],
-    valo: ["แบก ___", "ยิง ___", "___ ร้อน", "แร้งค์ ___", "___ แตก", "ไอรอน ___", "เรเดียนต์ ___", "แฟลช ___", "สโมค ___", "ดัก ___", "___ หลัง", "___ ทิพย์"]
+    general: [
+        "ข้าว ___", "น้ำ ___", "รัก ___", "เพื่อน ___", "คน ___", "รถ ___", "ใจ ___", "___ บอด", "หู ___", "หน้า ___", "หัว ___",
+        "หมู ___", "ไก่ ___", "ดาว ___", "เสื้อ ___", "กางเกง ___", "รองเท้า ___", "แว่น ___", "กระเป๋า ___", "ความ ___", "ความรู้สึก ___", "ปาก ___", "ตา ___", "ผม ___", "มือ ___", "เท้า ___", "หนัง ___", "เพลง ___", "เกม ___", "ผี ___", "บ้าน ___"
+    ],
+    valo: [
+        "แบก ___", "ยิง ___", "___ ร้อน", "แร้งค์ ___", "___ แตก", "ไอรอน ___", "เรเดียนต์ ___", "แฟลช ___", "สโมค ___", "ดัก ___", "___ หลัง", "___ ทิพย์",
+        "สเปรย์ ___", "กำแพง ___", "ระเบิด ___", "อัลติ ___", "ตัว ___", "หัว ___", "บุก ___", "วิ่ง ___", "แอบ ___", "แผน ___", "ไซเฟอร์ ___", "เจ็ตต์ ___", "เรน่า ___", "เสจ ___", "โอเมน ___", "เป้า ___", "ปิง ___", "มาโคร ___"
+    ]
 };
 
 const uniqueClueData = {
-    general: ['ไดโนเสาร์', 'แวมไพร์', 'ซอมบี้', 'แม่มด', 'มนุษย์ต่างดาว', 'หุ่นยนต์', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'พายุ', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'โทรทัศน์', 'ตู้เย็น', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ดาวเคราะห์'],
-    valo: ['สไนเปอร์', 'สไปค์', 'สโมค', 'แร้งค์', 'แฮกเกอร์', 'ดิสคอร์ด', 'สตรีมเมอร์', 'คีย์บอร์ด']
+    general: [
+        'ไดโนเสาร์', 'แวมไพร์', 'ซอมบี้', 'แม่มด', 'มนุษย์ต่างดาว', 'หุ่นยนต์', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'พายุ', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'โทรทัศน์', 'ตู้เย็น', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ดาวเคราะห์',
+        'ทะเลทราย', 'มหาสมุทร', 'ป่าดงดิบ', 'น้ำตก', 'ทอร์นาโด', 'หิมะตก', 'ท้องฟ้า', 'ดวงดาว', 'พระอาทิตย์', 'พระจันทร์', 'เมฆ', 'สายรุ้ง', 'ฟ้าผ่า', 'แม่น้ำ', 'ทะเลสาบ', 'เกาะ', 'คาบสมุทร', 'ถ้ำ', 'แบล็คโฮล', 'อุกกาบาต'
+    ],
+    valo: [
+        'สไนเปอร์', 'สไปค์', 'สโมค', 'แร้งค์', 'แฮกเกอร์', 'ดิสคอร์ด', 'สตรีมเมอร์', 'คีย์บอร์ด',
+        'โอมเมน', 'เจ็ตต์', 'เรน่า', 'เสจ', 'ไซเฟอร์', 'คิลจอย', 'โซว่า', 'ฟีนิกซ์', 'บริมสโตน', 'ไวเปอร์', 'อัสตร้า', 'เคโย', 'สกาย', 'แชมเบอร์', 'นีออน', 'เฟด', 'ฮาร์เบอร์', 'เก็คโค่', 'เดดล็อค', 'ไอโซ'
+    ]
 };
 
 const truthOrLieData = {
-    general: ["ความลับที่คนในกลุ่มยังไม่รู้", "เรื่องโกหกที่เคยเนียนพูด", "ความสามารถพิเศษแปลกๆ ที่ไม่มีใครรู้", "ของสะสมที่แปลกที่สุดในบ้าน", "เรื่องเข้าใจผิดที่ฝังใจมานาน", "เรื่องตลกตอนเด็กๆ"],
-    valo: ["วีรกรรมสุดบ้ง/แจกแต้ม ในเกม", "ข้ออ้างตอนตายที่ใช้บ่อยที่สุด", "เรื่องน่าอายที่สุดตอนเล่นเกมกับเพื่อน", "เหตุการณ์หัวร้อนจนเกือบพังข้าวของ", "อุบัติเหตุหรือเรื่องเจ็บตัวเพราะเล่นเกม"]
+    general: [
+        "ความลับที่คนในกลุ่มยังไม่รู้", "เรื่องโกหกที่เคยเนียนพูด", "ความสามารถพิเศษแปลกๆ ที่ไม่มีใครรู้", "ของสะสมที่แปลกที่สุดในบ้าน", "เรื่องเข้าใจผิดที่ฝังใจมานาน", "เรื่องตลกตอนเด็กๆ",
+        "เรื่องน่าอายตอนประถม", "วีรกรรมแสบสมัยเรียน", "ความฝันแปลกๆ ที่เคยฝัน", "อาหารที่เกลียดที่สุดแต่คนอื่นชอบ", "สิ่งที่เคยขโมยของพ่อแม่/เพื่อน", "สถานที่ที่เคยไปหลงทาง", "เหตุการณ์ที่ทำให้ร้องไห้หนักมาก", "เรื่องที่เคยโกหกแฟน/คนคุย", "สิ่งที่กลัวที่สุดในชีวิต", "อุบัติเหตุที่จำฝังใจ", "สัตว์เลี้ยงตัวแรกและวีรกรรมของมัน", "สิ่งของที่หวงที่สุด", "ความสามารถพิเศษที่ซ่อนไว้", "เรื่องที่เคยทำแล้วโดนตำรวจจับ/ดุ", "เหตุการณ์ผีหลอก/เจอผี", "คนที่เคยแอบชอบมานาน", "เรื่องเปิ่นๆ ตอนไปเที่ยว", "ของขวัญที่แปลกที่สุดที่เคยได้", "เรื่องที่เคยทะเลาะกับเพื่อนสนิท", "ความเชื่อผิดๆ ตอนเด็ก"
+    ],
+    valo: [
+        "วีรกรรมสุดบ้ง/แจกแต้ม ในเกม", "ข้ออ้างตอนตายที่ใช้บ่อยที่สุด", "เรื่องน่าอายที่สุดตอนเล่นเกมกับเพื่อน", "เหตุการณ์หัวร้อนจนเกือบพังข้าวของ", "อุบัติเหตุหรือเรื่องเจ็บตัวเพราะเล่นเกม",
+        "เรื่องฟลุ๊คตอนยิงแบบไม่ได้ตั้งใจ", "วิธีแก้หัวร้อนตอนเล่นแพ้ติดๆ กัน", "ข้ออ้างเวลาไม่อยากเล่นกับบางคน", "จังหวะที่เคยลืมกู้ Spike จนแพ้", "เหตุการณ์ที่เคยด่าคนผิดในเกม", "สิ่งที่ทำเวลาเจอสเมิร์ฟฝั่งตรงข้าม", "เพื่อนร่วมทีมที่แปลกที่สุดที่เคยเจอ", "จังหวะ Ace ที่ภูมิใจที่สุด", "เรื่องที่เคยโดนแบนในเกม", "คำสบถที่ใช้บ่อยที่สุดตอนตาย", "ความลับในการตั้งเป้าเล็ง (Crosshair)", "จุดซุ่มประจำที่ไม่มีใครรู้", "เคยใช้โปรแกรมช่วยเล่น/มาโครหรือไม่", "เคยหลอกให้เพื่อนซื้อปืนให้แล้วตัวเองเก็บตังค์", "เคยแกล้งเพื่อนในทีมจนเพื่อนตาย", "เคยปาแฟลชใส่เพื่อนเพราะหมั่นไส้", "เคยบล็อกเพื่อนร่วมทีมไม่ให้ออก", "เคยแย่งเพื่อนเก็บ Ace", "เคยปล่อยให้เพื่อนตายเพื่อตัวเองจะเอา MVP", "เคยซื้อสกินปืนแล้วโกหกแฟน/แม่ว่าเพื่อนให้"
+    ]
 };
+
+const valoMapRoles = [
+    "ตัวเปิด (Duelist)", "คนสโมค (Controller)", "คนฮีล (Healer)", "คนวางกับดัก (Sentinel)", "สไนเปอร์ (Operator)", 
+    "คนกำลังกู้สไปค์", "คนกำลังวางสไปค์", "คนหลุด (AFK)", "คนเดินแฟลงค์ (Lurker)", "สเมิร์ฟแบกทีม", 
+    "ตัวแจก (ตายคนแรก)", "คนขอซื้อปืน", "คนแคมป์หลังกล่อง", "คนดูแผนที่", "คนเล่น Odin", "คนใจดีดรอปปืนให้"
+];
 
 const spyfallData = {
     general: [
@@ -100,12 +156,17 @@ const spyfallData = {
         { name: "สวนสนุก", roles: ["คนคุมเครื่องเล่น", "มาสคอต", "คนขายสายไหม", "เด็ก", "ผู้ปกครอง", "พนักงานทำความสะอาด", "คนขายตั๋ว", "วัยรุ่น", "รปภ.", "ช่างซ่อมเครื่องเล่น"] }
     ],
     valo: [
-        { name: "ไซต์ A (Ascent)", roles: ["คนดักซุ่ม", "คนถือ Spike", "สโมคเกอร์", "คนเช็คกล้อง", "คนแคมป์หลังกล่อง", "สไนเปอร์", "ตัวเปิด", "ฮีลเลอร์", "คนวิ่งหนี", "ตัวแจก"] },
-        { name: "ไซต์ B (Bind)", roles: ["คนเฝ้าฮุกคา (Hookah)", "ตัวบุกจากลอง (Long)", "คนดักใน Teleporter", "คนถือสไนเปอร์", "คนแอบหลังตู้คอนเทนเนอร์", "คนวาง Spike", "คนปาแฟลช", "สโมคเกอร์", "ตัวล้วง", "ฮีลเลอร์"] },
-        { name: "จุดเกิดฝั่งป้องกัน", roles: ["คน AFK", "คนกำลังแต่งปืน", "คนโยนปืนให้เพื่อน", "คนขอซื้อปืน", "คนดรอปมีด", "คนซ้อมยิงกำแพง", "คนพ่นสเปรย์", "ตัววิ่งนำ", "คนหลุด", "คนเต้น"] },
-        { name: "จุดเกิดฝั่งโจมตี", roles: ["คนแบก Spike", "คน AFK", "คนขอปืน", "คนวอร์มอัพยิง", "ตัววิ่งเปิด", "สไนเปอร์", "คนพ่นสเปรย์", "คนดูแผนที่", "คนหลุด", "คนหัวร้อน"] },
-        { name: "ท่อ Mid", roles: ["คนแอบดักยิง", "คนกำลังคลาน", "ตัววิ่งทะลวง", "คนปาแฟลชเข้าท่อ", "คนยิงทะลุกำแพง", "สโมคเกอร์", "ตัวแจก", "คนซุ่ม", "คนเช็คเสียงเท้า", "สไนเปอร์"] },
-        { name: "ร้านค้าซื้อปืน (Buy Phase)", roles: ["คนเงินหมด", "คนขอปืน", "คนดรอปปืน", "คนซื้อสไน", "คนซื้อแต่ปืนพก", "คนลืมซื้อเกราะ", "คนกดสแปมขอของ", "คนใจดีซื้อให้", "คนกำลังตัดสินใจ", "คนบอกแผน"] }
+        { name: "ด่าน Ascent", roles: valoMapRoles },
+        { name: "ด่าน Bind", roles: valoMapRoles },
+        { name: "ด่าน Haven", roles: valoMapRoles },
+        { name: "ด่าน Split", roles: valoMapRoles },
+        { name: "ด่าน Icebox", roles: valoMapRoles },
+        { name: "ด่าน Breeze", roles: valoMapRoles },
+        { name: "ด่าน Fracture", roles: valoMapRoles },
+        { name: "ด่าน Pearl", roles: valoMapRoles },
+        { name: "ด่าน Lotus", roles: valoMapRoles },
+        { name: "ด่าน Sunset", roles: valoMapRoles },
+        { name: "ด่าน Abyss", roles: valoMapRoles }
     ]
 };
 
@@ -153,13 +214,43 @@ function getGameData(dataset, packType, customWords = null) {
     else if (packType === 'marvel' && dataset.marvel) result = [...dataset.marvel];
     else if (packType === 'anime' && dataset.anime) result = [...dataset.anime];
     else {
-        // mixed: combine all available categories
         if (dataset.general) result.push(...dataset.general);
         if (dataset.valo) result.push(...dataset.valo);
         if (dataset.marvel) result.push(...dataset.marvel);
         if (dataset.anime) result.push(...dataset.anime);
     }
     return result;
+}
+
+// --- Anti-Repetition System (สุ่มไม่ให้ซ้ำจนกว่าจะกลับล็อบบี้) ---
+function getUniqueItems(roomCode, gameKey, dataArray, count = 1) {
+    const room = rooms[roomCode];
+    if (!room.playedItems) room.playedItems = {};
+    if (!room.playedItems[gameKey]) room.playedItems[gameKey] = [];
+
+    let available = dataArray.filter(item => {
+        const key = typeof item === 'object' ? item.name || JSON.stringify(item) : item;
+        return !room.playedItems[gameKey].includes(key);
+    });
+
+    if (available.length < count) {
+        room.playedItems[gameKey] = []; // Reset when exhausted
+        available = [...dataArray];
+        
+        while (available.length < count) {
+            available = available.concat(dataArray);
+        }
+    }
+
+    available.sort(() => Math.random() - 0.5);
+    const selected = available.slice(0, count);
+
+    selected.forEach(item => {
+        const key = typeof item === 'object' ? item.name || JSON.stringify(item) : item;
+        room.playedItems[gameKey].push(key);
+    });
+
+    return count === 1 ? selected[0] : selected;
 }
 
 function syncGameStateToPlayer(socket, room, roomCode) {
@@ -204,7 +295,6 @@ function syncGameStateToPlayer(socket, room, roomCode) {
              socket.emit('truthOrLie_newRound', { prompt: g.prompt, players: pList });
          } else if (g.phase === 'voting') {
              const activePlayer = room.players.find(p => p.id === g.turnOrder[g.activePlayerIndex]);
-             // FIX 1: Check if activePlayer exists before accessing its id
              if (activePlayer) {
                  const activeAnswers = g.answers[activePlayer.id];
                  if(activeAnswers) socket.emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
@@ -217,13 +307,13 @@ function syncGameStateToPlayer(socket, room, roomCode) {
             socket.emit('spyfall_newRound', {
                 endTime: g.endTime,
                 allLocations: g.allLocations,
-                playedLocations: room.playedSpyfallLocs || [],
+                playedLocations: room.playedItems && room.playedItems['spyfall'] ? room.playedItems['spyfall'] : [],
                 location: g.playerRoles[socket.id].isSpy ? null : g.location,
                 role: g.playerRoles[socket.id].role,
                 isSpy: g.playerRoles[socket.id].isSpy
             });
         } else if (g.phase === 'spy_guessing') {
-            socket.emit('spyfall_spyGuessingPhase', { spyId: g.spyId, allLocations: g.allLocations, playedLocations: room.playedSpyfallLocs || [] });
+            socket.emit('spyfall_spyGuessingPhase', { spyId: g.spyId, allLocations: g.allLocations, playedLocations: room.playedItems && room.playedItems['spyfall'] ? room.playedItems['spyfall'] : [] });
         } else if (g.phase === 'voting') {
             socket.emit('spyfall_startVoting', { players: pList });
         }
@@ -254,18 +344,17 @@ function startWhoAmIRound(roomCode, pack, customWords) {
     const allData = getGameData(whoAmIData, pack, customWords);
     if (!allData || allData.length === 0) return;
 
-    let charPool = [...allData].sort(() => Math.random() - 0.5);
+    const selectedCharacters = getUniqueItems(roomCode, 'whoAmI', allData, room.players.length);
     const playerCharacters = {};
     
-    room.players.forEach(p => {
-        if (charPool.length === 0) charPool = [...allData].sort(() => Math.random() - 0.5); 
-        playerCharacters[p.id] = charPool.pop();
+    room.players.forEach((p, index) => {
+        playerCharacters[p.id] = Array.isArray(selectedCharacters) ? selectedCharacters[index] : selectedCharacters;
     });
 
     room.game = {
         phase: 'playing',
         playerCharacters,
-        customWords // เก็บไว้ใช้ตาถัดไปได้ถ้าเป็นโหมดแต่งเอง
+        customWords
     };
 
     room.players.forEach(p => {
@@ -290,19 +379,14 @@ function startSpyfallRound(roomCode, pack, timerMin, customWords) {
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
 
-    if (!room.playedSpyfallLocs) room.playedSpyfallLocs = [];
-
     const allData = getGameData(spyfallData, pack, customWords);
     if (!allData || allData.length === 0) return;
 
-    let availableLocs = allData.filter(loc => !room.playedSpyfallLocs.includes(loc.name));
+    // เก็บสถานะของด่านที่เคยเล่นไปแล้วก่อนที่จะสุ่มตาใหม่ (เพื่อส่งให้ Client ใช้ขีดฆ่า)
+    const previousPlayed = room.playedItems && room.playedItems['spyfall'] ? [...room.playedItems['spyfall']] : [];
     
-    if (availableLocs.length === 0) {
-        room.playedSpyfallLocs = []; 
-        availableLocs = allData;
-    }
-
-    const pickedLocData = availableLocs[Math.floor(Math.random() * availableLocs.length)];
+    // สุ่มด่านโดยไม่ให้ซ้ำกับของเก่าที่เคยเล่นในห้องนี้
+    const pickedLocData = getUniqueItems(roomCode, 'spyfall', allData, 1);
     const locationName = pickedLocData.name;
     
     let turnOrder = room.players.map(p => p.id);
@@ -340,7 +424,7 @@ function startSpyfallRound(roomCode, pack, timerMin, customWords) {
         io.to(p.id).emit('spyfall_newRound', {
             endTime,
             allLocations: room.game.allLocations,
-            playedLocations: room.playedSpyfallLocs,
+            playedLocations: previousPlayed, // ส่งข้อมูลสถานที่เดิมที่มีขีดฆ่าไปให้ Client
             location: playerRoles[p.id].isSpy ? null : locationName,
             role: playerRoles[p.id].role,
             isSpy: playerRoles[p.id].isSpy
@@ -352,10 +436,6 @@ function finishSpyfallGame(roomCode, spyWon, spyBonusWon = false, titleMsg = "")
     const room = rooms[roomCode]; if (!room || !room.game) return;
     const g = room.game;
     const spyPlayer = room.players.find(p => p.id === g.spyId);
-    
-    if (!room.playedSpyfallLocs.includes(g.location)) {
-        room.playedSpyfallLocs.push(g.location);
-    }
     
     broadcastScores(roomCode);
     
@@ -607,7 +687,7 @@ function startTruthOrLieRound(roomCode, pack, customWords) {
     }
 
     const dataPack = getGameData(truthOrLieData, pack, customWords);
-    const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const prompt = getUniqueItems(roomCode, 'truthOrLie', dataPack, 1);
     
     let turnOrder = room.players.map(p => p.id);
     turnOrder.sort(() => Math.random() - 0.5);
@@ -625,7 +705,7 @@ function startUniqueClueRound(roomCode, pack, customWords) {
     }
     
     const dataPack = getGameData(uniqueClueData, pack, customWords);
-    const word = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const word = getUniqueItems(roomCode, 'uniqueClue', dataPack, 1);
     const guesserIndex = Math.floor(Math.random() * room.players.length);
     const guesserId = room.players[guesserIndex].id;
 
@@ -644,7 +724,7 @@ function startSecretPainterRound(roomCode, pack, customWords) {
     }
 
     const dataPack = getGameData(secretPainterData, pack, customWords);
-    const categoryObj = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const categoryObj = getUniqueItems(roomCode, 'secretPainter', dataPack, 1);
     const word = categoryObj.words[Math.floor(Math.random() * categoryObj.words.length)];
     
     let turnOrder = room.players.map(p => p.id);
@@ -695,7 +775,7 @@ function startMatchTheBlankRound(roomCode, pack, customWords) {
     }
     
     const dataPack = getGameData(matchTheBlankData, pack, customWords);
-    const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const prompt = getUniqueItems(roomCode, 'matchTheBlank', dataPack, 1);
 
     room.game = { prompt: prompt, answers: {} };
     io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
@@ -710,7 +790,7 @@ function startFriendQuizRound(roomCode, pack, customWords) {
     }
     
     const dataPack = getGameData(friendQuizData, pack, customWords);
-    const question = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const question = getUniqueItems(roomCode, 'friendQuiz', dataPack, 1);
 
     room.game = { question, answers: {}, phase: 'answering', secretPlayerId: null, ranges: [], bets: {} };
     io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
@@ -729,7 +809,7 @@ function startNumberSortRound(roomCode, pack, customWords) {
     }
 
     const dataPack = getGameData(numberSortData, pack, customWords);
-    const theme = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const theme = getUniqueItems(roomCode, 'numberSort', dataPack, 1);
     
     room.game = { theme, playerNumbers: {} };
     const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
@@ -741,15 +821,15 @@ function startNumberSortRound(roomCode, pack, customWords) {
     });
 }
 
-function generateWordGuessBoard(pack, customWords) {
+function generateWordGuessBoard(roomCode, pack, customWords) {
     const dataPack = getGameData(wordGuessData, pack, customWords);
-    const shuffledWords = [...dataPack].sort(() => 0.5 - Math.random()).slice(0, 25);
+    const shuffledWords = getUniqueItems(roomCode, 'wordGuess', dataPack, 25);
     return shuffledWords.map(word => ({ word, type: 'neutral', revealed: false }));
 }
 
 function startWordGuessTeamGame(roomCode, pack, customWords) {
     const room = rooms[roomCode];
-    const board = generateWordGuessBoard(pack, customWords);
+    const board = generateWordGuessBoard(roomCode, pack, customWords);
     if(board.length < 25) { io.to(roomCode).emit('error', 'คำศัพท์ไม่พอ 25 คำสำหรับเล่นรหัสคำทาย'); return; }
     
     let types = Array(9).fill('red').concat(Array(8).fill('blue')).concat(Array(7).fill('neutral')).concat(['assassin']);
@@ -767,7 +847,7 @@ function startWordGuessTeamGame(roomCode, pack, customWords) {
 
 function startWordGuessCoopGame(roomCode, pack, customWords) {
     const room = rooms[roomCode];
-    const board = generateWordGuessBoard(pack, customWords);
+    const board = generateWordGuessBoard(roomCode, pack, customWords);
     if(board.length < 25) { io.to(roomCode).emit('error', 'คำศัพท์ไม่พอ 25 คำสำหรับเล่นรหัสคำทาย'); return; }
     
     let types = Array(15).fill('green').concat(Array(9).fill('neutral')).concat(['assassin']);
@@ -804,7 +884,7 @@ io.on('connection', (socket) => {
     socket.on('rejoinRoom', ({ roomCode, playerId, playerName, avatar }) => {
         let room = rooms[roomCode];
         if (!room) {
-            rooms[roomCode] = { gameType: null, players: [], gameState: 'waiting', game: {} };
+            rooms[roomCode] = { gameType: null, players: [], gameState: 'waiting', game: {}, playedItems: {} };
             room = rooms[roomCode];
         }
 
@@ -925,7 +1005,7 @@ io.on('connection', (socket) => {
     socket.on('createRoom', ({ playerName, avatar, playerId }) => {
         let roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
         while (rooms[roomCode]) roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-        rooms[roomCode] = { gameType: null, players: [{ id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true }], gameState: 'waiting', game: {} };
+        rooms[roomCode] = { gameType: null, players: [{ id: socket.id, playerId, name: playerName, avatar: avatar || '👤', score: 0, isOnline: true }], gameState: 'waiting', game: {}, playedItems: {} };
         socket.join(roomCode); socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
     });
 
@@ -1009,6 +1089,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id) {
             room.gameState = 'waiting'; room.gameType = null; room.game = {};
+            room.playedItems = {}; // รีเซ็ตประวัติการสุ่มโจทย์ทั้งหมดเมื่อกลับหน้าล็อบบี้
             io.to(roomCode).emit('backToLobby', room.players);
         }
     });
@@ -1125,7 +1206,7 @@ io.on('connection', (socket) => {
         if(socket.id !== room.game.spyId) return;
 
         room.game.phase = 'spy_guessing';
-        io.to(roomCode).emit('spyfall_spyGuessingPhase', { spyId: room.game.spyId, allLocations: room.game.allLocations, playedLocations: room.playedSpyfallLocs || [] });
+        io.to(roomCode).emit('spyfall_spyGuessingPhase', { spyId: room.game.spyId, allLocations: room.game.allLocations, playedLocations: room.playedItems && room.playedItems['spyfall'] ? room.playedItems['spyfall'] : [] });
         systemChat(roomCode, `🚨 สายลับขอชิงตอบสถานที่ก่อนหมดเวลา!`);
     });
 
@@ -1188,9 +1269,6 @@ io.on('connection', (socket) => {
                 if (spyPlayer) spyPlayer.score += 3;
                 room.game.phase = 'bonus_phase';
                 
-                if (!room.playedSpyfallLocs.includes(room.game.location)) {
-                    room.playedSpyfallLocs.push(room.game.location);
-                }
                 broadcastScores(roomCode);
                 
                 const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
@@ -1209,7 +1287,7 @@ io.on('connection', (socket) => {
                 io.to(roomCode).emit('spyfall_bonusPhase', {
                     spyId: room.game.spyId,
                     allLocations: room.game.allLocations,
-                    playedLocations: room.playedSpyfallLocs
+                    playedLocations: room.playedItems && room.playedItems['spyfall'] ? room.playedItems['spyfall'] : []
                 });
             }
         } else {
