@@ -91,6 +91,18 @@
             border: 1px solid var(--border-color);
             color: var(--text-color);
         }
+
+        /* Pack Selection Buttons */
+        .pack-btn {
+            background-color: var(--border-color);
+            border-color: transparent;
+        }
+        .pack-btn.selected {
+            background-color: var(--card-bg-color);
+            border-color: var(--primary-color);
+        }
+        html.dark .pack-btn { background-color: var(--border-color); }
+        html.dark .pack-btn.selected { background-color: var(--card-bg-color); border-color: var(--primary-color); }
         
         #rules-modal-overlay { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; }
         #rules-modal-content { background-color: var(--card-bg-color); border: 2px solid var(--primary-text-color); }
@@ -122,13 +134,13 @@
         .ns-player-card.fail { background-color: var(--accent-color); border-color: var(--accent-text-color); color: var(--accent-text-color); }
         .fq-range-card.success, .fq-result-card.success { background-color: var(--primary-color); border-color: var(--primary-text-color); color: var(--primary-text-color); }
         .fq-range-card.fail, .fq-result-card.fail { background-color: var(--accent-color); border-color: var(--accent-text-color); color: var(--accent-text-color); }
-        .fq-range-card.selected, .sp-vote-btn.selected, .tol-vote-btn.selected { border-color: var(--primary-text-color); transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0, 0.15); }
-        .sp-vote-btn.selected { background-color: var(--accent-color); color: var(--accent-text-color); }
-        .tol-vote-btn.selected { background-color: var(--primary-color); color: var(--primary-text-color); }
+        .fq-range-card.selected, .sp-vote-btn.selected, .tol-vote-btn.selected, .sf-loc-btn.selected, .sf-vote-btn.selected { border-color: var(--primary-text-color); transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0, 0.15); }
+        .sp-vote-btn.selected, .sf-vote-btn.selected { background-color: var(--accent-color); color: var(--accent-text-color); }
+        .tol-vote-btn.selected, .sf-loc-btn.selected { background-color: var(--primary-color); color: var(--primary-text-color); }
 
         #sp-drawing-canvas { background-color: #ffffff; cursor: crosshair; touch-action: none; }
 
-        /* Coup (Bluff) Styles */
+        /* Mafia Styles */
         .bo-card { min-width: 80px; text-align: center; border-radius: 8px; font-weight: bold; border: 2px solid; padding: 8px; transition: transform 0.2s; }
         .bo-card.alive { background-color: white; color: #1c1917; border-color: #d6d3d1; }
         html.dark .bo-card.alive { background-color: #292524; color: #f5f5f4; border-color: #57534e; }
@@ -137,6 +149,10 @@
         .bo-card.exchange-select { cursor: pointer; }
         .bo-card.exchange-select.selected { border-color: var(--primary-color); background-color: var(--primary-color); color: var(--primary-text-color); transform: translateY(-5px); }
 
+        /* Spyfall (Secret Agent) Styles */
+        .sf-loc-card { transition: all 0.2s; border: 2px solid var(--border-color); background-color: var(--card-bg-color); }
+        .sf-loc-card.played { opacity: 0.4; text-decoration: line-through; filter: grayscale(100%); pointer-events: none; }
+        
         .spinner-container::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 2.5rem; color: var(--accent-color); }
         #stopwatch-time { font-family: 'monospace'; }
         #chat-messages::-webkit-scrollbar { width: 6px; }
@@ -230,7 +246,7 @@
         <!-- Entry Screen -->
         <div id="entry-screen" class="text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors max-w-xl mx-auto">
             <h1 class="text-4xl sm:text-5xl font-bold mb-2" style="color: var(--primary-text-color);">Cozy Corner</h1>
-            <p class="text-stone-500 dark:text-stone-400 mb-8">โซนพักตับ แวะมาปั่นประสาทเพื่อนแทน</p>
+            <p class="text-stone-500 dark:text-stone-400 mb-8">โซนพักตับจากแร้งค์เดือด แวะมาปั่นประสาทเพื่อนแทน</p>
             
             <div id="player-entry" class="space-y-4">
                 <div class="mb-4">
@@ -286,8 +302,12 @@
                 </div>
                 
                 <div id="game-selection-area" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="secret-agent">
+                        <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-400">สายลับแฝงตัว 🕵️‍♂️</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">ซักถามจับผิด หาตัวสายลับให้เจอ!</p>
+                    </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="bluff-overthrow">
-                        <h3 class="text-lg font-bold text-red-600 dark:text-red-400">บลัฟโค่นอำนาจ ⚔️</h3>
+                        <h3 class="text-lg font-bold text-red-600 dark:text-red-400">เหลี่ยมมาเฟีย 🕴️</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">อ้างบทบาท โกหก และกำจัดศัตรูให้หมด!</p>
                     </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="truth-or-lie">
@@ -320,14 +340,31 @@
                     </div>
                 </div>
 
-                <div id="word-pack-selection" class="hidden mt-6 bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-stone-200 dark:border-stone-700 shadow-inner">
-                    <p class="font-bold text-lg mb-3" style="color: var(--heading-color);">เลือกหมวดหมู่คำศัพท์ / ธีมเกม:</p>
-                    <div class="flex flex-wrap justify-center gap-3">
-                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-[var(--primary-color)] ring-2 ring-[var(--primary-color)] shadow-md selected" data-pack="mixed">🌪️ ผสมทั้งหมด</button>
-                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-transparent" data-pack="general">⭐ ทั่วไป (ไม่เกม)</button>
-                        <button class="pack-btn btn-secondary px-4 py-2 rounded-lg font-bold transition-all border-2 border-transparent" data-pack="valo">🎮 เกมเมอร์/Valo</button>
+                <!-- Pack Selection UI -->
+                <div id="pack-selection-container" class="mt-8 mb-6 border-t border-stone-200 dark:border-stone-700 pt-6">
+                    <h3 class="text-lg font-bold mb-4 text-center" style="color: var(--heading-color);">เลือกหมวดหมู่คำศัพท์ / ธีมเกม:</h3>
+                    <div id="pack-buttons-area" class="flex flex-wrap justify-center gap-3 mb-2 transition-opacity">
+                        <button class="pack-btn selected px-6 py-3 rounded-xl border-4 font-bold transition-all text-[var(--heading-color)] text-sm sm:text-base" data-pack="mixed">
+                            🌪️ ผสมทั้งหมด
+                        </button>
+                        <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-[var(--heading-color)] text-sm sm:text-base" data-pack="general">
+                            ⭐ ทั่วไป (ไม่เกม)
+                        </button>
+                        <button class="pack-btn px-6 py-3 rounded-xl border-4 font-bold transition-all text-[var(--heading-color)] text-sm sm:text-base" data-pack="valo">
+                            🎮 เกมเมอร์/Valo
+                        </button>
                     </div>
-                    <p class="text-xs text-stone-500 mt-3">* มีผลเฉพาะเกมที่ใช้คำศัพท์ หรือประโยคคำถามเท่านั้น (เช่น รหัสคำทาย, ทายใจเพื่อน, จิตรกร ฯลฯ)</p>
+                    <p class="text-xs text-stone-500 dark:text-stone-400 text-center">* มีผลเฉพาะเกมที่ใช้คำศัพท์ หรือประโยคคำถาม (เช่น สายลับแฝงตัว, รหัสคำทาย, ทายใจเพื่อน ฯลฯ)</p>
+                </div>
+
+                <!-- Spyfall Timer Setting -->
+                <div id="spyfall-settings" class="hidden mt-4 p-4 bg-stone-100 dark:bg-stone-800 rounded-lg max-w-sm mx-auto border border-stone-200 dark:border-stone-700">
+                    <label class="block text-sm font-bold mb-2">ตั้งเวลาจับผิดสายลับ:</label>
+                    <select id="spyfall-timer-select" class="w-full p-2 rounded-md input-field font-bold text-center">
+                        <option value="3">3 นาที (เร็วจัด)</option>
+                        <option value="5" selected>5 นาที (กำลังดี)</option>
+                        <option value="8">8 นาที (คุยกันยาวๆ)</option>
+                    </select>
                 </div>
                 
                 <div class="mt-8">
@@ -350,11 +387,100 @@
             </div>
         </div>
 
-        <!-- Bluff Overthrow (Coup) Screen -->
+        <!-- Secret Agent (Spyfall) Screen -->
+        <div id="secret-agent-screen" class="hidden w-full text-center">
+            
+            <!-- Playing Phase -->
+            <div id="sf-playing-area" class="hidden w-full max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <!-- Left: Role & Timer -->
+                    <div class="w-full md:w-1/3 flex flex-col gap-4">
+                        <div class="p-6 bg-stone-100 dark:bg-[#3A322C] rounded-xl shadow-md border-2 border-stone-200 dark:border-stone-700">
+                            <p class="text-stone-500 dark:text-stone-400 font-bold mb-1">เวลาที่เหลือ</p>
+                            <h2 id="sf-timer-display" class="text-4xl font-mono font-bold text-[var(--accent-color)]">00:00</h2>
+                            <button id="sf-host-force-vote-btn" class="hidden mt-4 w-full p-2 text-sm btn-secondary rounded-lg">จบเวลา / เริ่มโหวตหาคนร้าย</button>
+                        </div>
+                        
+                        <div id="sf-my-role-card" class="p-6 rounded-xl shadow-md border-4 flex-grow flex flex-col justify-center transition-colors">
+                            <p class="text-stone-500 font-bold mb-2">ข้อมูลของคุณ</p>
+                            <h3 id="sf-my-location" class="text-2xl font-bold mb-2"></h3>
+                            <p id="sf-my-role" class="text-lg"></p>
+                        </div>
+
+                        <button id="sf-spy-guess-btn" class="hidden w-full p-4 text-lg font-bold rounded-xl btn-primary bg-indigo-600 hover:bg-indigo-700 border-indigo-700 text-white shadow-lg animate-pulse">
+                            🚨 ฉันรู้สถานที่แล้ว! (ทายสถานที่)
+                        </button>
+                    </div>
+
+                    <!-- Right: Locations Grid -->
+                    <div class="w-full md:w-2/3 p-4 bg-white/50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700">
+                        <h3 class="font-bold text-lg mb-4 text-left">สถานที่ทั้งหมดที่เป็นไปได้:</h3>
+                        <div id="sf-locations-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm"></div>
+                        <p class="text-xs text-stone-500 mt-4 text-left">* สถานที่ๆ มีขีดฆ่า คือสถานที่ๆ เคยออกไปแล้วในห้องนี้</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spy Guessing Phase -->
+            <div id="sf-spy-guessing-area" class="hidden w-full max-w-4xl mx-auto bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-xl border-4 border-indigo-400">
+                <h2 class="text-3xl font-bold mb-2 text-indigo-600 dark:text-indigo-400">🚨 สายลับกำลังทายสถานที่!</h2>
+                <p id="sf-spy-guess-wait-msg" class="mb-6 text-lg">รอดูว่าสายลับจะทายถูกไหม...</p>
+                
+                <div id="sf-spy-guess-action" class="hidden">
+                    <p class="font-bold mb-4">เลือกสถานที่ๆ คุณคิดว่าใช่ที่สุด! (ตอบได้ครั้งเดียว)</p>
+                    <div id="sf-spy-locations-select" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6"></div>
+                    <button id="sf-submit-spy-guess-btn" class="btn-primary p-3 px-8 rounded-lg" disabled>ยืนยันคำตอบ</button>
+                </div>
+            </div>
+
+            <!-- Voting Phase -->
+            <div id="sf-voting-area" class="hidden w-full max-w-4xl mx-auto bg-stone-100 dark:bg-[#3A322C] p-6 rounded-xl shadow-md border-2 border-stone-200 dark:border-stone-700">
+                <h2 class="text-3xl font-bold mb-2" style="color: var(--accent-color);">หมดเวลา! ใครคือสายลับ?</h2>
+                <p class="mb-6 text-stone-600 dark:text-stone-300">โหวตคนที่คุณคิดว่าเป็นสายลับ (โหวตตัวเองไม่ได้นะ)</p>
+                
+                <div id="sf-vote-options" class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"></div>
+                <p id="sf-vote-wait-msg" class="hidden mt-4 text-stone-500 font-bold animate-pulse">ส่งโหวตแล้ว รอเพื่อนๆ แป๊บ...</p>
+            </div>
+
+            <!-- Results Phase -->
+            <div id="sf-result-area" class="hidden w-full max-w-4xl mx-auto p-6 rounded-xl border-4 shadow-xl bg-white/90 dark:bg-[#2C2621]/90">
+                <h2 id="sf-result-title" class="text-4xl font-bold mb-6"></h2>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-6 mb-8">
+                    <div class="p-4 bg-stone-100 dark:bg-stone-800 rounded-lg flex-1 border-2 border-stone-200 dark:border-stone-700">
+                        <p class="text-stone-500 font-bold mb-1">สถานที่จริง</p>
+                        <p id="sf-result-location" class="text-2xl font-bold" style="color: var(--primary-text-color);"></p>
+                    </div>
+                    <div class="p-4 bg-stone-100 dark:bg-stone-800 rounded-lg flex-1 border-2 border-stone-200 dark:border-stone-700">
+                        <p class="text-stone-500 font-bold mb-1">สายลับคือ</p>
+                        <p id="sf-result-spy" class="text-2xl font-bold text-red-500"></p>
+                    </div>
+                </div>
+
+                <div id="sf-vote-summary" class="mb-6 bg-stone-50 dark:bg-stone-900 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">สรุปผลโหวต:</h4>
+                    <div id="sf-vote-tally" class="flex flex-wrap justify-center gap-3"></div>
+                </div>
+
+                <div id="sf-bonus-guess-area" class="hidden mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 rounded-lg">
+                    <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">✨ โบนัสพิเศษสำหรับสายลับ!</h3>
+                    <p id="sf-bonus-wait-msg" class="text-stone-600 dark:text-stone-300">สายลับรอดจากการโหวต! ให้เวลาสายลับทายสถานที่เพื่อรับแต้มพิเศษ...</p>
+                    <div id="sf-bonus-action" class="hidden mt-4">
+                        <div id="sf-bonus-locations-select" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4"></div>
+                        <button id="sf-submit-bonus-guess-btn" class="btn-primary p-3 px-8 rounded-lg" disabled>ยืนยันคำตอบโบนัส</button>
+                    </div>
+                </div>
+
+                <button id="sf-next-round-btn" class="hidden p-4 px-10 text-lg rounded-xl btn-primary mx-auto shadow-md hover:scale-105 transition-transform">เล่นรอบต่อไป</button>
+            </div>
+
+        </div>
+
+        <!-- Mafia Screen -->
         <div id="bluff-overthrow-screen" class="hidden w-full text-center">
             <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg transition-colors shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="text-left">
-                    <h2 class="text-2xl font-bold" style="color: var(--primary-text-color);">บลัฟโค่นอำนาจ ⚔️</h2>
+                    <h2 class="text-2xl font-bold" style="color: var(--primary-text-color);">เหลี่ยมมาเฟีย 🕴️</h2>
                     <p class="text-stone-500 dark:text-stone-400 text-sm">ตาของ: <span id="bo-current-turn" class="font-bold text-lg" style="color: var(--accent-color);"></span></p>
                 </div>
                 <div class="flex gap-4 items-center">
@@ -373,14 +499,14 @@
                 <h3 class="text-xl font-bold mb-4">เลือกแอคชันของคุณ</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="income">💰 รับรายได้ (+1)</button>
-                    <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="foreign_aid">🎁 รับเงินสนับสนุน (+2)</button>
-                    <button class="bo-action-btn btn-primary p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white border-red-700" data-action="coup">💥 โค่นอำนาจ (-7)</button>
+                    <button class="bo-action-btn btn-secondary p-3 rounded-lg" data-action="foreign_aid">🎁 รับของสนับสนุน (+2)</button>
+                    <button class="bo-action-btn btn-primary p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white border-red-700" data-action="eliminate">💥 ปิดบัญชี (-7)</button>
                 </div>
                 <h4 class="font-bold text-sm mb-2 text-left text-stone-500">อ้างบทบาท (ไม่ต้องมีไพ่จริงก็ได้ แต่ระวังโดนจับได้!)</h4>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="tax">🔫 สไนเปอร์: เก็บภาษี (+3)</button>
+                    <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="tax">🔫 มือปืน: เก็บส่วย (+3)</button>
                     <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="assassinate">🔪 นักฆ่า: ลอบสังหาร (-3)</button>
-                    <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="steal">💻 แฮกเกอร์: ขโมยเงิน (+2)</button>
+                    <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="steal">💻 แฮกเกอร์: แฮกเงิน (+2)</button>
                     <button class="bo-action-btn btn-secondary p-3 rounded-lg border-2 border-stone-300" data-action="exchange">🕶️ สายลับ: เปลี่ยนไพ่</button>
                 </div>
                 <div id="bo-target-selection" class="hidden mt-4 p-4 bg-stone-100 dark:bg-stone-800 rounded-lg">
@@ -781,7 +907,8 @@
     <script>
         // --- Global Variables and Functions ---
         const gameNames = {
-            'bluff-overthrow': 'บลัฟโค่นอำนาจ ⚔️',
+            'secret-agent': 'สายลับแฝงตัว 🕵️‍♂️',
+            'bluff-overthrow': 'เหลี่ยมมาเฟีย 🕴️',
             'truth-or-lie': 'ความจริง 1 โกหก 1 🎭',
             'unique-clue': 'คำใบ้ใจตรงกัน 🧠',
             'match-the-blank': 'เติมคำหาคู่ 🧩',
@@ -792,35 +919,53 @@
         };
 
         const roleNames = {
-            'sniper': '🔫 สไนเปอร์',
+            'sniper': '🔫 มือปืน',
             'assassin': '🔪 นักฆ่า',
             'hacker': '💻 แฮกเกอร์',
             'spy': '🕶️ สายลับ',
-            'healer': '💉 หมอ'
+            'healer': '💉 หมอเถื่อน'
         };
 
         const gameRules = {
+            'secret-agent': {
+                title: 'วิธีเล่น: สายลับแฝงตัว 🕵️‍♂️',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-2">ผู้เล่นปกติ: หาให้เจอว่าใครคือ "สายลับ" โดยการถามคำถามกันไปมา<br>สายลับ: เนียนเป็นคนปกติ และพยายามเดาให้ได้ว่า "สถานที่" ของรอบนี้คือที่ไหน!</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">วิธีเล่น:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left mb-4">
+                        <li>ทุกคนจะได้รับคำว่า <strong>"สถานที่"</strong> และ <strong>"บทบาท"</strong> ของตัวเอง <em>ยกเว้น 1 คนที่จะเป็นสายลับ</em> (จะไม่รู้สถานที่)</li>
+                        <li>ผลัดกันถามคำถามเพื่อน 1 คน (เช่น "ที่นั่นอากาศร้อนมั้ย?", "คุณแต่งตัวยังไง?") เพื่อเช็คว่าเพื่อนรู้สถานที่จริงไหม</li>
+                        <li><strong>ระวัง!</strong> อย่าถามเจาะจงเกินไป เพราะสายลับจะรู้สถานที่ และอย่าถามกว้างเกินไป เพราะเพื่อนจะสงสัยว่าคุณคือสายลับ!</li>
+                    </ol>
+                    <h4 class="font-bold text-lg mb-2 rule-header">การจบเกมและคะแนน:</h4>
+                    <ul class="list-disc list-inside ml-4">
+                        <li><strong>สายลับชิงตอบ:</strong> ถ้ารู้สถานที่แล้ว กดปุ่ม "ฉันรู้สถานที่แล้ว!" ทายถูกได้ <strong>+5 แต้ม</strong> / ทายผิด คนอื่นได้ <strong>+2 แต้ม</strong></li>
+                        <li><strong>หมดเวลาโหวตกัน:</strong> ถ้าจับสายลับได้ คนโหวตถูกได้ <strong>+2 แต้ม</strong> / ถ้าโหวตผิด สายลับรอดรับ <strong>+3 แต้ม</strong> (และสายลับจะได้สิทธิ์ทายสถานที่โบนัส ถ้าถูกเอาไปอีก <strong>+2 แต้ม!</strong>)</li>
+                    </ul>
+                `
+            },
             'bluff-overthrow': {
-                title: 'วิธีเล่น: บลัฟโค่นอำนาจ ⚔️',
+                title: 'วิธีเล่น: เหลี่ยมมาเฟีย 🕴️',
                 content: `
                     <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
                     <p class="mb-4">กำจัดผู้เล่นคนอื่นให้หมด ใครเหลือรอดคนสุดท้ายเป็นผู้ชนะ!</p>
                     <h4 class="font-bold text-lg mb-2 rule-header">แอคชันทั่วไป (ไม่ถูกจับโกหก):</h4>
                     <ul class="list-disc list-inside ml-4 mb-4">
                         <li><strong>รับรายได้:</strong> หยิบ 1 เครดิต</li>
-                        <li><strong>รับเงินสนับสนุน:</strong> หยิบ 2 เครดิต (สไนเปอร์บล็อกได้)</li>
-                        <li><strong>โค่นอำนาจ:</strong> จ่าย 7 เครดิต เลือกกำจัด 1 ชีวิตของเพื่อน (บล็อกไม่ได้)</li>
+                        <li><strong>รับของสนับสนุน:</strong> หยิบ 2 เครดิต (มือปืนบล็อกได้)</li>
+                        <li><strong>ปิดบัญชี:</strong> จ่าย 7 เครดิต เลือกกำจัด 1 ชีวิตของเพื่อน (บล็อกไม่ได้)</li>
                     </ul>
                     <h4 class="font-bold text-lg mb-2 rule-header">แอคชันตัวละคร (โกหกได้ / ถูกจับโกหกได้):</h4>
                     <ul class="list-disc list-inside ml-4 mb-4">
-                        <li><strong>🔫 สไนเปอร์:</strong> หยิบ 3 เครดิต | <em>บล็อกรับเงินสนับสนุนได้</em></li>
+                        <li><strong>🔫 มือปืน:</strong> หยิบ 3 เครดิต | <em>บล็อกรับของสนับสนุนได้</em></li>
                         <li><strong>🔪 นักฆ่า:</strong> จ่าย 3 เครดิต ฆ่าเพื่อน 1 ชีวิต</li>
-                        <li><strong>💻 แฮกเกอร์:</strong> ขโมย 2 เครดิตจากเพื่อน | <em>บล็อกขโมยได้</em></li>
-                        <li><strong>🕶️ สายลับ:</strong> จั่วการ์ดใหม่ 2 ใบ เลือกเก็บ 2 ใบ (เปลี่ยนไพ่) | <em>บล็อกขโมยได้</em></li>
-                        <li><strong>💉 หมอ:</strong> <em>บล็อกการฆ่าจากนักฆ่าได้</em></li>
+                        <li><strong>💻 แฮกเกอร์:</strong> แฮกขโมย 2 เครดิตจากเพื่อน | <em>บล็อกแฮกได้</em></li>
+                        <li><strong>🕶️ สายลับ:</strong> จั่วไพ่ใหม่ 2 ใบ เลือกเก็บ (เปลี่ยนไพ่) | <em>บล็อกแฮกได้</em></li>
+                        <li><strong>💉 หมอเถื่อน:</strong> <em>บล็อกการฆ่าจากนักฆ่าได้</em></li>
                     </ul>
                     <h4 class="font-bold text-lg mb-2 rule-header">การจับโกหก (Challenge):</h4>
-                    <p>ถ้าคิดว่าเพื่อนไม่มีการ์ดใบนั้นจริง ให้กด "จับโกหก!" ถ้าเพื่อนมีจริง เราเสีย 1 ชีวิต แต่ถ้าเพื่อนโกหก เพื่อนเสีย 1 ชีวิต!</p>
+                    <p>ถ้าคิดว่าเพื่อนไม่มีไพ่ใบนั้นจริง ให้กด "จับโกหก!" ถ้าเพื่อนมีจริง เราเสีย 1 ชีวิต แต่ถ้าเพื่อนโกหก เพื่อนเสีย 1 ชีวิต!</p>
                 `
             },
             'truth-or-lie': {
@@ -968,7 +1113,9 @@
             }
         });
 
-        // --- Avatar Generation ---
+        // --- Socket & Initialization ---
+        const socket = io();
+
         const avatarSelection = document.getElementById('avatar-selection');
         const playerNameInput = document.getElementById('playerName');
         let selectedAvatar = '🎮';
@@ -982,9 +1129,6 @@
             avatarSelection.appendChild(btn);
         });
 
-        // --- Socket & Initialization ---
-        const socket = io();
-        
         let myPlayerId = localStorage.getItem('cozyPlayerId');
         if (!myPlayerId) {
             myPlayerId = 'p_' + Math.random().toString(36).substr(2, 9);
@@ -1001,7 +1145,7 @@
                     b.classList.remove('selected'); b.style.borderColor = 'transparent';
                     if (b.dataset.avatar === savedAvatar) {
                         b.classList.add('selected'); b.style.borderColor = 'var(--primary-color)';
-                        b.scrollIntoView({ behavior: 'smooth', block: 'center' }); // เลื่อนไปที่ตัวละครที่เคยเลือก
+                        b.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
                     }
                 });
             }
@@ -1137,7 +1281,7 @@
                 document.getElementById('startGameBtn').disabled = true;
                 selectedGame = null;
                 document.querySelectorAll('#game-selection-area .card').forEach(c => c.classList.remove('selected'));
-                document.getElementById('word-pack-selection').classList.add('hidden');
+                document.getElementById('spyfall-settings').classList.add('hidden');
                 promptEl.textContent = "เลือกเกมที่จะเล่นด้านล่างได้เลย!";
                 promptEl.className = "mb-6 p-4 rounded-lg bg-[var(--primary-color)]/20 border-2 border-[var(--primary-color)] text-[var(--primary-text-color)] font-bold text-xl animate-pulse";
             } else {
@@ -1195,6 +1339,7 @@
         const screens = {
             entry: document.getElementById('entry-screen'),
             waiting: document.getElementById('waiting-screen'),
+            secretAgent: document.getElementById('secret-agent-screen'),
             wordGuess: document.getElementById('word-guess-screen'),
             numberSort: document.getElementById('number-sort-screen'),
             friendQuiz: document.getElementById('friend-quiz-screen'),
@@ -1210,7 +1355,7 @@
         let myRoomCode = '';
         let isHost = false;
         let selectedGame = null;
-        let selectedPack = 'mixed'; // ค่าเริ่มต้นของหมวดหมู่
+        let selectedPack = 'mixed';
 
         function showScreen(screenName) {
             Object.values(screens).forEach(s => { if (s) s.classList.add('hidden'); });
@@ -1236,23 +1381,37 @@
             const promptEl = document.getElementById('action-prompt');
             const startBtn = document.getElementById('startGameBtn');
             const wrapper = document.getElementById('game-selection-wrapper');
+            const packButtonsArea = document.getElementById('pack-buttons-area');
+            const spyfallSettings = document.getElementById('spyfall-settings');
 
             if (isHost) {
                 wrapper.classList.remove('hidden');
+                packButtonsArea.style.pointerEvents = 'auto';
+                packButtonsArea.style.opacity = '1';
+                
                 if(!selectedGame) {
                     promptEl.textContent = "เลือกเกมที่จะเล่นด้านล่างได้เลย!";
                     promptEl.className = "mb-6 p-4 rounded-lg bg-[var(--primary-color)]/20 border-2 border-[var(--primary-color)] text-[var(--primary-text-color)] font-bold text-xl animate-pulse";
                     startBtn.disabled = true; startBtn.textContent = "เริ่มเกม (ต้องเลือกเกมก่อน)";
+                    spyfallSettings.classList.add('hidden');
                 } else {
                     promptEl.textContent = "เลือกเกมแล้ว กดเริ่มเกมได้เลย!";
                     promptEl.className = "mb-6 p-4 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 font-bold text-xl";
+                    
                     let minPlayers = 2;
-                    if (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie') minPlayers = 3;
+                    if (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie' || selectedGame === 'secret-agent' || selectedGame === 'secret-painter') minPlayers = 3;
+                    
                     startBtn.disabled = players.length < minPlayers;
                     startBtn.textContent = players.length < minPlayers ? `ต้องมี ${minPlayers} คนขึ้นไป` : '🚀 เริ่มเกมเลย!';
+
+                    if (selectedGame === 'secret-agent') spyfallSettings.classList.remove('hidden');
+                    else spyfallSettings.classList.add('hidden');
                 }
             } else {
                 wrapper.classList.add('hidden');
+                packButtonsArea.style.pointerEvents = 'none';
+                packButtonsArea.style.opacity = '0.7';
+
                 if (gameType) {
                     promptEl.innerHTML = `หัวหน้าห้องเลือกเกม <strong>${gameNames[gameType] || 'เกม'}</strong> แล้ว<br class="sm:hidden"><span class="hidden sm:inline"> </span><button onclick="window.showRulesFor('${gameType}')" class="mt-2 sm:mt-0 px-4 py-1 text-sm rounded-full bg-white text-green-700 hover:bg-green-50 shadow-sm transition border border-green-500 font-bold active:scale-95">📖 ดูวิธีเล่น</button>`;
                     promptEl.className = "mb-6 p-4 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 text-lg";
@@ -1272,19 +1431,6 @@
         }
         document.getElementById('roomCodeInput').addEventListener('input', updateButtonStates);
 
-        // Word Pack Selection Click
-        document.querySelectorAll('.pack-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.pack-btn').forEach(b => {
-                    b.classList.remove('selected', 'ring-2', 'ring-[var(--primary-color)]', 'border-[var(--primary-color)]');
-                    b.classList.add('border-transparent');
-                });
-                btn.classList.add('selected', 'ring-2', 'ring-[var(--primary-color)]', 'border-[var(--primary-color)]');
-                btn.classList.remove('border-transparent');
-                selectedPack = btn.dataset.pack;
-            });
-        });
-
         document.getElementById('game-selection-area').addEventListener('click', (e) => {
             if (!isHost) return;
             const card = e.target.closest('.card');
@@ -1293,25 +1439,43 @@
             card.classList.add('selected');
             selectedGame = card.dataset.game;
             document.getElementById('how-to-play-btn').disabled = false;
-            
-            // แสดง Word Pack Selection สำหรับเกมคำศัพท์
-            if(selectedGame !== 'bluff-overthrow') {
-                document.getElementById('word-pack-selection').classList.remove('hidden');
-            } else {
-                document.getElementById('word-pack-selection').classList.add('hidden');
-            }
-
             socket.emit('host_selectGame', selectedGame); 
             
             const currentPlayersCount = parseInt(document.getElementById('playerCount').textContent) || 1;
             const startBtn = document.getElementById('startGameBtn');
-            let minPlayers = (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie') ? 3 : 2;
+            let minPlayers = 2;
+            if (selectedGame === 'unique-clue' || selectedGame === 'truth-or-lie' || selectedGame === 'secret-agent' || selectedGame === 'secret-painter') minPlayers = 3;
+            
             startBtn.disabled = currentPlayersCount < minPlayers;
             startBtn.textContent = currentPlayersCount < minPlayers ? `ต้องมี ${minPlayers} คนขึ้นไป` : '🚀 เริ่มเกมเลย!';
             
+            if (selectedGame === 'secret-agent') document.getElementById('spyfall-settings').classList.remove('hidden');
+            else document.getElementById('spyfall-settings').classList.add('hidden');
+
             const promptEl = document.getElementById('action-prompt');
             promptEl.textContent = "เลือกเกมแล้ว กดเริ่มเกมได้เลย!";
             promptEl.className = "mb-6 p-4 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 font-bold text-xl";
+        });
+
+        // Pack Selection Logic
+        document.getElementById('pack-buttons-area').addEventListener('click', (e) => {
+            if (!isHost) return;
+            const btn = e.target.closest('.pack-btn');
+            if (!btn) return;
+            
+            document.querySelectorAll('.pack-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedPack = btn.dataset.pack;
+            
+            socket.emit('host_selectPack', selectedPack);
+        });
+
+        socket.on('packSelected', (pack) => {
+            selectedPack = pack;
+            document.querySelectorAll('.pack-btn').forEach(b => {
+                if (b.dataset.pack === pack) b.classList.add('selected');
+                else b.classList.remove('selected');
+            });
         });
         
         document.getElementById('tool-selection-area').addEventListener('click', (e) => {
@@ -1344,8 +1508,11 @@
         
         document.getElementById('startGameBtn').addEventListener('click', () => {
             if (isHost && selectedGame) {
-                // ส่งค่า pack ที่เลือกไปด้วย
-                socket.emit('startGame', { roomCode: myRoomCode, pack: selectedPack });
+                let payload = { roomCode: myRoomCode, pack: selectedPack };
+                if (selectedGame === 'secret-agent') {
+                    payload.timerMin = parseInt(document.getElementById('spyfall-timer-select').value) || 5;
+                }
+                socket.emit('startGame', payload);
             }
         });
 
@@ -1389,12 +1556,24 @@
             }
         });
 
-        socket.on('gameStarted', ({ gameType, pack }) => {
+        socket.on('gameStarted', (payload) => {
+            // payload อาจจะเป็นแค่ string ชื่อเกม หรือ object
+            const gameType = typeof payload === 'string' ? payload : payload.gameType;
             showScreen(gameType);
             if (isHost) {
                 returnLobbyBtn.classList.remove('hidden');
-                socket.emit('host_gameLogicStart', { roomCode: myRoomCode, pack: pack });
+                
+                let startData = { roomCode: myRoomCode, pack: selectedPack };
+                if (gameType === 'secret-agent' && typeof payload === 'object') {
+                    startData.timerMin = payload.timerMin;
+                }
+                socket.emit('host_gameLogicStart', startData);
             }
+        });
+
+        socket.on('rejoinGameStarted', (gameType) => {
+            showScreen(gameType);
+            if (isHost) returnLobbyBtn.classList.remove('hidden');
         });
 
         socket.on('error', (message) => {
@@ -1407,7 +1586,262 @@
         // GAME LOGIC CLIENT CODE 
         // ==========================================
         
-        // --- Bluff Overthrow (Coup) Client Logic ---
+        // --- Secret Agent (Spyfall) Client Logic ---
+        (function initSecretAgent() {
+            const playingArea = document.getElementById('sf-playing-area');
+            const timerDisplay = document.getElementById('sf-timer-display');
+            const hostForceVoteBtn = document.getElementById('sf-host-force-vote-btn');
+            const myRoleCard = document.getElementById('sf-my-role-card');
+            const myLocationTxt = document.getElementById('sf-my-location');
+            const myRoleTxt = document.getElementById('sf-my-role');
+            const spyGuessBtn = document.getElementById('sf-spy-guess-btn');
+            const locationsGrid = document.getElementById('sf-locations-grid');
+            
+            const spyGuessingArea = document.getElementById('sf-spy-guessing-area');
+            const spyGuessWaitMsg = document.getElementById('sf-spy-guess-wait-msg');
+            const spyGuessAction = document.getElementById('sf-spy-guess-action');
+            const spyLocsSelect = document.getElementById('sf-spy-locations-select');
+            const submitSpyGuessBtn = document.getElementById('sf-submit-spy-guess-btn');
+            
+            const votingArea = document.getElementById('sf-voting-area');
+            const voteOptions = document.getElementById('sf-vote-options');
+            const voteWaitMsg = document.getElementById('sf-vote-wait-msg');
+
+            const resultArea = document.getElementById('sf-result-area');
+            const resultTitle = document.getElementById('sf-result-title');
+            const resultLoc = document.getElementById('sf-result-location');
+            const resultSpy = document.getElementById('sf-result-spy');
+            const voteTally = document.getElementById('sf-vote-tally');
+            const nextRoundBtn = document.getElementById('sf-next-round-btn');
+            
+            const bonusArea = document.getElementById('sf-bonus-guess-area');
+            const bonusWaitMsg = document.getElementById('sf-bonus-wait-msg');
+            const bonusAction = document.getElementById('sf-bonus-action');
+            const bonusLocsSelect = document.getElementById('sf-bonus-locations-select');
+            const submitBonusGuessBtn = document.getElementById('sf-submit-bonus-guess-btn');
+
+            let sfTimerInterval = null;
+            let currentSfState = null;
+
+            function formatSfTime(ms) {
+                if (ms <= 0) return "00:00";
+                const totalSec = Math.floor(ms / 1000);
+                const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                const s = String(totalSec % 60).padStart(2, '0');
+                return `${m}:${s}`;
+            }
+
+            function updateTimer() {
+                if (!currentSfState || !currentSfState.endTime) return;
+                const remain = currentSfState.endTime - Date.now();
+                timerDisplay.textContent = formatSfTime(remain);
+                
+                if (remain <= 10000) timerDisplay.classList.add('text-red-500', 'animate-pulse');
+                else timerDisplay.classList.remove('text-red-500', 'animate-pulse');
+
+                if (remain <= 0) {
+                    clearInterval(sfTimerInterval);
+                    timerDisplay.textContent = "00:00";
+                    // ถ้าโฮสยังไม่ได้กดเริ่มโหวต ให้ยิงไปเซิร์ฟ
+                    if (isHost && currentSfState.phase === 'playing') {
+                        socket.emit('spyfall_timeUp');
+                    }
+                }
+            }
+
+            function buildLocationsGrid(container, allLocs, playedLocs, isInteractive = false, onSelectCallback = null) {
+                container.innerHTML = '';
+                allLocs.forEach(loc => {
+                    const btn = document.createElement('button');
+                    const isPlayed = playedLocs.includes(loc);
+                    
+                    btn.className = `sf-loc-btn sf-loc-card p-3 rounded-lg text-sm font-bold w-full h-full flex items-center justify-center text-center ${isPlayed ? 'played' : ''}`;
+                    btn.textContent = loc;
+                    
+                    if (isInteractive && !isPlayed) {
+                        btn.onclick = () => {
+                            container.querySelectorAll('.sf-loc-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            if (onSelectCallback) onSelectCallback(loc);
+                        };
+                    } else if (!isInteractive) {
+                        btn.style.cursor = 'default';
+                        btn.style.pointerEvents = 'none';
+                    }
+                    container.appendChild(btn);
+                });
+            }
+
+            hostForceVoteBtn.addEventListener('click', () => {
+                if (isHost && confirm("ต้องการจบเวลาแล้วเริ่มโหวตเลยใช่ไหม?")) {
+                    socket.emit('spyfall_timeUp');
+                }
+            });
+
+            spyGuessBtn.addEventListener('click', () => {
+                if (confirm("แน่ใจนะว่ารู้สถานที่แล้ว? (ถ้ากดตอนนี้เกมจะหยุด และคุณต้องตอบให้ถูกเท่านั้น!)")) {
+                    socket.emit('spyfall_spyEarlyGuess');
+                }
+            });
+
+            submitSpyGuessBtn.addEventListener('click', () => {
+                const selected = spyLocsSelect.querySelector('.selected');
+                if (selected) {
+                    socket.emit('spyfall_submitSpyGuess', { location: selected.textContent });
+                    submitSpyGuessBtn.disabled = true;
+                    spyLocsSelect.classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+
+            submitBonusGuessBtn.addEventListener('click', () => {
+                const selected = bonusLocsSelect.querySelector('.selected');
+                if (selected) {
+                    socket.emit('spyfall_submitSpyGuess', { location: selected.textContent, isBonus: true });
+                    submitBonusGuessBtn.disabled = true;
+                    bonusLocsSelect.classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if (isHost) socket.emit('spyfall_nextRound');
+            });
+
+            socket.on('spyfall_newRound', (data) => {
+                currentSfState = data;
+                playingArea.classList.remove('hidden');
+                spyGuessingArea.classList.add('hidden');
+                votingArea.classList.add('hidden');
+                resultArea.classList.add('hidden');
+                
+                if (isHost) hostForceVoteBtn.classList.remove('hidden');
+                else hostForceVoteBtn.classList.add('hidden');
+
+                if (data.isSpy) {
+                    myRoleCard.classList.remove('border-stone-200');
+                    myRoleCard.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20');
+                    myLocationTxt.textContent = "สถานที่: ???";
+                    myLocationTxt.classList.add('text-red-500');
+                    myRoleTxt.innerHTML = "คุณคือ <strong>สายลับ! 🕵️‍♂️</strong><br><span class='text-sm text-stone-500'>เนียนไว้ แล้วพยายามเดาสถานที่ให้ได้!</span>";
+                    spyGuessBtn.classList.remove('hidden');
+                } else {
+                    myRoleCard.classList.remove('border-red-500', 'bg-red-50', 'dark:bg-red-900/20');
+                    myRoleCard.classList.add('border-[var(--primary-color)]', 'bg-[var(--primary-color)]/10');
+                    myLocationTxt.textContent = `สถานที่: ${data.location}`;
+                    myLocationTxt.classList.remove('text-red-500');
+                    myRoleTxt.innerHTML = `บทบาทของคุณ: <strong>${data.role}</strong>`;
+                    spyGuessBtn.classList.add('hidden');
+                }
+
+                buildLocationsGrid(locationsGrid, data.allLocations, data.playedLocations, false);
+
+                clearInterval(sfTimerInterval);
+                updateTimer();
+                sfTimerInterval = setInterval(updateTimer, 1000);
+            });
+
+            socket.on('spyfall_spyGuessingPhase', (data) => {
+                currentSfState.phase = 'spy_guessing';
+                clearInterval(sfTimerInterval);
+                playingArea.classList.add('hidden');
+                spyGuessingArea.classList.remove('hidden');
+                
+                if (socket.id === data.spyId) {
+                    spyGuessWaitMsg.classList.add('hidden');
+                    spyGuessAction.classList.remove('hidden');
+                    submitSpyGuessBtn.disabled = true;
+                    spyLocsSelect.classList.remove('opacity-50', 'pointer-events-none');
+                    buildLocationsGrid(spyLocsSelect, data.allLocations, data.playedLocations, true, (loc) => {
+                        submitSpyGuessBtn.disabled = false;
+                    });
+                } else {
+                    spyGuessWaitMsg.classList.remove('hidden');
+                    spyGuessAction.classList.add('hidden');
+                }
+            });
+
+            socket.on('spyfall_startVoting', (data) => {
+                currentSfState.phase = 'voting';
+                clearInterval(sfTimerInterval);
+                playingArea.classList.add('hidden');
+                spyGuessingArea.classList.add('hidden');
+                votingArea.classList.remove('hidden');
+                voteWaitMsg.classList.add('hidden');
+                voteOptions.innerHTML = '';
+
+                data.players.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = 'sf-vote-btn card p-4 rounded-xl text-lg font-bold border-4 transition-all flex flex-col items-center justify-center gap-2';
+                    btn.innerHTML = `<span class="text-3xl">${p.avatar}</span> <span>${p.name}</span>`;
+                    
+                    if (p.id === socket.id) {
+                        btn.classList.add('opacity-50');
+                        btn.title = "โหวตตัวเองไม่ได้";
+                    } else {
+                        btn.onclick = () => {
+                            document.querySelectorAll('.sf-vote-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            socket.emit('spyfall_submitVote', { votedId: p.id });
+                            document.querySelectorAll('.sf-vote-btn').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
+                            btn.style.opacity = '1';
+                            voteWaitMsg.classList.remove('hidden');
+                        };
+                    }
+                    voteOptions.appendChild(btn);
+                });
+            });
+
+            socket.on('spyfall_showResult', (data) => {
+                currentSfState.phase = 'reveal';
+                playingArea.classList.add('hidden');
+                spyGuessingArea.classList.add('hidden');
+                votingArea.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+                bonusArea.classList.add('hidden');
+                
+                resultLoc.textContent = data.location;
+                resultSpy.textContent = `${data.spyAvatar} ${data.spyName}`;
+                
+                resultTitle.textContent = data.titleMsg;
+                resultTitle.className = `text-4xl font-bold mb-6 ${data.spyWon ? 'text-red-500' : 'text-green-500'}`;
+
+                voteTally.innerHTML = '';
+                if (data.votes) {
+                    for (let id in data.votes) {
+                        const target = data.players.find(p => p.id === id);
+                        if (target) {
+                            const badge = document.createElement('span');
+                            badge.className = `px-3 py-1 rounded-full text-sm font-bold border-2 ${id === data.spyId ? 'border-red-500 bg-red-50 text-red-600' : 'border-stone-300 bg-stone-100 text-stone-600'}`;
+                            badge.textContent = `${target.name} โดนโหวต ${data.votes[id]} เสียง`;
+                            voteTally.appendChild(badge);
+                        }
+                    }
+                }
+
+                if (isHost) nextRoundBtn.classList.remove('hidden');
+                else nextRoundBtn.classList.add('hidden');
+            });
+
+            socket.on('spyfall_bonusPhase', (data) => {
+                // สายลับรอดโหวต ให้ทายสถานที่
+                bonusArea.classList.remove('hidden');
+                if (socket.id === data.spyId) {
+                    bonusWaitMsg.classList.add('hidden');
+                    bonusAction.classList.remove('hidden');
+                    submitBonusGuessBtn.disabled = true;
+                    bonusLocsSelect.classList.remove('opacity-50', 'pointer-events-none');
+                    buildLocationsGrid(bonusLocsSelect, data.allLocations, data.playedLocations, true, (loc) => {
+                        submitBonusGuessBtn.disabled = false;
+                    });
+                } else {
+                    bonusWaitMsg.classList.remove('hidden');
+                    bonusAction.classList.add('hidden');
+                }
+                nextRoundBtn.classList.add('hidden'); // ซ่อนปุ่มไปก่อน รอสายลับทายจบ
+            });
+
+        })();
+
+        // --- Mafia Game (Bluff) Client Logic ---
         (function initBluffOverthrow() {
             const screen = document.getElementById('bluff-overthrow-screen');
             const turnDisplay = document.getElementById('bo-current-turn');
@@ -1483,9 +1917,12 @@
             });
 
             socket.on('bluff_newRound', () => {
-                screen.querySelectorAll('> div').forEach(d => { if(d.id) d.classList.add('hidden'); });
-                screen.children[0].classList.remove('hidden'); 
-                screen.children[1].classList.remove('hidden'); 
+                actionArea.classList.add('hidden');
+                reactionArea.classList.add('hidden');
+                loseCardArea.classList.add('hidden');
+                exchangeArea.classList.add('hidden');
+                eliminatedArea.classList.add('hidden');
+                targetSelection.classList.add('hidden');
             });
 
             socket.on('coup_updateState', ({ myState, globalState }) => {
@@ -1502,7 +1939,6 @@
                 else eliminatedArea.classList.add('hidden');
 
                 oppsGrid.innerHTML = ''; targetBtns.innerHTML = '';
-                const aliveOpps = [];
                 globalState.playersStatus.forEach(p => {
                     if (p.id === socket.id) return;
                     const div = document.createElement('div');
@@ -1516,7 +1952,6 @@
                     oppsGrid.appendChild(div);
 
                     if (!p.isEliminated) {
-                        aliveOpps.push(p);
                         const tBtn = document.createElement('button');
                         tBtn.className = 'btn-secondary px-3 py-1 rounded text-sm'; tBtn.textContent = p.name;
                         tBtn.onclick = () => {
@@ -1560,8 +1995,8 @@
                             });
                         } else { btnBlock.classList.add('hidden'); }
 
-                        let sourcePlayerInfo = globalState.playersStatus.find(p=>p.id===action.source);
-                        let sourceName = sourcePlayerInfo ? sourcePlayerInfo.name : 'Unknown';
+                        let sourcePlayer = globalState.playersStatus.find(p=>p.id===action.source);
+                        let sourceName = sourcePlayer ? sourcePlayer.name : 'Unknown';
                         reactionMsg.textContent = `${sourceName} อ้างสิทธิ์ ${roleNames[action.claim] || 'ทำแอคชัน'}`;
                     }
                 }
@@ -1570,8 +2005,9 @@
                         reactionArea.classList.remove('hidden'); reactionWait.classList.add('hidden');
                         btnPass.classList.remove('hidden'); btnChallenge.classList.remove('hidden');
                         btnBlock.classList.add('hidden'); blockOptions.classList.add('hidden');
-                        let sourcePlayerInfo = globalState.playersStatus.find(p=>p.id===globalState.pendingBlock.source);
-                        let sourceName = sourcePlayerInfo ? sourcePlayerInfo.name : 'Unknown';
+                        
+                        let sourcePlayer = globalState.playersStatus.find(p=>p.id===globalState.pendingBlock.source);
+                        let sourceName = sourcePlayer ? sourcePlayer.name : 'Unknown';
                         reactionMsg.textContent = `${sourceName} กำลังบล็อกด้วย ${roleNames[globalState.pendingBlock.claim]}`;
                     }
                 }
@@ -1586,6 +2022,31 @@
                                 b.onclick = () => { socket.emit('bluff_loseCard', { cardIndex: idx }); loseCardArea.classList.add('hidden'); };
                                 loseCardBtns.appendChild(b);
                             }
+                        });
+                    }
+                }
+                else if (globalState.phase === 'exchange') {
+                    if (globalState.pendingAction && globalState.pendingAction.source === socket.id && globalState.exchangeOptions) {
+                        exchangeArea.classList.remove('hidden'); exchangeCards.innerHTML = '';
+                        selectedExchangeCards = []; requiredKeepCards = myState.cards.filter(c=>!c.dead).length;
+                        
+                        globalState.exchangeOptions.forEach((c, idx) => {
+                            const b = document.createElement('div');
+                            b.className = 'bo-card exchange-select alive';
+                            b.textContent = roleNames[c.role];
+                            b.onclick = () => {
+                                if (b.classList.contains('selected')) {
+                                    b.classList.remove('selected');
+                                    selectedExchangeCards = selectedExchangeCards.filter(i => i !== idx);
+                                } else {
+                                    if (selectedExchangeCards.length < requiredKeepCards) {
+                                        b.classList.add('selected');
+                                        selectedExchangeCards.push(idx);
+                                    }
+                                }
+                                confirmExchangeBtn.disabled = selectedExchangeCards.length !== requiredKeepCards;
+                            };
+                            exchangeCards.appendChild(b);
                         });
                     }
                 }

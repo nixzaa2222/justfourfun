@@ -18,7 +18,9 @@ app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
-// --- Game Data (แยกหมวดหมู่ ทั่วไป กับ Valo/Gaming) ---
+// ==========================================
+// GAME DATA
+// ==========================================
 const wordGuessData = {
     general: ['คอมพิวเตอร์', 'หูฟัง', 'เมาส์', 'คีย์บอร์ด', 'ไมค์ช็อต', 'กล้วย', 'โรงเรียน', 'ตำรวจ', 'ดวงจันทร์', 'ทะเล', 'ภูเขา', 'โทรศัพท์', 'หนังสือ', 'ปากกา', 'รถไฟ', 'ช้าง', 'สิงโต', 'พิซซ่า', 'หมอ', 'พายุ', 'ดาวเคราะห์', 'แวมไพร์', 'ซอมบี้', 'ตู้เย็น', 'พีระมิด', 'กำแพงเมืองจีน', 'แผ่นดินไหว', 'น้ำท่วม', 'ภูเขาไฟ', 'ช็อกโกแลต', 'ไอศกรีม', 'แผนที่', 'เข็มทิศ', 'โจรสลัด', 'สมบัติ', 'นินจา', 'เอเลี่ยน', 'อวกาศ', 'ไดโนเสาร์', 'แม่มด', 'หุ่นยนต์'],
     valo: ['สไปค์', 'วานดัล', 'แฟนทอม', 'โอเปอเรเตอร์', 'เจ็ตต์', 'เรน่า', 'เรซ', 'โอมเมน', 'คิลจอย', 'ไซเฟอร์', 'สโมค', 'แฟลช', 'ฮีล', 'ชุบชีวิต', 'อัลติ', 'หัวร้อน', 'แลค', 'หลุด', 'ปิงปิง', 'ยิงนก', 'แครี่', 'ตัวถ่วง', 'เรเดียนต์', 'ไอรอน', 'บรอนซ์', 'บุกหลัง', 'ดักซุ่ม', 'แคมป์', 'วิ่งยิง', 'สไนเปอร์', 'มีด', 'ดิสคอร์ด', 'ปาร์ตี้', 'แร้งค์ตก', 'แรงค์ขึ้น']
@@ -61,15 +63,50 @@ const truthOrLieData = {
     valo: ["วีรกรรมสุดบ้ง/แจกแต้ม ในเกม", "ข้ออ้างตอนตายที่ใช้บ่อยที่สุด", "เรื่องน่าอายที่สุดตอนเล่นเกมกับเพื่อน", "เหตุการณ์หัวร้อนจนเกือบพังข้าวของ", "อุบัติเหตุหรือเรื่องเจ็บตัวเพราะเล่นเกม"]
 };
 
-// --- Bluff Overthrow Data ---
+const spyfallData = {
+    general: [
+        { name: "โรงพยาบาล", roles: ["หมอศัลยกรรม", "พยาบาล", "คนไข้", "ยาม", "ผู้อำนวยการ", "คนขับรถพยาบาล", "เภสัชกร", "ญาติคนไข้", "พนักงานทำความสะอาด", "หมอฟัน"] },
+        { name: "ค่ายทหาร", roles: ["ผู้บัญชาการ", "ทหารเกณฑ์", "พลซุ่มยิง", "พ่อครัว", "หน่วยแพทย์", "ทหารสื่อสาร", "ช่างซ่อมอาวุธ", "ทหารลาดตระเวน", "ครูฝึก", "ทหารยาม"] },
+        { name: "โรงเรียน", roles: ["ครูใหญ่", "ครูพละ", "นักเรียน", "ภารโรง", "แม่ครัว", "บรรณารักษ์", "หัวหน้าห้อง", "สภานักเรียน", "รปภ.", "ครูแนะแนว"] },
+        { name: "สถานีตำรวจ", roles: ["ผู้กำกับ", "สารวัตร", "ตำรวจจราจร", "ผู้ต้องหา", "ทนายความ", "พนักงานสอบสวน", "สายสืบ", "ประชาชนแจ้งความ", "นักข่าว", "ตำรวจสายตรวจ"] },
+        { name: "สถานีอวกาศ", roles: ["นักบินอวกาศ", "วิศวกร", "นักวิจัย", "ผู้บัญชาการสถานี", "หมออวกาศ", "ช่างซ่อมบำรุง", "นักพฤกษศาสตร์", "นักท่องเที่ยวอวกาศ", "คนควบคุมหุ่นยนต์", "เจ้าหน้าที่สื่อสาร"] },
+        { name: "เรือดำน้ำ", roles: ["กัปตัน", "ต้นหน", "พลเรดาร์", "ช่างเครื่อง", "พ่อครัว", "ผู้เชี่ยวชาญอาวุธ", "หมอ", "พลวิทยุ", "ลูกเรือ", "วิศวกรนิวเคลียร์"] },
+        { name: "คาสิโน", roles: ["ดีลเลอร์", "ผู้เล่นวีไอพี", "นักพนันหน้าใหม่", "รปภ.", "ผู้จัดการคาสิโน", "พนักงานเสิร์ฟเครื่องดื่ม", "นักเต้นโชว์", "คนแลกชิป", "นักสืบเอกชน", "มาเฟีย"] },
+        { name: "กองถ่ายทำหนัง", roles: ["ผู้กำกับ", "ดารานำ", "ตัวประกอบ", "ตากล้อง", "คนจัดไฟ", "ช่างแต่งหน้า", "คนเขียนบท", "ผู้ช่วยผู้กำกับ", "เด็กเสิร์ฟน้ำ", "สตันท์แมน"] },
+        { name: "เครื่องบินโดยสาร", roles: ["กัปตัน", "ผู้ช่วยนักบิน", "แอร์โฮสเตส", "ผู้โดยสารวีไอพี", "ผู้โดยสารเด็ก", "คนกลัวความสูง", "ช่างเครื่อง", "แอร์มาร์แชล", "นักธุรกิจ", "คนแอบสูบบุหรี่"] },
+        { name: "ร้านอาหารหรู", roles: ["เชฟใหญ่", "ผู้จัดการร้าน", "พนักงานเสิร์ฟ", "นักวิจารณ์อาหาร", "ลูกค้าวีไอพี", "พนักงานล้างจาน", "บาร์เทนเดอร์", "นักดนตรี", "พนักงานต้อนรับ", "ลูกค้าเรื่องเยอะ"] },
+        { name: "ซูเปอร์มาร์เก็ต", roles: ["ผู้จัดการ", "แคชเชียร์", "คนจัดชั้นวางของ", "ลูกค้า", "เด็กหลงทาง", "รปภ.", "คนขโมยของ", "พนักงานทำความสะอาด", "พนักงานเข็นรถเข็น", "คนขายเนื้อ"] },
+        { name: "ธนาคาร", roles: ["ผู้จัดการธนาคาร", "พนักงานเคาน์เตอร์", "รปภ.", "ลูกค้ามาฝากเงิน", "ลูกค้ามากู้เงิน", "คนปล้นธนาคาร", "พนักงานทำความสะอาด", "คนเติมเงินตู้เอทีเอ็ม", "ที่ปรึกษาการลงทุน", "พนักงานสินเชื่อ"] },
+        { name: "เรือโจรสลัด", roles: ["กัปตัน", "ต้นหน", "พลปืนใหญ่", "คนเฝ้ารังนก", "พ่อครัว", "ช่างไม้", "หมอเถื่อน", "ลูกเรือ", "นักโทษ", "ลิงกัปตัน"] },
+        { name: "สวนสนุก", roles: ["คนคุมเครื่องเล่น", "มาสคอต", "คนขายสายไหม", "เด็ก", "ผู้ปกครอง", "พนักงานทำความสะอาด", "คนขายตั๋ว", "วัยรุ่น", "รปภ.", "ช่างซ่อมเครื่องเล่น"] }
+    ],
+    valo: [
+        { name: "ไซต์ A (Ascent)", roles: ["คนดักซุ่ม", "คนถือ Spike", "สโมคเกอร์", "คนเช็คกล้อง", "คนแคมป์หลังกล่อง", "สไนเปอร์", "ตัวเปิด", "ฮีลเลอร์", "คนวิ่งหนี", "ตัวแจก"] },
+        { name: "ไซต์ B (Bind)", roles: ["คนเฝ้าฮุกคา (Hookah)", "ตัวบุกจากลอง (Long)", "คนดักใน Teleporter", "คนถือสไนเปอร์", "คนแอบหลังตู้คอนเทนเนอร์", "คนวาง Spike", "คนปาแฟลช", "สโมคเกอร์", "ตัวล้วง", "ฮีลเลอร์"] },
+        { name: "จุดเกิดฝั่งป้องกัน", roles: ["คน AFK", "คนกำลังแต่งปืน", "คนโยนปืนให้เพื่อน", "คนขอซื้อปืน", "คนดรอปมีด", "คนซ้อมยิงกำแพง", "คนพ่นสเปรย์", "ตัววิ่งนำ", "คนหลุด", "คนเต้น"] },
+        { name: "จุดเกิดฝั่งโจมตี", roles: ["คนแบก Spike", "คน AFK", "คนขอปืน", "คนวอร์มอัพยิง", "ตัววิ่งเปิด", "สไนเปอร์", "คนพ่นสเปรย์", "คนดูแผนที่", "คนหลุด", "คนหัวร้อน"] },
+        { name: "ท่อ Mid", roles: ["คนแอบดักยิง", "คนกำลังคลาน", "ตัววิ่งทะลวง", "คนปาแฟลชเข้าท่อ", "คนยิงทะลุกำแพง", "สโมคเกอร์", "ตัวแจก", "คนซุ่ม", "คนเช็คเสียงเท้า", "สไนเปอร์"] },
+        { name: "ร้านค้าซื้อปืน (Buy Phase)", roles: ["คนเงินหมด", "คนขอปืน", "คนดรอปปืน", "คนซื้อสไน", "คนซื้อแต่ปืนพก", "คนลืมซื้อเกราะ", "คนกดสแปมขอของ", "คนใจดีซื้อให้", "คนกำลังตัดสินใจ", "คนบอกแผน"] }
+    ]
+};
+
 const bluffData = {
-    deck: ['sniper','sniper','sniper','assassin','assassin','assassin','hacker','hacker','hacker','spy','spy','spy','healer','healer','healer'],
-    roleNames: { 'sniper': '🔫 สไนเปอร์', 'assassin': '🔪 นักฆ่า', 'hacker': '💻 แฮกเกอร์', 'spy': '🕶️ สายลับ', 'healer': '💉 หมอ' }
+    deck: [
+        'sniper','sniper','sniper','sniper','sniper',
+        'assassin','assassin','assassin','assassin','assassin',
+        'hacker','hacker','hacker','hacker','hacker',
+        'spy','spy','spy','spy','spy',
+        'healer','healer','healer','healer','healer'
+    ],
+    roleNames: { 'sniper': '🔫 มือปืน', 'assassin': '🔪 นักฆ่า', 'hacker': '💻 แฮกเกอร์', 'spy': '🕶️ สายลับ', 'healer': '💉 หมอเถื่อน' }
 };
 
 const rooms = {};
 
-// --- Helper Functions ---
+// ==========================================
+// UTILITY FUNCTIONS (Global Scope)
+// ==========================================
+
 function findRoomBySocketId(socketId) {
     return Object.keys(rooms).find(roomCode => rooms[roomCode] && rooms[roomCode].players.some(p => p.id === socketId));
 }
@@ -87,11 +124,12 @@ function systemChat(roomCode, msg) {
 function getGameData(dataset, packType) {
     if (packType === 'general') return [...dataset.general];
     if (packType === 'valo') return [...dataset.valo];
-    return [...dataset.general, ...dataset.valo]; // mixed เป็นค่า default
+    return [...dataset.general, ...(dataset.valo || [])]; 
 }
 
-function syncGameStateToPlayer(socket, room) {
-    if (!room || !room.game || room.gameState !== 'playing') return;
+function syncGameStateToPlayer(socket, room, roomCode) {
+    if (!socket || !room || !room.game || room.gameState !== 'playing') return;
+    
     const g = room.game;
     const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, score: p.score }));
     
@@ -136,14 +174,542 @@ function syncGameStateToPlayer(socket, room) {
          }
     } else if (room.gameType === 'bluff-overthrow') {
          syncBluffState(roomCode, socket.id);
+    } else if (room.gameType === 'secret-agent') {
+        if (g.phase === 'playing' && g.playerRoles[socket.id]) {
+            socket.emit('spyfall_newRound', {
+                endTime: g.endTime,
+                allLocations: g.allLocations,
+                playedLocations: room.playedSpyfallLocs || [],
+                location: g.playerRoles[socket.id].isSpy ? null : g.location,
+                role: g.playerRoles[socket.id].role,
+                isSpy: g.playerRoles[socket.id].isSpy
+            });
+        } else if (g.phase === 'spy_guessing') {
+            socket.emit('spyfall_spyGuessingPhase', { spyId: g.spyId, allLocations: g.allLocations, playedLocations: room.playedSpyfallLocs || [] });
+        } else if (g.phase === 'voting') {
+            socket.emit('spyfall_startVoting', { players: pList });
+        }
     }
 }
 
-// --- Main Socket Logic ---
+// ==========================================
+// SECRET AGENT (SPYFALL) LOGIC
+// ==========================================
+
+function startSpyfallRound(roomCode, pack, timerMin) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 3) {
+        io.to(roomCode).emit('error', 'เกมสายลับแฝงตัว ต้องมีผู้เล่นอย่างน้อย 3 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    if (!room.playedSpyfallLocs) room.playedSpyfallLocs = [];
+
+    const allData = getGameData(spyfallData, pack);
+    if (allData.length === 0) return;
+
+    let availableLocs = allData.filter(loc => !room.playedSpyfallLocs.includes(loc.name));
+    
+    if (availableLocs.length === 0) {
+        room.playedSpyfallLocs = []; 
+        availableLocs = allData;
+    }
+
+    const pickedLocData = availableLocs[Math.floor(Math.random() * availableLocs.length)];
+    const locationName = pickedLocData.name;
+    
+    let turnOrder = room.players.map(p => p.id);
+    turnOrder.sort(() => Math.random() - 0.5);
+    
+    const spyId = turnOrder[Math.floor(Math.random() * turnOrder.length)];
+
+    let rolesPool = [...pickedLocData.roles];
+    rolesPool.sort(() => Math.random() - 0.5);
+
+    const playerRoles = {};
+    turnOrder.forEach((id) => {
+        if (id === spyId) {
+            playerRoles[id] = { isSpy: true, role: "สายลับ" };
+        } else {
+            if (rolesPool.length === 0) rolesPool = [...pickedLocData.roles].sort(() => Math.random() - 0.5);
+            playerRoles[id] = { isSpy: false, role: rolesPool.pop() };
+        }
+    });
+
+    const endTime = Date.now() + (timerMin * 60 * 1000);
+
+    room.game = { 
+        phase: 'playing', 
+        location: locationName, 
+        allLocations: allData.map(d => d.name),
+        spyId, 
+        playerRoles, 
+        endTime,
+        timerMin,
+        votes: {}
+    };
+
+    room.players.forEach(p => {
+        io.to(p.id).emit('spyfall_newRound', {
+            endTime,
+            allLocations: room.game.allLocations,
+            playedLocations: room.playedSpyfallLocs,
+            location: playerRoles[p.id].isSpy ? null : locationName,
+            role: playerRoles[p.id].role,
+            isSpy: playerRoles[p.id].isSpy
+        });
+    });
+}
+
+function finishSpyfallGame(roomCode, spyWon, titleMsg = "") {
+    const room = rooms[roomCode]; if (!room || !room.game) return;
+    const g = room.game;
+    const spyPlayer = room.players.find(p => p.id === g.spyId);
+    
+    if (!room.playedSpyfallLocs.includes(g.location)) {
+        room.playedSpyfallLocs.push(g.location);
+    }
+
+    broadcastScores(roomCode);
+    
+    const voteCounts = {};
+    if (g.votes) {
+        for (let v in g.votes) {
+            voteCounts[g.votes[v]] = (voteCounts[g.votes[v]] || 0) + 1;
+        }
+    }
+
+    const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
+
+    io.to(roomCode).emit('spyfall_showResult', {
+        titleMsg,
+        spyWon,
+        spyId: g.spyId,
+        spyName: spyPlayer ? spyPlayer.name : 'Unknown',
+        spyAvatar: spyPlayer ? spyPlayer.avatar : '🕵️',
+        location: g.location,
+        votes: voteCounts,
+        players: pList
+    });
+}
+
+// ==========================================
+// POWER STRUGGLE LOGIC (เหลี่ยมมาเฟีย)
+// ==========================================
+
+function syncBluffState(roomCode, specificSocketId = null) {
+    const room = rooms[roomCode];
+    if (!room || !room.game) return;
+    const g = room.game;
+
+    const globalState = {
+        phase: g.phase, 
+        currentTurnId: g.turnOrder[g.currentTurnIndex],
+        pendingAction: g.pendingAction, 
+        pendingBlock: g.pendingBlock, 
+        playerLosingCard: g.playerLosingCard,
+        exchangeOptions: g.phase === 'exchange' ? g.exchangeOptions : null,
+        playersStatus: room.players.map(p => {
+            const ps = g.players[p.id];
+            if(!ps) return null;
+            const deadCards = ps.cards.filter(c => c.dead).map(c => c.role);
+            return { id: p.id, name: p.name, avatar: p.avatar, coins: ps.coins, cardsCount: ps.cards.filter(c => !c.dead).length, deadCards, isEliminated: ps.isEliminated };
+        }).filter(p=>p!==null)
+    };
+
+    if (specificSocketId) {
+        const myState = g.players[specificSocketId];
+        if(myState) io.to(specificSocketId).emit('coup_updateState', { myState, globalState });
+    } else {
+        room.players.forEach(p => {
+            const myState = g.players[p.id];
+            if(myState) io.to(p.id).emit('coup_updateState', { myState, globalState });
+        });
+    }
+}
+
+function startBluffRound(roomCode) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 2 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    let deck = [...bluffData.deck];
+    deck.sort(() => Math.random() - 0.5);
+
+    const playersStatus = {};
+    const turnOrder = [];
+    room.players.forEach(p => {
+        playersStatus[p.id] = { id: p.id, coins: 2, cards: [{ role: deck.pop(), dead: false }, { role: deck.pop(), dead: false }], isEliminated: false };
+        turnOrder.push(p.id);
+    });
+
+    room.game = { 
+        deck, players: playersStatus, turnOrder, currentTurnIndex: 0, 
+        phase: 'action', pendingAction: null, pendingBlock: null, 
+        responses: {}, playerLosingCard: null, afterLoseCardAction: null, exchangeOptions: null
+    };
+    
+    io.to(roomCode).emit('bluff_newRound');
+    syncBluffState(roomCode);
+}
+
+function advanceBluffTurn(roomCode) {
+    const room = rooms[roomCode]; 
+    if(!room || !room.game) return;
+    const g = room.game;
+    
+    g.phase = 'action'; 
+    g.pendingAction = null; 
+    g.pendingBlock = null; 
+    g.responses = {}; 
+    g.playerLosingCard = null; 
+    g.afterLoseCardAction = null;
+    g.exchangeOptions = null;
+    
+    if (checkBluffGameOver(roomCode)) return;
+
+    let safety = 0;
+    do {
+        g.currentTurnIndex = (g.currentTurnIndex + 1) % g.turnOrder.length;
+        safety++;
+    } while (g.players[g.turnOrder[g.currentTurnIndex]].isEliminated && safety < g.turnOrder.length);
+
+    syncBluffState(roomCode);
+}
+
+function getClaimForAction(type) {
+    if(type === 'tax') return 'sniper';
+    if(type === 'assassinate') return 'assassin';
+    if(type === 'steal') return 'hacker';
+    if(type === 'exchange') return 'spy';
+    return null;
+}
+
+function getActionText(type, targetId, room) {
+    const targetPlayer = targetId ? room.players.find(p=>p.id===targetId) : null;
+    const targetName = targetPlayer ? targetPlayer.name : 'ใครบางคน';
+    
+    if(type==='foreign_aid') return 'รับของสนับสนุน (+2 เครดิต)';
+    if(type==='tax') return 'เก็บส่วย (มือปืน +3 เครดิต)';
+    if(type==='assassinate') return `ลอบสังหาร (นักฆ่า เล็งไปที่ ${targetName})`;
+    if(type==='steal') return `แฮกเงิน (แฮกเกอร์ เล็งไปที่ ${targetName})`;
+    if(type==='exchange') return 'เปลี่ยนไพ่ (สายลับ)';
+    return '';
+}
+
+function handleChallenge(roomCode, challengerId, claimedId, claimRole, successAction, failAction) {
+    const room = rooms[roomCode]; const g = room.game;
+    const challenger = room.players.find(p=>p.id===challengerId);
+    const claimed = room.players.find(p=>p.id===claimedId);
+    
+    if(!challenger || !claimed) return;
+    
+    systemChat(roomCode, `🚨 ${challenger.name} ขอจับโกหก ${claimed.name} ว่าเป็น ${bluffData.roleNames[claimRole]} จริงหรือมั่ว!`);
+
+    const p = g.players[claimedId];
+    const hasCard = p.cards.some(c => !c.dead && c.role === claimRole);
+
+    if (hasCard) {
+        systemChat(roomCode, `✔️ ${claimed.name} โชว์ไพ่ ${bluffData.roleNames[claimRole]}! (ของจริง)`);
+        const cardIdx = p.cards.findIndex(c => !c.dead && c.role === claimRole);
+        
+        g.deck.push(p.cards[cardIdx].role);
+        g.deck.sort(() => Math.random() - 0.5);
+        p.cards[cardIdx].role = g.deck.pop();
+
+        systemChat(roomCode, `💀 ${challenger.name} จับผิดพลาด! ต้องเสีย 1 ชีวิต`);
+        g.phase = 'lose_card'; 
+        g.playerLosingCard = challengerId; 
+        g.afterLoseCardAction = successAction;
+        syncBluffState(roomCode);
+    } else {
+        systemChat(roomCode, `❌ ${claimed.name} โดนจับโป๊ะ! (ไม่มีไพ่จริง) แอคชันถูกยกเลิก`);
+        g.phase = 'lose_card'; 
+        g.playerLosingCard = claimedId; 
+        g.afterLoseCardAction = failAction;
+        syncBluffState(roomCode);
+    }
+}
+
+function resolveAction(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const p = g.players[g.pendingAction.source];
+    const type = g.pendingAction.type;
+    const tId = g.pendingAction.target;
+
+    if (type === 'foreign_aid') { 
+        p.coins += 2; systemChat(roomCode, `💰 รับของสนับสนุนสำเร็จ (+2)`); advanceBluffTurn(roomCode); 
+    }
+    else if (type === 'tax') { 
+        p.coins += 3; systemChat(roomCode, `🔫 มือปืนเก็บส่วยสำเร็จ (+3)`); advanceBluffTurn(roomCode); 
+    }
+    else if (type === 'steal') {
+        const target = g.players[tId];
+        if(target) {
+            const amount = Math.min(2, target.coins);
+            target.coins -= amount; p.coins += amount;
+            systemChat(roomCode, `💻 แฮกเกอร์แฮกได้ ${amount} เครดิต สำเร็จ!`);
+        }
+        advanceBluffTurn(roomCode);
+    }
+    else if (type === 'assassinate') {
+        systemChat(roomCode, `🔪 นักฆ่าลงมือสำเร็จ!`);
+        g.phase = 'lose_card'; 
+        g.playerLosingCard = tId; 
+        g.afterLoseCardAction = 'advanceTurn';
+        syncBluffState(roomCode);
+    }
+    else if (type === 'exchange') {
+        const newCards = [g.deck.pop(), g.deck.pop()];
+        const aliveCards = p.cards.filter(c => !c.dead).map(c => c.role);
+        const totalCards = [...aliveCards, ...newCards].filter(c => c); 
+        
+        g.exchangeOptions = totalCards.map(role => ({ role, dead: false }));
+        g.phase = 'exchange';
+        systemChat(roomCode, `🕶️ สายลับกำลังเลือกเปลี่ยนไพ่...`);
+        syncBluffState(roomCode);
+    }
+}
+
+function checkReactionsComplete(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const alivePlayers = Object.values(g.players).filter(p => !p.isEliminated);
+    
+    let requiredResponses = alivePlayers.length - 1; 
+    if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
+        requiredResponses = alivePlayers.length - 1;
+    }
+
+    if (Object.keys(g.responses).length >= requiredResponses) {
+        if (g.phase === 'reaction') {
+            resolveAction(roomCode);
+        }
+        else if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
+            systemChat(roomCode, `🛡️ บล็อกสำเร็จ! แอคชันถูกยกเลิก`);
+            advanceBluffTurn(roomCode);
+        }
+    }
+}
+
+function checkBluffGameOver(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    const alive = Object.values(g.players).filter(p => !p.isEliminated);
+    if (alive.length === 1) {
+        const winner = room.players.find(p=>p.id===alive[0].id);
+        if(winner) winner.score += 5;
+        systemChat(roomCode, `🏆 จบเกม! ${winner ? winner.name : 'ผู้เล่น'} เป็นผู้ชนะในศึกชิงอำนาจ!`);
+        broadcastScores(roomCode);
+        room.gameState = 'waiting';
+        setTimeout(() => io.to(roomCode).emit('backToLobby', room.players), 5000);
+        return true;
+    }
+    return false;
+}
+
+// ==========================================
+// OTHER GAMES LOGIC (Global Scope)
+// ==========================================
+
+function startTruthOrLieRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 3) {
+        io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    const dataPack = getGameData(truthOrLieData, pack);
+    const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
+    
+    let turnOrder = room.players.map(p => p.id);
+    turnOrder.sort(() => Math.random() - 0.5);
+
+    room.game = { prompt, answers: {}, turnOrder, activePlayerIndex: 0, phase: 'answering', votes: {} };
+    io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนแต่งเรื่อง...' });
+    io.to(roomCode).emit('truthOrLie_newRound', { prompt });
+}
+
+function startUniqueClueRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 3) {
+        io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+    
+    const dataPack = getGameData(uniqueClueData, pack);
+    const word = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const guesserIndex = Math.floor(Math.random() * room.players.length);
+    const guesserId = room.players[guesserIndex].id;
+
+    room.game = { word, guesserId, phase: 'clue_giving', clues: {} };
+    const guesser = room.players.find(p => p.id === guesserId);
+    
+    io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length - 1, text: 'รอเพื่อนส่งคำใบ้...' });
+    io.to(roomCode).emit('uniqueClue_newRound', { guesser, word });
+}
+
+function startSecretPainterRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 3) {
+        io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    const dataPack = getGameData(secretPainterData, pack);
+    const categoryObj = dataPack[Math.floor(Math.random() * dataPack.length)];
+    const word = categoryObj.words[Math.floor(Math.random() * categoryObj.words.length)];
+    
+    let turnOrder = room.players.map(p => p.id);
+    turnOrder.sort(() => Math.random() - 0.5);
+    
+    const secretPainterIndex = Math.floor(Math.random() * turnOrder.length);
+    const secretPainterId = turnOrder[secretPainterIndex];
+
+    const colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3'];
+    colors.sort(() => Math.random() - 0.5);
+
+    const playerInfo = {};
+    turnOrder.forEach((id, index) => {
+        playerInfo[id] = { color: colors[index % colors.length], isSecretPainter: (id === secretPainterId) };
+    });
+
+    room.game = { category: categoryObj.name, word, turnOrder, secretPainterId, playerInfo, currentTurnIndex: 0, currentRound: 1, maxRounds: 2, linesDrawn: 0, votes: {} };
+
+    room.players.forEach(p => {
+        const info = playerInfo[p.id];
+        io.to(p.id).emit('secretPainter_newRound', {
+            category: categoryObj.name, word: info.isSecretPainter ? null : word,
+            isSecretPainter: info.isSecretPainter, myColor: info.color,
+            turnOrderNames: turnOrder.map(id => room.players.find(pl => pl.id === id).name),
+            currentTurnId: turnOrder[0], currentTurnName: room.players.find(pl => pl.id === turnOrder[0]).name,
+            currentTurnAvatar: room.players.find(pl => pl.id === turnOrder[0]).avatar
+        });
+    });
+}
+
+function secretPainter_checkGameOver(roomCode, isPainterCorrect) {
+    const room = rooms[roomCode]; if (!room) return;
+    if (isPainterCorrect) {
+        const sp = room.players.find(p => p.id === room.game.secretPainterId);
+        if(sp) sp.score += 3;
+    } else {
+        room.players.forEach(p => { if (p.id !== room.game.secretPainterId) p.score += 1; });
+    }
+    broadcastScores(roomCode);
+    io.to(roomCode).emit('secretPainter_gameOver', { isCorrect: isPainterCorrect, actualWord: room.game.word });
+}
+
+function startMatchTheBlankRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+    
+    const dataPack = getGameData(matchTheBlankData, pack);
+    const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
+
+    room.game = { prompt: prompt, answers: {} };
+    io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
+    io.to(roomCode).emit('matchTheBlank_newRound', { prompt });
+}
+
+function startFriendQuizRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+    
+    const dataPack = getGameData(friendQuizData, pack);
+    const question = dataPack[Math.floor(Math.random() * dataPack.length)];
+
+    room.game = { question, answers: {}, phase: 'answering', secretPlayerId: null, ranges: [], bets: {} };
+    io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
+    io.to(roomCode).emit('friendQuiz_newRound', { question });
+}
+
+function findQuizCorrectRangeIndex(secretAnswer, ranges) {
+    return ranges.findIndex(r => secretAnswer >= r.min && secretAnswer <= r.max);
+}
+
+function startNumberSortRound(roomCode, pack) {
+    const room = rooms[roomCode];
+    if (!room || room.players.length < 2) {
+        io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
+        room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
+    }
+
+    const dataPack = getGameData(numberSortData, pack);
+    const theme = dataPack[Math.floor(Math.random() * dataPack.length)];
+    
+    room.game = { theme, playerNumbers: {} };
+    const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
+
+    room.players.forEach(p => {
+        const num = Math.floor(Math.random() * 100) + 1;
+        room.game.playerNumbers[p.id] = num;
+        io.to(p.id).emit('numberSort_newRound', { theme, number: num, players: pList });
+    });
+}
+
+function generateWordGuessBoard(pack) {
+    const dataPack = getGameData(wordGuessData, pack);
+    const shuffledWords = [...dataPack].sort(() => 0.5 - Math.random()).slice(0, 25);
+    return shuffledWords.map(word => ({ word, type: 'neutral', revealed: false }));
+}
+
+function startWordGuessTeamGame(roomCode, pack) {
+    const room = rooms[roomCode];
+    const board = generateWordGuessBoard(pack);
+    let types = Array(9).fill('red').concat(Array(8).fill('blue')).concat(Array(7).fill('neutral')).concat(['assassin']);
+    types.sort(() => 0.5 - Math.random());
+    board.forEach((card, i) => card.type = types[i]);
+
+    room.game = {
+        isCoop: false, board, turn: 'red', clue: null, guessesLeft: 0,
+        teams: { red: { players: [], spymaster: null, score: 9 }, blue: { players: [], spymaster: null, score: 8 } },
+        players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, team: null, isSpymaster: false }))
+    };
+    syncGameStateToPlayer(null, room, roomCode);
+    room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
+}
+
+function startWordGuessCoopGame(roomCode, pack) {
+    const room = rooms[roomCode];
+    const board = generateWordGuessBoard(pack);
+    let types = Array(15).fill('green').concat(Array(9).fill('neutral')).concat(['assassin']);
+    types.sort(() => 0.5 - Math.random());
+    board.forEach((card, i) => card.type = types[i]);
+
+    room.game = {
+        isCoop: true, board, turnsLeft: 9, wordsFound: 0, wordsToFind: 15, clue: null, guessesLeft: 0,
+        players: room.players.map((p, i) => ({ id: p.id, name: p.name, avatar: p.avatar, team: 'coop', isSpymaster: i === 0 }))
+    };
+    syncGameStateToPlayer(null, room, roomCode);
+    room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
+}
+
+function checkWordGuessWinCondition(roomCode) {
+    const room = rooms[roomCode]; const g = room.game;
+    if (g.isCoop) {
+        if (g.wordsFound === g.wordsToFind) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'players', reason: 'หาเจอครบแล้ว!', isCoop: true }); return true; }
+        if (g.turnsLeft <= 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'none', reason: 'หมดเทิร์นแล้ว!', isCoop: true }); return true; }
+    } else {
+        if (g.teams.red.score === 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'red', reason: 'หาการ์ดเจอครบ', isCoop: false }); return true; }
+        if (g.teams.blue.score === 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'blue', reason: 'หาการ์ดเจอครบ', isCoop: false }); return true; }
+    }
+    return false;
+}
+
+// ==========================================
+// SOCKET CONNECTION & EVENT HANDLERS
+// ==========================================
+
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
 
-    // --- RECONNECT LOGIC ---
     socket.on('rejoinRoom', ({ roomCode, playerId, playerName, avatar }) => {
         let room = rooms[roomCode];
         if (!room) {
@@ -181,6 +747,16 @@ io.on('connection', (socket) => {
                     room.game.responses[socket.id] = room.game.responses[oldId];
                     delete room.game.responses[oldId];
                 }
+            } else if (room.gameType === 'secret-agent' && room.game && room.game.playerRoles) {
+                if (room.game.playerRoles[oldId]) {
+                    room.game.playerRoles[socket.id] = room.game.playerRoles[oldId];
+                    delete room.game.playerRoles[oldId];
+                }
+                if (room.game.spyId === oldId) room.game.spyId = socket.id;
+                if (room.game.votes && room.game.votes[oldId]) {
+                    room.game.votes[socket.id] = room.game.votes[oldId];
+                    delete room.game.votes[oldId];
+                }
             }
         } else {
             if (room.players.length < 16) {
@@ -195,8 +771,8 @@ io.on('connection', (socket) => {
         socket.emit('joinSuccess', { roomCode, players: room.players, gameType: room.gameType });
         
         if (room.gameState === 'playing') {
-            socket.emit('gameStarted', { gameType: room.gameType });
-            syncGameStateToPlayer(socket, room);
+            socket.emit('rejoinGameStarted', room.gameType);
+            syncGameStateToPlayer(socket, room, roomCode);
         }
         
         io.to(roomCode).emit('updateLobby', room.players);
@@ -283,13 +859,30 @@ io.on('connection', (socket) => {
             rooms[roomCode].gameType = gameType; io.to(roomCode).emit('gameSelected', gameType);
         }
     });
+
+    socket.on('host_selectPack', (pack) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            room.currentPack = pack;
+            io.to(roomCode).emit('packSelected', pack);
+        }
+    });
     
     socket.on('startGame', (data) => {
         const roomCode = typeof data === 'string' ? data : data.roomCode;
         const pack = data.pack || 'mixed';
         const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id && room.gameType) {
-            room.gameState = 'playing'; io.to(roomCode).emit('gameStarted', { gameType: room.gameType, pack });
+            room.gameState = 'playing'; 
+            room.currentPack = pack;
+            
+            // ส่งข้อมูลกลับไปให้ไคลเอนต์ทั้งหมดรู้ว่าเริ่มเกมอะไร พร้อมแนบออพชันต่างๆ ด้วย
+            let payload = { gameType: room.gameType, pack };
+            if (room.gameType === 'secret-agent' && data.timerMin) {
+                payload.timerMin = data.timerMin;
+            }
+            io.to(roomCode).emit('gameStarted', payload);
         }
     });
 
@@ -304,9 +897,11 @@ io.on('connection', (socket) => {
 
     socket.on('host_gameLogicStart', (data) => {
         const roomCode = typeof data === 'string' ? data : data.roomCode;
-        const pack = data.pack || 'mixed';
         const room = rooms[roomCode];
+        const pack = data.pack || (room ? room.currentPack : 'mixed') || 'mixed';
+        
         if (room && room.players.length > 0 && room.players[0].id === socket.id) {
+            room.currentPack = pack;
             try {
                 if (room.gameType === 'word-guess') {
                     if (room.players.length >= 2 && room.players.length <= 2) startWordGuessCoopGame(roomCode, pack);
@@ -318,6 +913,7 @@ io.on('connection', (socket) => {
                 else if (room.gameType === 'unique-clue') startUniqueClueRound(roomCode, pack);
                 else if (room.gameType === 'truth-or-lie') startTruthOrLieRound(roomCode, pack);
                 else if (room.gameType === 'bluff-overthrow') startBluffRound(roomCode);
+                else if (room.gameType === 'secret-agent') startSpyfallRound(roomCode, pack, data.timerMin || 5);
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
                 io.to(roomCode).emit('error', 'เกิดข้อผิดพลาดร้ายแรงขณะเริ่มเกม');
@@ -325,180 +921,129 @@ io.on('connection', (socket) => {
         }
     });
 
-    // ==========================================
-    // BLUFF OVERTHROW LOGIC (COUP)
-    // ==========================================
-    function startBluffRound(roomCode) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 2) {
-            io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 2 คน');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-
-        let deck = [...bluffData.deck];
-        deck.sort(() => Math.random() - 0.5);
-
-        const playersStatus = {};
-        const turnOrder = [];
-        room.players.forEach(p => {
-            playersStatus[p.id] = { id: p.id, coins: 2, cards: [{ role: deck.pop(), dead: false }, { role: deck.pop(), dead: false }], isEliminated: false };
-            turnOrder.push(p.id);
-        });
-
-        room.game = { deck, players: playersStatus, turnOrder, currentTurnIndex: 0, phase: 'action', pendingAction: null, pendingBlock: null, responses: {}, playerLosingCard: null, afterLoseCard: null };
-        io.to(roomCode).emit('bluff_newRound');
-        syncBluffState(roomCode);
-    }
-
-    function syncBluffState(roomCode, targetSocketId = null) {
-        const room = rooms[roomCode];
-        if (!room) return;
-        const g = room.game;
+    // --- Secret Agent (Spyfall) Events ---
+    socket.on('spyfall_timeUp', () => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if(!room || room.gameType !== 'secret-agent' || room.game.phase !== 'playing') return;
         
-        const globalState = {
-            phase: g.phase, currentTurnId: g.turnOrder[g.currentTurnIndex],
-            pendingAction: g.pendingAction, pendingBlock: g.pendingBlock, playerLosingCard: g.playerLosingCard,
-            playersStatus: room.players.map(p => {
-                const ps = g.players[p.id];
-                if(!ps) return null;
-                const deadCards = ps.cards.filter(c => c.dead).map(c => c.role);
-                return { id: p.id, name: p.name, avatar: p.avatar, coins: ps.coins, cardsCount: ps.cards.filter(c => !c.dead).length, deadCards, isEliminated: ps.isEliminated };
-            }).filter(p=>p!==null)
-        };
+        room.game.phase = 'voting';
+        const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
+        io.to(roomCode).emit('spyfall_startVoting', { players: pList });
+        systemChat(roomCode, `⏳ หมดเวลา! ถึงเวลาโหวตหาตัวสายลับแล้ว!`);
+    });
 
-        if (targetSocketId) {
-            const myState = g.players[targetSocketId];
-            if(myState) io.to(targetSocketId).emit('coup_updateState', { myState, globalState });
+    socket.on('spyfall_spyEarlyGuess', () => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if(!room || room.gameType !== 'secret-agent' || room.game.phase !== 'playing') return;
+        if(socket.id !== room.game.spyId) return;
+
+        room.game.phase = 'spy_guessing';
+        io.to(roomCode).emit('spyfall_spyGuessingPhase', { spyId: room.game.spyId, allLocations: room.game.allLocations, playedLocations: room.playedSpyfallLocs || [] });
+        systemChat(roomCode, `🚨 สายลับขอชิงตอบสถานที่ก่อนหมดเวลา!`);
+    });
+
+    socket.on('spyfall_submitSpyGuess', ({ location, isBonus }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if(!room || room.gameType !== 'secret-agent') return;
+        if(socket.id !== room.game.spyId) return;
+
+        const isCorrect = location === room.game.location;
+        const spyPlayer = room.players.find(p => p.id === room.game.spyId);
+
+        if (isBonus) {
+            // โบนัสทายสถานที่ หลังจากสายลับรอดชีวิตจากการโหวต
+            if (isCorrect) {
+                if (spyPlayer) spyPlayer.score += 2;
+                finishSpyfallGame(roomCode, true, `สายลับรอดตัว แถมได้โบนัสทายสถานที่ถูกเป๊ะ! (+5 แต้ม)`);
+            } else {
+                finishSpyfallGame(roomCode, true, `สายลับรอดตัว แต่ทายสถานที่ผิด! (ได้แค่ +3 แต้ม)`);
+            }
         } else {
-            room.players.forEach(p => {
-                const myState = g.players[p.id];
-                if(myState) io.to(p.id).emit('coup_updateState', { myState, globalState });
-            });
-        }
-    }
-
-    function advanceBluffTurn(roomCode) {
-        const room = rooms[roomCode]; const g = room.game;
-        g.phase = 'action'; g.pendingAction = null; g.pendingBlock = null; g.responses = {}; g.playerLosingCard = null; g.afterLoseCard = null;
-        
-        if (checkBluffGameOver(roomCode)) return;
-
-        let safety = 0;
-        do {
-            g.currentTurnIndex = (g.currentTurnIndex + 1) % g.turnOrder.length;
-            safety++;
-        } while (g.players[g.turnOrder[g.currentTurnIndex]].isEliminated && safety < g.turnOrder.length);
-
-        syncBluffState(roomCode);
-    }
-
-    function getClaimForAction(type) {
-        if(type === 'tax') return 'sniper';
-        if(type === 'assassinate') return 'assassin';
-        if(type === 'steal') return 'hacker';
-        if(type === 'exchange') return 'spy';
-        return null;
-    }
-
-    function getActionText(type, targetId, room) {
-        const targetName = targetId ? room.players.find(p=>p.id===targetId).name : '';
-        if(type==='foreign_aid') return 'รับเงินสนับสนุน (+2 เครดิต)';
-        if(type==='tax') return 'เก็บภาษี (สไนเปอร์ +3 เครดิต)';
-        if(type==='assassinate') return `ลอบสังหาร (นักฆ่า ฆ่า ${targetName})`;
-        if(type==='steal') return `ขโมยเงิน (แฮกเกอร์ ปล้น ${targetName})`;
-        if(type==='exchange') return 'เปลี่ยนไพ่ (สายลับ)';
-        return '';
-    }
-
-    function handleChallenge(roomCode, challengerId, claimedId, claimRole, successCb, failCb) {
-        const room = rooms[roomCode]; const g = room.game;
-        const challengerName = room.players.find(p=>p.id===challengerId).name;
-        const claimedName = room.players.find(p=>p.id===claimedId).name;
-        
-        systemChat(roomCode, `🚨 ${challengerName} ขอจับโกหก ${claimedName} ว่าเป็น ${bluffData.roleNames[claimRole]} จริงหรือมั่ว!`);
-
-        const p = g.players[claimedId];
-        const hasCard = p.cards.some(c => !c.dead && c.role === claimRole);
-
-        if (hasCard) {
-            systemChat(roomCode, `✔️ ${claimedName} โชว์ไพ่ ${bluffData.roleNames[claimRole]}! (ของจริง)`);
-            const cardIdx = p.cards.findIndex(c => !c.dead && c.role === claimRole);
-            g.deck.push(p.cards[cardIdx].role);
-            g.deck.sort(() => Math.random() - 0.5);
-            p.cards[cardIdx].role = g.deck.pop();
-
-            systemChat(roomCode, `💀 ${challengerName} จับผิดพลาด! ต้องเสีย 1 ชีวิต`);
-            g.phase = 'lose_card'; g.playerLosingCard = challengerId; g.afterLoseCard = successCb;
-            syncBluffState(roomCode);
-        } else {
-            systemChat(roomCode, `❌ ${claimedName} โดนจับโป๊ะ! (ไม่มีไพ่) แอคชันถูกยกเลิก`);
-            g.phase = 'lose_card'; g.playerLosingCard = claimedId; g.afterLoseCard = failCb;
-            syncBluffState(roomCode);
-        }
-    }
-
-    function resolveAction(roomCode) {
-        const room = rooms[roomCode]; const g = room.game;
-        const p = g.players[g.pendingAction.source];
-        const type = g.pendingAction.type;
-        const tId = g.pendingAction.target;
-
-        if (type === 'foreign_aid') { p.coins += 2; systemChat(roomCode, `💰 รับเงินสนับสนุนสำเร็จ (+2)`); advanceBluffTurn(roomCode); }
-        else if (type === 'tax') { p.coins += 3; systemChat(roomCode, `🔫 สไนเปอร์เก็บภาษีสำเร็จ (+3)`); advanceBluffTurn(roomCode); }
-        else if (type === 'steal') {
-            const target = g.players[tId];
-            const amount = Math.min(2, target.coins);
-            target.coins -= amount; p.coins += amount;
-            systemChat(roomCode, `💻 แฮกเกอร์ขโมย ${amount} เครดิต สำเร็จ!`);
-            advanceBluffTurn(roomCode);
-        }
-        else if (type === 'assassinate') {
-            systemChat(roomCode, `🔪 นักฆ่าลงมือสำเร็จ!`);
-            g.phase = 'lose_card'; g.playerLosingCard = tId; g.afterLoseCard = () => advanceBluffTurn(roomCode);
-            syncBluffState(roomCode);
-        }
-        else if (type === 'exchange') {
-            const newCards = [g.deck.pop(), g.deck.pop()];
-            const aliveCards = p.cards.filter(c => !c.dead).map(c => c.role);
-            const totalCards = [...aliveCards, ...newCards];
-            io.to(p.id).emit('bluff_exchange_start', { cards: totalCards, requiredKeep: aliveCards.length });
-            g.phase = 'exchange';
-            systemChat(roomCode, `🕶️ สายลับกำลังเลือกเปลี่ยนไพ่...`);
-            syncBluffState(roomCode);
-        }
-    }
-
-    function checkReactionsComplete(roomCode) {
-        const room = rooms[roomCode]; const g = room.game;
-        const alivePlayers = Object.values(g.players).filter(p => !p.isEliminated);
-        
-        let requiredResponses = alivePlayers.length - 1; 
-        if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') requiredResponses = alivePlayers.length - 1;
-
-        if (Object.keys(g.responses).length >= requiredResponses) {
-            if (g.phase === 'reaction') resolveAction(roomCode);
-            else if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
-                systemChat(roomCode, `🛡️ บล็อกสำเร็จ! แอคชันถูกยกเลิก`);
-                advanceBluffTurn(roomCode);
+            // ชิงทายก่อนหมดเวลา
+            if (isCorrect) {
+                if (spyPlayer) spyPlayer.score += 5;
+                finishSpyfallGame(roomCode, true, `โคตรตึง! สายลับทายถูกก่อนหมดเวลา! (+5 แต้ม)`);
+            } else {
+                room.players.forEach(p => { if (p.id !== room.game.spyId) p.score += 2; });
+                finishSpyfallGame(roomCode, false, `โป๊ะแตก! สายลับชิงตอบแต่ทายผิด! (คนอื่น +2 แต้ม)`);
             }
         }
-    }
+    });
 
-    function checkBluffGameOver(roomCode) {
-        const room = rooms[roomCode]; const g = room.game;
-        const alive = Object.values(g.players).filter(p => !p.isEliminated);
-        if (alive.length === 1) {
-            const winner = room.players.find(p=>p.id===alive[0].id);
-            winner.score += 5;
-            systemChat(roomCode, `🏆 จบเกม! ${winner.name} เป็นผู้ชนะ! (เหลือรอดคนสุดท้าย)`);
-            broadcastScores(roomCode);
-            room.gameState = 'waiting';
-            setTimeout(() => io.to(roomCode).emit('backToLobby', room.players), 5000);
-            return true;
+    socket.on('spyfall_submitVote', ({ votedId }) => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if(!room || room.gameType !== 'secret-agent' || room.game.phase !== 'voting') return;
+        
+        room.game.votes[socket.id] = votedId;
+        
+        if (Object.keys(room.game.votes).length === room.players.length) {
+            // นับคะแนนโหวตทั้งหมด
+            const voteCounts = {};
+            for (let v in room.game.votes) {
+                voteCounts[room.game.votes[v]] = (voteCounts[room.game.votes[v]] || 0) + 1;
+            }
+            
+            let maxVotes = 0; let votedOutId = null; let isTie = false;
+            for (let id in voteCounts) {
+                if (voteCounts[id] > maxVotes) { maxVotes = voteCounts[id]; votedOutId = id; isTie = false; }
+                else if (voteCounts[id] === maxVotes) { isTie = true; }
+            }
+
+            const spyCaught = (!isTie && votedOutId === room.game.spyId);
+            const spyPlayer = room.players.find(p => p.id === room.game.spyId);
+
+            if (spyCaught) {
+                // จับสายลับได้ คนโหวตถูกได้ +2
+                for (let voterId in room.game.votes) {
+                    if (room.game.votes[voterId] === room.game.spyId) {
+                        const p = room.players.find(pl => pl.id === voterId);
+                        if(p) p.score += 2;
+                    }
+                }
+                finishSpyfallGame(roomCode, false, `จับสายลับได้แล้ว! (คนที่โหวตถูก +2 แต้ม)`);
+            } else {
+                // สายลับรอด! รับไปก่อน +3 แต้ม และให้โอกาสทายสถานที่โบนัส
+                if (spyPlayer) spyPlayer.score += 3;
+                room.game.phase = 'bonus_phase';
+                
+                if (!room.playedSpyfallLocs.includes(room.game.location)) {
+                    room.playedSpyfallLocs.push(room.game.location);
+                }
+                broadcastScores(roomCode);
+                
+                const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
+                
+                io.to(roomCode).emit('spyfall_showResult', {
+                    titleMsg: `โหวตผิดคน! สายลับรอดตัวไปได้ (+3 แต้ม)`,
+                    spyWon: true,
+                    spyId: room.game.spyId,
+                    spyName: spyPlayer ? spyPlayer.name : 'Unknown',
+                    spyAvatar: spyPlayer ? spyPlayer.avatar : '🕵️',
+                    location: room.game.location,
+                    votes: voteCounts,
+                    players: pList
+                });
+
+                io.to(roomCode).emit('spyfall_bonusPhase', {
+                    spyId: room.game.spyId,
+                    allLocations: room.game.allLocations,
+                    playedLocations: room.playedSpyfallLocs
+                });
+            }
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.votes).length, total: room.players.length, text: 'รอเพื่อนโหวตให้ครบ...' });
         }
-        return false;
-    }
+    });
 
+    socket.on('spyfall_nextRound', () => {
+        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            const timerMin = room.game.timerMin || 5; 
+            startSpyfallRound(roomCode, room.currentPack, timerMin);
+        }
+    });
+
+    // --- Bluff Overthrow (Power Struggle) Events ---
     socket.on('bluff_action', ({ type, targetId }) => {
         try {
             const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
@@ -507,21 +1052,28 @@ io.on('connection', (socket) => {
 
             const player = room.game.players[socket.id];
             const g = room.game;
-            const pName = room.players.find(p=>p.id===socket.id).name;
+            const pObj = room.players.find(p=>p.id===socket.id);
+            if(!pObj) return;
+            const pName = pObj.name;
 
-            if (type === 'coup' && player.coins < 7) return socket.emit('error', 'เครดิตไม่พอสำหรับโค่นอำนาจ');
+            if (type === 'eliminate' && player.coins < 7) return socket.emit('error', 'เครดิตไม่พอสำหรับปิดบัญชี');
             if (type === 'assassinate' && player.coins < 3) return socket.emit('error', 'เครดิตไม่พอสำหรับจ้างนักฆ่า');
-            if (player.coins >= 10 && type !== 'coup') return socket.emit('error', 'เครดิตถึง 10 แล้ว บังคับโค่นอำนาจ!');
+            if (player.coins >= 10 && type !== 'eliminate') return socket.emit('error', 'เครดิตถึง 10 แล้ว บังคับต้องปิดบัญชีเท่านั้น!');
 
             g.pendingAction = { type, source: socket.id, target: targetId, claim: getClaimForAction(type) };
             g.responses = {};
 
             if (type === 'income') {
-                player.coins += 1; systemChat(roomCode, `${pName} รับรายได้ (+1 เครดิต)`);
+                player.coins += 1; systemChat(roomCode, `${pName} รับรายได้ปกติ (+1 เครดิต)`);
                 advanceBluffTurn(roomCode);
-            } else if (type === 'coup') {
-                player.coins -= 7; systemChat(roomCode, `💥 ${pName} โค่นอำนาจ ใส่ ${room.players.find(p=>p.id===targetId).name}!`);
-                g.phase = 'lose_card'; g.playerLosingCard = targetId; g.afterLoseCard = () => advanceBluffTurn(roomCode);
+            } else if (type === 'eliminate') {
+                player.coins -= 7; 
+                const targetObj = room.players.find(p=>p.id===targetId);
+                const targetName = targetObj ? targetObj.name : 'ใครบางคน';
+                systemChat(roomCode, `💥 ${pName} ใช้สิทธิ์ปิดบัญชี ใส่ ${targetName}!`);
+                g.phase = 'lose_card'; 
+                g.playerLosingCard = targetId; 
+                g.afterLoseCardAction = 'advanceTurn';
                 syncBluffState(roomCode);
             } else {
                 if (type === 'assassinate') player.coins -= 3;
@@ -530,7 +1082,7 @@ io.on('connection', (socket) => {
                 systemChat(roomCode, `⚡ ${pName} ต้องการ: ${actionText}`);
                 syncBluffState(roomCode);
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Bluff action error:', e); }
     });
 
     socket.on('bluff_react', ({ response, claimRole }) => {
@@ -538,143 +1090,148 @@ io.on('connection', (socket) => {
             const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
             if (!room || room.gameType !== 'bluff-overthrow') return;
             const g = room.game;
-            if (g.players[socket.id].isEliminated) return;
+            if (!g.players[socket.id] || g.players[socket.id].isEliminated) return;
 
             if (g.phase === 'reaction') {
                 if (response === 'challenge') {
                     handleChallenge(roomCode, socket.id, g.pendingAction.source, g.pendingAction.claim, 
-                        () => { 
-                            if (g.pendingAction.type === 'foreign_aid') { g.players[g.pendingAction.source].coins += 2; advanceBluffTurn(roomCode); } 
-                            else { g.phase = 'block_reaction'; g.responses = {}; syncBluffState(roomCode); }
-                        },
-                        () => advanceBluffTurn(roomCode) 
+                        'advanceTurn', 'resolveAction' 
                     );
                 } else if (response === 'block') {
                     g.pendingBlock = { source: socket.id, claim: claimRole };
                     g.phase = 'block_challenge_reaction'; g.responses = {};
-                    systemChat(roomCode, `🛡️ ${room.players.find(p=>p.id===socket.id).name} บล็อกด้วย ${bluffData.roleNames[claimRole]}`);
+                    const blockerName = room.players.find(p=>p.id===socket.id)?.name || 'Someone';
+                    systemChat(roomCode, `🛡️ ${blockerName} ประกาศบล็อก! (อ้างเป็น ${bluffData.roleNames[claimRole]})`);
                     syncBluffState(roomCode);
                 } else {
-                    g.responses[socket.id] = 'pass'; checkReactionsComplete(roomCode);
+                    g.responses[socket.id] = 'pass';
+                    checkReactionsComplete(roomCode);
                 }
             } else if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
                 if (response === 'challenge') {
                     handleChallenge(roomCode, socket.id, g.pendingBlock.source, g.pendingBlock.claim,
-                        () => advanceBluffTurn(roomCode), () => resolveAction(roomCode) 
+                        'resolveAction', 'advanceTurn'   
                     );
                 } else {
-                    g.responses[socket.id] = 'pass'; checkReactionsComplete(roomCode);
+                    g.responses[socket.id] = 'pass';
+                    checkReactionsComplete(roomCode);
                 }
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Bluff react error:', e); }
     });
 
     socket.on('bluff_loseCard', ({ cardIndex }) => {
-        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'lose_card') return;
-        if (socket.id !== room.game.playerLosingCard) return;
+        try {
+            const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+            if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'lose_card') return;
+            if (socket.id !== room.game.playerLosingCard) return;
 
-        const p = room.game.players[socket.id];
-        if (!p.cards[cardIndex] || p.cards[cardIndex].dead) return;
+            const p = room.game.players[socket.id];
+            if (!p.cards[cardIndex] || p.cards[cardIndex].dead) return;
 
-        p.cards[cardIndex].dead = true;
-        const pName = room.players.find(x=>x.id===socket.id).name;
-        systemChat(roomCode, `💀 ${pName} ทิ้งไพ่ ${bluffData.roleNames[p.cards[cardIndex].role]}`);
+            p.cards[cardIndex].dead = true;
+            const pName = room.players.find(x=>x.id===socket.id)?.name || 'Unknown';
+            systemChat(roomCode, `💀 ${pName} ทิ้งไพ่ ${bluffData.roleNames[p.cards[cardIndex].role]}`);
 
-        if (p.cards.every(c => c.dead)) {
-            p.isEliminated = true;
-            systemChat(roomCode, `❌ ${pName} ถูกคัดออกจากเกมแล้ว!`);
-        }
+            if (p.cards.every(c => c.dead)) {
+                p.isEliminated = true;
+                systemChat(roomCode, `❌ ${pName} ถูกคัดออกจากเกมแล้ว!`);
+            }
 
-        if (g.afterLoseCard) { const cb = g.afterLoseCard; g.afterLoseCard = null; cb(); }
-        else advanceBluffTurn(roomCode);
+            const action = room.game.afterLoseCardAction;
+            room.game.afterLoseCardAction = null;
+
+            if (action === 'advanceTurn') advanceBluffTurn(roomCode);
+            else if (action === 'resolveAction') resolveAction(roomCode);
+            else advanceBluffTurn(roomCode);
+        } catch(e) { console.error('Bluff lose card error', e); }
     });
 
     socket.on('bluff_exchange', ({ keepIndices }) => {
-        const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'exchange') return;
-        if (socket.id !== room.game.pendingAction.source) return;
+        try {
+            const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
+            if (!room || room.gameType !== 'bluff-overthrow' || room.game.phase !== 'exchange') return;
+            if (socket.id !== room.game.pendingAction.source) return;
 
-        systemChat(roomCode, `🕶️ สายลับเปลี่ยนไพ่เสร็จสิ้น`);
-        advanceBluffTurn(roomCode);
+            const p = room.game.players[socket.id];
+            const newCards = keepIndices.map(idx => room.game.exchangeOptions[idx]);
+            
+            room.game.exchangeOptions.forEach((opt, idx) => {
+                if(!keepIndices.includes(idx) && opt && opt.role) {
+                    room.game.deck.push(opt.role);
+                }
+            });
+            room.game.deck.sort(() => Math.random() - 0.5);
+            p.cards = newCards;
+
+            systemChat(roomCode, `🕶️ สายลับเปลี่ยนไพ่เสร็จสิ้น`);
+            advanceBluffTurn(roomCode);
+        } catch(e) { console.error('Bluff exchange error', e); }
     });
 
-
-    // ==========================================
-    // TRUTH OR LIE LOGIC
-    // ==========================================
-    function startTruthOrLieRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 3) {
-            io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-
-        const dataPack = getGameData(truthOrLieData, pack);
-        const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
-        
-        let turnOrder = room.players.map(p => p.id);
-        turnOrder.sort(() => Math.random() - 0.5);
-
-        room.game = { prompt, answers: {}, turnOrder, activePlayerIndex: 0, phase: 'answering', votes: {} };
-        io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนแต่งเรื่อง...' });
-        io.to(roomCode).emit('truthOrLie_newRound', { prompt });
-    }
-
+    // --- Truth or Lie Events ---
     socket.on('truthOrLie_submitAnswer', ({ truth, lie }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'truth-or-lie' || room.game.phase !== 'answering') return;
 
-        const options = Math.random() > 0.5 ? { A: truth, B: lie, lieOption: 'B' } : { A: lie, B: truth, lieOption: 'A' };
-        room.game.answers[socket.id] = { truth, lie, optionA: options.A, optionB: options.B, lieOption: options.lieOption };
-
-        const answeredCount = Object.keys(room.game.answers).length;
-        io.to(roomCode).emit('updateProgress', { current: answeredCount, total: room.players.length, text: 'รอเพื่อนแต่งเรื่อง...' });
-
-        if (answeredCount === room.players.length) {
-            room.game.phase = 'voting'; room.game.activePlayerIndex = 0; room.game.votes = {};
-            const activePlayer = room.players.find(p => p.id === room.game.turnOrder[0]);
-            const activeAnswers = room.game.answers[activePlayer.id];
-            
-            io.to(roomCode).emit('updateProgress', { hide: true });
-            io.to(roomCode).emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
+        const options = Math.random() > 0.5 ? { A: truth, B: lie } : { A: lie, B: truth };
+        room.game.answers[socket.id] = { truth, lie, optionA: options.A, optionB: options.B, lieOption: options.A === lie ? 'A' : 'B' };
+        
+        if (Object.keys(room.game.answers).length === room.players.length) {
+            room.game.phase = 'voting';
+            io.to(roomCode).emit('truthOrLie_startVoting', {
+                activePlayer: room.players.find(p => p.id === room.game.turnOrder[room.game.activePlayerIndex]),
+                optionA: room.game.answers[room.game.turnOrder[room.game.activePlayerIndex]].optionA,
+                optionB: room.game.answers[room.game.turnOrder[room.game.activePlayerIndex]].optionB
+            });
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.answers).length, total: room.players.length, text: 'รอเพื่อนส่งเรื่อง...' });
         }
     });
 
     socket.on('truthOrLie_submitVote', ({ vote }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'truth-or-lie' || room.game.phase !== 'voting') return;
-        
+
         const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
         if (socket.id === activePlayerId) return;
 
         room.game.votes[socket.id] = vote;
-        const votedCount = Object.keys(room.game.votes).length;
-        io.to(roomCode).emit('updateProgress', { current: votedCount, total: room.players.length - 1, text: 'รอเพื่อนโหวต...' });
-
-        if (votedCount === room.players.length - 1) {
-            const activeAnswers = room.game.answers[activePlayerId];
-            const activePlayerObj = room.players.find(p => p.id === activePlayerId);
+        if (Object.keys(room.game.votes).length === room.players.length - 1) {
             let fooledCount = 0;
             const voteDetails = [];
-
-            for (const [voterId, v] of Object.entries(room.game.votes)) {
-                const voter = room.players.find(p => p.id === voterId);
-                if (v !== activeAnswers.lieOption) {
-                    fooledCount++; activePlayerObj.score += 1;
-                } else {
-                    voter.score += 1;
+            const lieOpt = room.game.answers[activePlayerId].lieOption;
+            
+            for (let vid in room.game.votes) {
+                const p = room.players.find(pl => pl.id === vid);
+                if(p) {
+                    voteDetails.push({ id: p.id, name: p.name, avatar: p.avatar, vote: room.game.votes[vid] });
+                    if (room.game.votes[vid] !== lieOpt) {
+                        fooledCount++; 
+                    } else {
+                        p.score += 1; 
+                    }
                 }
-                voteDetails.push({ name: voter.name, avatar: voter.avatar, vote: v });
             }
 
-            if (fooledCount === room.players.length - 1 && fooledCount > 0) activePlayerObj.score += 2;
+            const activePlayerObj = room.players.find(pl => pl.id === activePlayerId);
+            if (activePlayerObj) {
+                activePlayerObj.score += fooledCount;
+                if (fooledCount === room.players.length - 1) activePlayerObj.score += 2;
+            }
 
-            broadcastScores(roomCode);
             io.to(roomCode).emit('truthOrLie_showVoteResult', {
-                activePlayer: activePlayerObj, truth: activeAnswers.truth, lie: activeAnswers.lie,
-                lieOption: activeAnswers.lieOption, fooledCount, totalVoters: room.players.length - 1, voteDetails
+                activePlayer: activePlayerObj,
+                truth: room.game.answers[activePlayerId].truth,
+                lie: room.game.answers[activePlayerId].lie,
+                lieOption: lieOpt,
+                fooledCount,
+                totalVoters: room.players.length - 1,
+                voteDetails
             });
+            broadcastScores(roomCode);
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.votes).length, total: room.players.length - 1, text: 'รอเพื่อนโหวต...' });
         }
     });
 
@@ -683,76 +1240,54 @@ io.on('connection', (socket) => {
         if (!room || room.gameType !== 'truth-or-lie' || room.players[0].id !== socket.id) return;
 
         room.game.activePlayerIndex++;
-        if (room.game.activePlayerIndex < room.turnOrder.length) {
-            room.game.votes = {};
-            const activePlayer = room.players.find(p => p.id === room.game.turnOrder[room.game.activePlayerIndex]);
-            const activeAnswers = room.game.answers[activePlayer.id];
-            io.to(roomCode).emit('truthOrLie_startVoting', { activePlayer, optionA: activeAnswers.optionA, optionB: activeAnswers.optionB });
+        if (room.game.activePlayerIndex >= room.players.length) {
+            io.to(roomCode).emit('truthOrLie_endRound', { players: room.players.map(p => ({id:p.id, name:p.name, avatar:p.avatar, score:p.score})) });
         } else {
-            io.to(roomCode).emit('truthOrLie_endRound', { players: room.players });
+            room.game.votes = {};
+            const activePlayerId = room.game.turnOrder[room.game.activePlayerIndex];
+            io.to(roomCode).emit('truthOrLie_startVoting', {
+                activePlayer: room.players.find(p => p.id === activePlayerId),
+                optionA: room.game.answers[activePlayerId].optionA,
+                optionB: room.game.answers[activePlayerId].optionB
+            });
         }
     });
 
     socket.on('truthOrLie_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startTruthOrLieRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startTruthOrLieRound(roomCode, room.currentPack);
     });
 
-
-    // ==========================================
-    // UNIQUE CLUE LOGIC
-    // ==========================================
-    function startUniqueClueRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 3) {
-            io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-        
-        const dataPack = getGameData(uniqueClueData, pack);
-        const word = dataPack[Math.floor(Math.random() * dataPack.length)];
-        const guesserIndex = Math.floor(Math.random() * room.players.length);
-        const guesserId = room.players[guesserIndex].id;
-
-        room.game = { word, guesserId, phase: 'clue_giving', clues: {} };
-        const guesser = room.players.find(p => p.id === guesserId);
-        
-        io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length - 1, text: 'รอเพื่อนส่งคำใบ้...' });
-        io.to(roomCode).emit('uniqueClue_newRound', { guesser, word });
-    }
-
+    // --- Unique Clue Events ---
     socket.on('uniqueClue_submitClue', ({ clue }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'unique-clue' || room.game.phase !== 'clue_giving') return;
-        if (socket.id === room.game.guesserId) return;
 
         room.game.clues[socket.id] = clue.trim().toLowerCase();
-        const clueCount = Object.keys(room.game.clues).length;
-        io.to(roomCode).emit('updateProgress', { current: clueCount, total: room.players.length - 1, text: 'รอเพื่อนส่งคำใบ้...' });
-
-        if (clueCount === room.players.length - 1) {
+        
+        if (Object.keys(room.game.clues).length === room.players.length - 1) {
             room.game.phase = 'guessing';
-            
-            const clueFrequency = {};
-            for (const c of Object.values(room.game.clues)) {
-                clueFrequency[c] = (clueFrequency[c] || 0) + 1;
+            const clueCounts = {};
+            for (let id in room.game.clues) {
+                const c = room.game.clues[id];
+                clueCounts[c] = (clueCounts[c] || 0) + 1;
             }
 
             const validClues = [];
             const playerClues = [];
-
-            for (const [playerId, c] of Object.entries(room.game.clues)) {
-                const player = room.players.find(p => p.id === playerId);
-                const isValid = clueFrequency[c] === 1;
+            for (let id in room.game.clues) {
+                const p = room.players.find(pl => pl.id === id);
+                const c = room.game.clues[id];
+                const isValid = clueCounts[c] === 1;
                 if (isValid) validClues.push(c);
-                playerClues.push({ playerId, playerName: player.name, playerAvatar: player.avatar, clue: c, isValid });
+                if (p) playerClues.push({ playerId: p.id, playerName: p.name, playerAvatar: p.avatar, clue: c, isValid });
             }
 
             room.game.validClues = validClues;
             room.game.playerClues = playerClues;
-
-            io.to(roomCode).emit('updateProgress', { hide: true });
             io.to(roomCode).emit('uniqueClue_startGuessing', { validClues, playerClues });
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.clues).length, total: room.players.length - 1, text: 'รอเพื่อนส่งคำใบ้...' });
         }
     });
 
@@ -762,92 +1297,48 @@ io.on('connection', (socket) => {
         if (socket.id !== room.game.guesserId) return;
 
         const isCorrect = guess.trim().toLowerCase() === room.game.word.toLowerCase();
-        
         if (isCorrect) {
-            const guesser = room.players.find(p => p.id === socket.id);
-            guesser.score += 2;
+            room.players.find(p => p.id === socket.id).score += 2;
             room.game.playerClues.forEach(pc => {
                 if (pc.isValid) {
-                    const p = room.players.find(player => player.id === pc.playerId);
+                    const p = room.players.find(pl => pl.id === pc.playerId);
                     if (p) p.score += 1;
                 }
             });
-            broadcastScores(roomCode);
         }
-
+        broadcastScores(roomCode);
         io.to(roomCode).emit('uniqueClue_showResult', { isCorrect, word: room.game.word, guess, playerClues: room.game.playerClues });
     });
 
     socket.on('uniqueClue_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startUniqueClueRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startUniqueClueRound(roomCode, room.currentPack);
     });
 
-
-    // ==========================================
-    // SECRET PAINTER LOGIC
-    // ==========================================
-    function startSecretPainterRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 3) {
-            io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-
-        const dataPack = getGameData(secretPainterData, pack);
-        const categoryObj = dataPack[Math.floor(Math.random() * dataPack.length)];
-        const word = categoryObj.words[Math.floor(Math.random() * categoryObj.words.length)];
-        
-        let turnOrder = room.players.map(p => p.id);
-        turnOrder.sort(() => Math.random() - 0.5);
-        
-        const secretPainterIndex = Math.floor(Math.random() * turnOrder.length);
-        const secretPainterId = turnOrder[secretPainterIndex];
-
-        const colors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3'];
-        colors.sort(() => Math.random() - 0.5);
-
-        const playerInfo = {};
-        turnOrder.forEach((id, index) => {
-            playerInfo[id] = { color: colors[index % colors.length], isSecretPainter: (id === secretPainterId) };
-        });
-
-        room.game = { category: categoryObj.name, word, turnOrder, secretPainterId, playerInfo, currentTurnIndex: 0, currentRound: 1, maxRounds: 2, linesDrawn: 0, votes: {} };
-
-        room.players.forEach(p => {
-            const info = playerInfo[p.id];
-            io.to(p.id).emit('secretPainter_newRound', {
-                category: categoryObj.name, word: info.isSecretPainter ? null : word,
-                isSecretPainter: info.isSecretPainter, myColor: info.color,
-                turnOrderNames: turnOrder.map(id => room.players.find(pl => pl.id === id).name),
-                currentTurnId: turnOrder[0], currentTurnName: room.players.find(pl => pl.id === turnOrder[0]).name,
-                currentTurnAvatar: room.players.find(pl => pl.id === turnOrder[0]).avatar
-            });
-        });
-    }
-
+    // --- Secret Painter Events ---
     socket.on('secretPainter_drawLine', (data) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.gameType === 'secret-painter' && room.game.turnOrder[room.game.currentTurnIndex] === socket.id) {
-            socket.to(roomCode).emit('secretPainter_onDraw', data);
-        }
+        if (!room || room.gameType !== 'secret-painter') return;
+        if (socket.id === room.game.turnOrder[room.game.currentTurnIndex]) socket.to(roomCode).emit('secretPainter_onDraw', data);
     });
 
     socket.on('secretPainter_endTurn', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (!room || room.gameType !== 'secret-painter' || room.game.turnOrder[room.game.currentTurnIndex] !== socket.id) return;
+        if (!room || room.gameType !== 'secret-painter') return;
+        if (socket.id !== room.game.turnOrder[room.game.currentTurnIndex]) return;
 
         room.game.currentTurnIndex++;
         if (room.game.currentTurnIndex >= room.game.turnOrder.length) {
-            room.game.currentTurnIndex = 0; room.game.currentRound++;
+            room.game.currentTurnIndex = 0;
+            room.game.currentRound++;
         }
 
         if (room.game.currentRound > room.game.maxRounds) {
-            io.to(roomCode).emit('secretPainter_startVoting', { players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, color: room.game.playerInfo[p.id].color })) });
+            io.to(roomCode).emit('secretPainter_startVoting', { players: room.players.map(p => ({id: p.id, name: p.name, avatar: p.avatar, color: room.game.playerInfo[p.id].color})) });
         } else {
-            const nextId = room.game.turnOrder[room.game.currentTurnIndex];
-            const nextP = room.players.find(p => p.id === nextId);
-            io.to(roomCode).emit('secretPainter_updateTurn', { currentTurnId: nextId, currentTurnName: nextP.name, currentTurnAvatar: nextP.avatar, round: room.game.currentRound });
+            const nextPlayerId = room.game.turnOrder[room.game.currentTurnIndex];
+            const nextPlayer = room.players.find(p => p.id === nextPlayerId);
+            io.to(roomCode).emit('secretPainter_updateTurn', { currentTurnId: nextPlayerId, currentTurnName: nextPlayer.name, currentTurnAvatar: nextPlayer.avatar, round: room.game.currentRound });
         }
     });
 
@@ -858,348 +1349,236 @@ io.on('connection', (socket) => {
         room.game.votes[socket.id] = votedId;
         if (Object.keys(room.game.votes).length === room.players.length) {
             const voteCounts = {};
-            Object.values(room.game.votes).forEach(id => { voteCounts[id] = (voteCounts[id] || 0) + 1; });
+            for (let v in room.game.votes) {
+                voteCounts[room.game.votes[v]] = (voteCounts[room.game.votes[v]] || 0) + 1;
+            }
             
-            let maxVotes = 0; let votedOutIds = [];
-            for (const [id, count] of Object.entries(voteCounts)) {
-                if (count > maxVotes) { maxVotes = count; votedOutIds = [id]; }
-                else if (count === maxVotes) { votedOutIds.push(id); }
+            let maxVotes = 0; let votedOutId = null; let isTie = false;
+            for (let id in voteCounts) {
+                if (voteCounts[id] > maxVotes) { maxVotes = voteCounts[id]; votedOutId = id; isTie = false; }
+                else if (voteCounts[id] === maxVotes) { isTie = true; }
             }
 
-            const isPainterCaught = votedOutIds.length === 1 && votedOutIds[0] === room.game.secretPainterId;
+            const isPainterCaught = !isTie && votedOutId === room.game.secretPainterId;
             const sp = room.players.find(p => p.id === room.game.secretPainterId);
 
-            const voteResultData = {};
-            for(const id in voteCounts) { voteResultData[room.players.find(p=>p.id===id).name] = voteCounts[id]; }
-
             io.to(roomCode).emit('secretPainter_reveal', {
-                votes: voteResultData, isPainterCaught,
+                votes: voteCounts, isPainterCaught,
                 secretPainterId: sp.id, secretPainterName: sp.name, secretPainterAvatar: sp.avatar
             });
 
-            if (!isPainterCaught) {
-                sp.score += 3; broadcastScores(roomCode);
-                setTimeout(() => secretPainter_checkGameOver(roomCode, false), 3000);
-            }
+            if (!isPainterCaught) secretPainter_checkGameOver(roomCode, true);
         }
     });
 
     socket.on('secretPainter_submitGuess', ({ guessWord }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'secret-painter' || socket.id !== room.game.secretPainterId) return;
-        
+
+        if (guessWord === "I_WON_ALREADY") return;
         const isCorrect = guessWord.trim().toLowerCase() === room.game.word.toLowerCase();
         secretPainter_checkGameOver(roomCode, isCorrect);
     });
 
-    function secretPainter_checkGameOver(roomCode, isPainterCorrect) {
-        const room = rooms[roomCode]; if (!room) return;
-        if (isPainterCorrect) {
-            const sp = room.players.find(p => p.id === room.game.secretPainterId);
-            if(sp) sp.score += 3;
-        } else {
-            room.players.forEach(p => { if (p.id !== room.game.secretPainterId) p.score += 1; });
-        }
-        broadcastScores(roomCode);
-        io.to(roomCode).emit('secretPainter_gameOver', { isCorrect: isPainterCorrect, actualWord: room.game.word });
-    }
-
     socket.on('secretPainter_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startSecretPainterRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startSecretPainterRound(roomCode, room.currentPack);
     });
 
-    // ==========================================
-    // MATCH THE BLANK LOGIC
-    // ==========================================
-    function startMatchTheBlankRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 2) {
-            io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-        
-        const dataPack = getGameData(matchTheBlankData, pack);
-        const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
-
-        room.game = { prompt: prompt, answers: {} };
-        io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
-        io.to(roomCode).emit('matchTheBlank_newRound', { prompt });
-    }
-
+    // --- Match The Blank Events ---
     socket.on('matchTheBlank_submitAnswer', ({ answer }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'match-the-blank') return;
 
         room.game.answers[socket.id] = answer.trim().toLowerCase();
-        const answeredCount = Object.keys(room.game.answers).length;
         
-        io.to(roomCode).emit('updateProgress', { current: answeredCount, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
-
-        if (answeredCount === room.players.length) {
-            const wordCounts = {};
-            for (const w of Object.values(room.game.answers)) { wordCounts[w] = (wordCounts[w] || 0) + 1; }
+        if (Object.keys(room.game.answers).length === room.players.length) {
+            const answerCounts = {};
+            for(let id in room.game.answers) {
+                let ans = room.game.answers[id];
+                answerCounts[ans] = (answerCounts[ans] || 0) + 1;
+            }
 
             const results = [];
-            for (const [pId, word] of Object.entries(room.game.answers)) {
-                const player = room.players.find(p => p.id === pId);
+            for (let id in room.game.answers) {
+                let ans = room.game.answers[id];
+                let count = answerCounts[ans];
                 let points = 0;
-                if (wordCounts[word] === 2) points = 3;
-                else if (wordCounts[word] > 2) points = 1;
-
-                player.score += points;
-                results.push({ id: pId, name: player.name, avatar: player.avatar, word, points });
+                if (count === 2) points = 3;
+                else if (count >= 3) points = 1;
+                
+                const p = room.players.find(pl => pl.id === id);
+                if(p) { p.score += points; results.push({ id: p.id, name: p.name, avatar: p.avatar, word: ans, points }); }
             }
-            
             broadcastScores(roomCode);
-            io.to(roomCode).emit('updateProgress', { hide: true });
             io.to(roomCode).emit('matchTheBlank_showResult', { results });
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.answers).length, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
         }
     });
 
     socket.on('matchTheBlank_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startMatchTheBlankRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startMatchTheBlankRound(roomCode, room.currentPack);
     });
 
-    // ==========================================
-    // FRIEND QUIZ LOGIC
-    // ==========================================
-    function startFriendQuizRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 2) {
-            io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-        
-        const dataPack = getGameData(friendQuizData, pack);
-        const question = dataPack[Math.floor(Math.random() * dataPack.length)];
-
-        room.game = { question, answers: {}, phase: 'answering', secretPlayerId: null, ranges: [], bets: {} };
-        io.to(roomCode).emit('updateProgress', { current: 0, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
-        io.to(roomCode).emit('friendQuiz_newRound', { question });
-    }
-
+    // --- Friend Quiz Events ---
     socket.on('friendQuiz_submitAnswer', ({ answer }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'friend-quiz' || room.game.phase !== 'answering') return;
 
         room.game.answers[socket.id] = answer;
-        const answeredCount = Object.keys(room.game.answers).length;
-        io.to(roomCode).emit('updateProgress', { current: answeredCount, total: room.players.length, text: 'รอเพื่อนส่งคำตอบ...' });
-
-        if (answeredCount === room.players.length) {
+        
+        if (Object.keys(room.game.answers).length === room.players.length) {
             room.game.phase = 'betting';
-            const pIds = Object.keys(room.game.answers);
-            room.game.secretPlayerId = pIds[Math.floor(Math.random() * pIds.length)];
-            const secretPlayer = room.players.find(p => p.id === room.game.secretPlayerId);
+            const playerIds = Object.keys(room.game.answers);
+            room.game.secretPlayerId = playerIds[Math.floor(Math.random() * playerIds.length)];
             
-            const revealedPlayers = room.players.filter(p => p.id !== room.game.secretPlayerId).map(p => ({ id: p.id, answer: room.game.answers[p.id] })).sort((a,b) => a.answer - b.answer);
-            
-            const ranges = [];
-            if (revealedPlayers.length > 0) {
-                ranges.push({ label: `< ${revealedPlayers[0].answer}`, min: -Infinity, max: revealedPlayers[0].answer - 1 });
-                for(let i=0; i<revealedPlayers.length - 1; i++) {
-                    const curr = revealedPlayers[i]; const next = revealedPlayers[i+1];
-                    if (curr.answer === next.answer) continue;
-                    ranges.push({ label: `${curr.answer} - ${next.answer - 1}`, min: curr.answer, max: next.answer - 1 });
-                }
-                ranges.push({ label: `≥ ${revealedPlayers[revealedPlayers.length - 1].answer}`, min: revealedPlayers[revealedPlayers.length - 1].answer, max: Infinity });
-            } else {
-                ranges.push({ label: `ทายยากเลยสิ! (มีแค่ 2 คน)`, min: -Infinity, max: Infinity });
-            }
+            const secretAns = room.game.answers[room.game.secretPlayerId];
+            let offset = Math.max(1, Math.floor(Math.abs(secretAns) * 0.2)); 
+            if (offset < 5) offset = 5;
 
-            const uniqueRanges = ranges.filter((r, i, s) => i === s.findIndex(t => t.label === r.label));
-            room.game.ranges = uniqueRanges;
-            
-            io.to(roomCode).emit('updateProgress', { hide: true });
-            io.to(roomCode).emit('friendQuiz_startBetting', { secretPlayer: { id: secretPlayer.id, name: secretPlayer.name, avatar: secretPlayer.avatar }, ranges: uniqueRanges });
+            const baseMid = secretAns;
+            room.game.ranges = [
+                { label: `น้อยกว่า ${baseMid - offset}`, min: -Infinity, max: baseMid - offset - 1 },
+                { label: `${baseMid - offset} ถึง ${baseMid + offset}`, min: baseMid - offset, max: baseMid + offset },
+                { label: `มากกว่า ${baseMid + offset}`, min: baseMid + offset + 1, max: Infinity }
+            ];
+
+            const sp = room.players.find(p => p.id === room.game.secretPlayerId);
+            io.to(roomCode).emit('friendQuiz_startBetting', { secretPlayer: sp, ranges: room.game.ranges });
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.answers).length, total: room.players.length, text: 'รอเพื่อนตอบคำถาม...' });
         }
     });
-
-    function findQuizCorrectRangeIndex(secretAnswer, ranges) {
-        return ranges.findIndex(r => secretAnswer >= r.min && secretAnswer <= r.max);
-    }
 
     socket.on('friendQuiz_placeBet', ({ betOnRangeIndex }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'friend-quiz' || room.game.phase !== 'betting') return;
-        if (socket.id === room.game.secretPlayerId) return;
 
+        if (socket.id === room.game.secretPlayerId) return; 
         room.game.bets[socket.id] = betOnRangeIndex;
-        const betsCount = Object.keys(room.game.bets).length;
-        io.to(roomCode).emit('updateProgress', { current: betsCount, total: room.players.length - 1, text: 'รอเพื่อนโหวต...' });
 
-        if (betsCount === room.players.length - 1) {
-            const secretAnswer = room.game.answers[room.game.secretPlayerId];
-            const correctIndex = findQuizCorrectRangeIndex(secretAnswer, room.game.ranges);
+        if (Object.keys(room.game.bets).length === room.players.length - 1) {
+            const secretAns = room.game.answers[room.game.secretPlayerId];
+            const correctRangeIdx = findQuizCorrectRangeIndex(secretAns, room.game.ranges);
             
             const winners = [];
-            for (const [pId, betIdx] of Object.entries(room.game.bets)) {
-                if (betIdx === correctIndex) { winners.push(pId); const p = room.players.find(x=>x.id===pId); if(p) p.score += 2; }
+            for (let id in room.game.bets) {
+                if (room.game.bets[id] === correctRangeIdx) {
+                    winners.push(id);
+                    const p = room.players.find(pl => pl.id === id);
+                    if(p) p.score += 2;
+                }
             }
+            
+            const sp = room.players.find(p => p.id === room.game.secretPlayerId);
+            if (winners.length === 0 && sp) sp.score += 2; 
 
             const allPlayersData = room.players.map(p => ({
-                id: p.id, name: p.name, avatar: p.avatar, answer: room.game.answers[p.id], isSecret: p.id === room.game.secretPlayerId
+                id: p.id, name: p.name, avatar: p.avatar, answer: room.game.answers[p.id], isSecret: (p.id === room.game.secretPlayerId)
             }));
 
             broadcastScores(roomCode);
-            io.to(roomCode).emit('updateProgress', { hide: true });
-            io.to(roomCode).emit('friendQuiz_showResult', { allPlayers: allPlayersData, correctRangeIndex: correctIndex, winners });
+            io.to(roomCode).emit('friendQuiz_showResult', { allPlayers: allPlayersData, correctRangeIndex: correctRangeIdx, winners });
+        } else {
+            io.to(roomCode).emit('updateProgress', { current: Object.keys(room.game.bets).length, total: room.players.length - 1, text: 'รอเพื่อนทายช่วงคะแนน...' });
         }
     });
 
     socket.on('friendQuiz_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startFriendQuizRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startFriendQuizRound(roomCode, room.currentPack);
     });
 
-    // ==========================================
-    // NUMBER SORT LOGIC
-    // ==========================================
-    function startNumberSortRound(roomCode, pack) {
-        const room = rooms[roomCode];
-        if (!room || room.players.length < 2) {
-            io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
-            room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
-        }
-
-        const dataPack = getGameData(numberSortData, pack);
-        const theme = dataPack[Math.floor(Math.random() * dataPack.length)];
-        
-        room.game = { theme, playerNumbers: {} };
-        const pList = room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar }));
-
-        room.players.forEach(p => {
-            const num = Math.floor(Math.random() * 100) + 1;
-            room.game.playerNumbers[p.id] = num;
-            io.to(p.id).emit('numberSort_newRound', { theme, number: num, players: pList });
-        });
-    }
-
+    // --- Number Sort Events ---
     socket.on('numberSort_submitOrder', ({ orderedPlayerIds }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (!room || room.gameType !== 'number-sort' || room.players[0].id !== socket.id) return;
+        if (!room || room.gameType !== 'number-sort') return;
 
-        let success = true;
-        let lastNum = -1;
-        orderedPlayerIds.forEach(id => {
-            const num = room.game.playerNumbers[id];
-            if (num < lastNum) success = false;
-            lastNum = num;
-        });
-
-        if (success) { room.players.forEach(p => p.score += 2); broadcastScores(roomCode); }
+        let isCorrect = true;
+        let prevNum = -1;
+        for (let i = 0; i < orderedPlayerIds.length; i++) {
+            const num = room.game.playerNumbers[orderedPlayerIds[i]];
+            if (num < prevNum) { isCorrect = false; break; }
+            prevNum = num;
+        }
 
         const results = orderedPlayerIds.map(id => {
-            const p = room.players.find(x=>x.id===id);
+            const p = room.players.find(pl => pl.id === id);
             return { id, name: p.name, avatar: p.avatar, number: room.game.playerNumbers[id] };
         });
 
-        io.to(roomCode).emit('numberSort_showResults', { results, success });
+        if (isCorrect) {
+            room.players.forEach(p => p.score += 2);
+            broadcastScores(roomCode);
+        }
+        
+        io.to(roomCode).emit('numberSort_showResults', { results, success: isCorrect });
     });
 
     socket.on('numberSort_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startNumberSortRound(roomCode, 'mixed');
+        if (room && room.players[0].id === socket.id) startNumberSortRound(roomCode, room.currentPack);
     });
 
-    // ==========================================
-    // WORD GUESS LOGIC
-    // ==========================================
-    function generateWordGuessBoard(pack) {
-        const dataPack = getGameData(wordGuessData, pack);
-        const shuffledWords = [...dataPack].sort(() => 0.5 - Math.random()).slice(0, 25);
-        return shuffledWords.map(word => ({ word, type: 'neutral', revealed: false }));
-    }
-
-    function startWordGuessTeamGame(roomCode, pack) {
-        const room = rooms[roomCode];
-        const board = generateWordGuessBoard(pack);
-        let types = Array(9).fill('red').concat(Array(8).fill('blue')).concat(Array(7).fill('neutral')).concat(['assassin']);
-        types.sort(() => 0.5 - Math.random());
-        board.forEach((card, i) => card.type = types[i]);
-
-        room.game = {
-            isCoop: false, board, turn: 'red', clue: null, guessesLeft: 0,
-            teams: { red: { players: [], spymaster: null, score: 9 }, blue: { players: [], spymaster: null, score: 8 } },
-            players: room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, team: null, isSpymaster: false }))
-        };
-        syncGameStateToPlayer(null, room);
-        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
-    }
-
-    function startWordGuessCoopGame(roomCode, pack) {
-        const room = rooms[roomCode];
-        const board = generateWordGuessBoard(pack);
-        let types = Array(15).fill('green').concat(Array(9).fill('neutral')).concat(['assassin']);
-        types.sort(() => 0.5 - Math.random());
-        board.forEach((card, i) => card.type = types[i]);
-
-        room.game = {
-            isCoop: true, board, turnsLeft: 9, wordsFound: 0, wordsToFind: 15, clue: null, guessesLeft: 0,
-            players: room.players.map((p, i) => ({ id: p.id, name: p.name, avatar: p.avatar, team: 'coop', isSpymaster: i === 0 }))
-        };
-        syncGameStateToPlayer(null, room);
-        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
-    }
-
-    function checkWordGuessWinCondition(roomCode) {
-        const room = rooms[roomCode]; const g = room.game;
-        if (g.isCoop) {
-            if (g.wordsFound === g.wordsToFind) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'players', reason: 'หาเจอครบแล้ว!', isCoop: true }); return true; }
-            if (g.turnsLeft <= 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'none', reason: 'หมดเทิร์นแล้ว!', isCoop: true }); return true; }
-        } else {
-            if (g.teams.red.score === 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'red', reason: 'หาการ์ดเจอครบ', isCoop: false }); return true; }
-            if (g.teams.blue.score === 0) { io.to(roomCode).emit('wordGuess_gameOver', { winner: 'blue', reason: 'หาการ์ดเจอครบ', isCoop: false }); return true; }
-        }
-        return false;
-    }
-
+    // --- Word Guess Events ---
     socket.on('wordGuess_joinTeam', ({ team }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'word-guess' || room.game.isCoop) return;
-        
-        const player = room.game.players.find(p => p.id === socket.id);
-        if (player.team) room.game.teams[player.team].players = room.game.teams[player.team].players.filter(id => id !== socket.id);
-        player.team = team; player.isSpymaster = false;
-        room.game.teams[team].players.push(socket.id);
-        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
+
+        const g = room.game;
+        const player = g.players.find(p => p.id === socket.id);
+        if (player.team === team) return;
+
+        if (player.team) {
+            g.teams[player.team].players = g.teams[player.team].players.filter(id => id !== socket.id);
+            if (g.teams[player.team].spymaster === socket.id) {
+                g.teams[player.team].spymaster = null; player.isSpymaster = false;
+            }
+        }
+        player.team = team;
+        g.teams[team].players.push(socket.id);
+        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
     });
 
     socket.on('wordGuess_becomeSpymaster', ({ team }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'word-guess' || room.game.isCoop) return;
-        
-        const player = room.game.players.find(p => p.id === socket.id);
-        if (player.team === team) {
-            room.game.teams[team].spymaster = socket.id;
-            room.game.players.forEach(p => { if (p.team === team) p.isSpymaster = (p.id === socket.id); });
-            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
-        }
+
+        const g = room.game;
+        const player = g.players.find(p => p.id === socket.id);
+        if (player.team !== team || g.teams[team].spymaster) return;
+
+        g.teams[team].spymaster = socket.id;
+        player.isSpymaster = true;
+        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
     });
 
     socket.on('wordGuess_giveClue', ({ word, number }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'word-guess') return;
+
+        const g = room.game;
+        const player = g.players.find(p => p.id === socket.id);
         
-        const player = room.game.players.find(p => p.id === socket.id);
-        if (player.isSpymaster) {
-            room.game.clue = { word, number };
-            room.game.guessesLeft = number + 1;
-            systemChat(roomCode, `📢 Spymaster ให้คำใบ้: "${word}" จำนวน ${number} คำ`);
-            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
-        }
+        if (!player.isSpymaster) return;
+        if (!g.isCoop && g.turn !== player.team) return;
+
+        g.clue = { word, number };
+        g.guessesLeft = number + 1;
+        room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
     });
 
     socket.on('wordGuess_makeGuess', ({ cardIndex }) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (!room || room.gameType !== 'word-guess') return;
-        
+
         const g = room.game;
         const player = g.players.find(p => p.id === socket.id);
+        
         if (player.isSpymaster || !g.clue || g.guessesLeft <= 0) return;
-        if (!g.isCoop && player.team !== g.turn) return;
+        if (!g.isCoop && g.turn !== player.team) return;
 
         const card = g.board[cardIndex];
         if (card.revealed) return;
@@ -1207,31 +1586,40 @@ io.on('connection', (socket) => {
         card.revealed = true;
         g.guessesLeft--;
 
-        systemChat(roomCode, `👆 ${player.name} เปิดไพ่: "${card.word}"`);
-
-        if (card.type === 'assassin') {
-            const winner = g.isCoop ? 'none' : (g.turn === 'red' ? 'blue' : 'red');
-            io.to(roomCode).emit('wordGuess_gameOver', { winner, reason: 'เปิดเจอไพ่มือสังหาร! 💀', isCoop: g.isCoop });
-            return;
-        }
-
         if (g.isCoop) {
-            if (card.type === 'green') g.wordsFound++;
-            else { g.turnsLeft--; g.guessesLeft = 0; g.clue = null; }
+            if (card.type === 'green') {
+                g.wordsFound++;
+            } else if (card.type === 'assassin') {
+                io.to(roomCode).emit('wordGuess_gameOver', { winner: 'none', reason: 'เจอสายลับ 2 หน้า!', isCoop: true });
+                return;
+            } else {
+                g.guessesLeft = 0; 
+            }
         } else {
-            if (card.type === g.turn) { g.teams[g.turn].score--; }
-            else {
-                if (card.type === 'red' || card.type === 'blue') g.teams[card.type].score--;
-                g.guessesLeft = 0; g.clue = null; g.turn = g.turn === 'red' ? 'blue' : 'red';
+            if (card.type === g.turn) {
+                g.teams[g.turn].score--;
+            } else if (card.type === 'assassin') {
+                const winner = g.turn === 'red' ? 'blue' : 'red';
+                io.to(roomCode).emit('wordGuess_gameOver', { winner, reason: 'เจอการ์ดมือสังหาร!', isCoop: false });
+                return;
+            } else {
+                if (card.type !== 'neutral') g.teams[card.type].score--;
+                g.guessesLeft = 0;
             }
         }
 
         if (!checkWordGuessWinCondition(roomCode)) {
-            if (g.guessesLeft === 0 && g.isCoop) {
-                const spymaster = g.players.find(p=>p.isSpymaster); const guesser = g.players.find(p=>!p.isSpymaster);
-                spymaster.isSpymaster = false; guesser.isSpymaster = true;
+            if (g.guessesLeft === 0) {
+                if (g.isCoop) {
+                    g.turnsLeft--; g.clue = null;
+                    const spymaster = g.players.find(p=>p.isSpymaster); const guesser = g.players.find(p=>!p.isSpymaster);
+                    if(spymaster && guesser) { spymaster.isSpymaster = false; guesser.isSpymaster = true; }
+                    if (g.turnsLeft <= 0) io.to(roomCode).emit('wordGuess_gameOver', { winner: 'none', reason: 'หมดเทิร์นแล้ว!', isCoop: true });
+                } else {
+                    g.turn = g.turn === 'red' ? 'blue' : 'red'; g.clue = null; g.guessesLeft = 0;
+                }
             }
-            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
+            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
         }
     });
 
@@ -1244,12 +1632,12 @@ io.on('connection', (socket) => {
             g.turnsLeft--; g.guessesLeft = 0; g.clue = null;
             if (!checkWordGuessWinCondition(roomCode)) {
                 const spymaster = g.players.find(p=>p.isSpymaster); const guesser = g.players.find(p=>!p.isSpymaster);
-                spymaster.isSpymaster = false; guesser.isSpymaster = true;
-                room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
+                if(spymaster && guesser) { spymaster.isSpymaster = false; guesser.isSpymaster = true; }
+                room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
             }
         } else {
-            g.guessesLeft = 0; g.clue = null; g.turn = g.turn === 'red' ? 'blue' : 'red';
-            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room));
+            g.guessesLeft = 0; g.turn = g.turn === 'red' ? 'blue' : 'red'; g.clue = null;
+            room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
         }
     });
 
@@ -1257,5 +1645,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server listening on port ${PORT}`);
 });
