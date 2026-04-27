@@ -121,7 +121,13 @@ function systemChat(roomCode, msg) {
     io.to(roomCode).emit('receiveChat', { sender: 'ระบบเกม', avatar: '🤖', message: msg, senderId: 'system' });
 }
 
-function getGameData(dataset, packType) {
+function getGameData(dataset, packType, customWords = null) {
+    if (packType === 'custom' && customWords && customWords.length > 0) {
+        if (dataset === secretPainterData) return [{ name: "คำศัพท์กำหนดเอง", words: customWords }];
+        if (dataset === spyfallData) return customWords.map(w => ({ name: w, roles: ["คนในพื้นที่", "นักท่องเที่ยว", "คนเดินผ่านไปมา", "พนักงาน", "ลูกค้าทั่วไป", "ยาม", "ผู้จัดการ", "เด็กหลงทาง"] }));
+        return customWords;
+    }
+    
     if (packType === 'general') return [...dataset.general];
     if (packType === 'valo') return [...dataset.valo];
     return [...dataset.general, ...(dataset.valo || [])]; 
@@ -196,7 +202,7 @@ function syncGameStateToPlayer(socket, room, roomCode) {
 // SECRET AGENT (SPYFALL) LOGIC
 // ==========================================
 
-function startSpyfallRound(roomCode, pack, timerMin) {
+function startSpyfallRound(roomCode, pack, timerMin, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
         io.to(roomCode).emit('error', 'เกมสายลับแฝงตัว ต้องมีผู้เล่นอย่างน้อย 3 คน');
@@ -205,8 +211,8 @@ function startSpyfallRound(roomCode, pack, timerMin) {
 
     if (!room.playedSpyfallLocs) room.playedSpyfallLocs = [];
 
-    const allData = getGameData(spyfallData, pack);
-    if (allData.length === 0) return;
+    const allData = getGameData(spyfallData, pack, customWords);
+    if (!allData || allData.length === 0) return;
 
     let availableLocs = allData.filter(loc => !room.playedSpyfallLocs.includes(loc.name));
     
@@ -261,7 +267,7 @@ function startSpyfallRound(roomCode, pack, timerMin) {
     });
 }
 
-function finishSpyfallGame(roomCode, spyWon, titleMsg = "") {
+function finishSpyfallGame(roomCode, spyWon, spyBonusWon = false, titleMsg = "") {
     const room = rooms[roomCode]; if (!room || !room.game) return;
     const g = room.game;
     const spyPlayer = room.players.find(p => p.id === g.spyId);
@@ -269,7 +275,7 @@ function finishSpyfallGame(roomCode, spyWon, titleMsg = "") {
     if (!room.playedSpyfallLocs.includes(g.location)) {
         room.playedSpyfallLocs.push(g.location);
     }
-
+    
     broadcastScores(roomCode);
     
     const voteCounts = {};
@@ -512,14 +518,14 @@ function checkBluffGameOver(roomCode) {
 // OTHER GAMES LOGIC (Global Scope)
 // ==========================================
 
-function startTruthOrLieRound(roomCode, pack) {
+function startTruthOrLieRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
         io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
 
-    const dataPack = getGameData(truthOrLieData, pack);
+    const dataPack = getGameData(truthOrLieData, pack, customWords);
     const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
     
     let turnOrder = room.players.map(p => p.id);
@@ -530,14 +536,14 @@ function startTruthOrLieRound(roomCode, pack) {
     io.to(roomCode).emit('truthOrLie_newRound', { prompt });
 }
 
-function startUniqueClueRound(roomCode, pack) {
+function startUniqueClueRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
         io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
-    const dataPack = getGameData(uniqueClueData, pack);
+    const dataPack = getGameData(uniqueClueData, pack, customWords);
     const word = dataPack[Math.floor(Math.random() * dataPack.length)];
     const guesserIndex = Math.floor(Math.random() * room.players.length);
     const guesserId = room.players[guesserIndex].id;
@@ -549,14 +555,14 @@ function startUniqueClueRound(roomCode, pack) {
     io.to(roomCode).emit('uniqueClue_newRound', { guesser, word });
 }
 
-function startSecretPainterRound(roomCode, pack) {
+function startSecretPainterRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 3) {
         io.to(roomCode).emit('error', 'ต้องมีผู้เล่นอย่างน้อย 3 คน');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
 
-    const dataPack = getGameData(secretPainterData, pack);
+    const dataPack = getGameData(secretPainterData, pack, customWords);
     const categoryObj = dataPack[Math.floor(Math.random() * dataPack.length)];
     const word = categoryObj.words[Math.floor(Math.random() * categoryObj.words.length)];
     
@@ -600,14 +606,14 @@ function secretPainter_checkGameOver(roomCode, isPainterCorrect) {
     io.to(roomCode).emit('secretPainter_gameOver', { isCorrect: isPainterCorrect, actualWord: room.game.word });
 }
 
-function startMatchTheBlankRound(roomCode, pack) {
+function startMatchTheBlankRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
         io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
-    const dataPack = getGameData(matchTheBlankData, pack);
+    const dataPack = getGameData(matchTheBlankData, pack, customWords);
     const prompt = dataPack[Math.floor(Math.random() * dataPack.length)];
 
     room.game = { prompt: prompt, answers: {} };
@@ -615,14 +621,14 @@ function startMatchTheBlankRound(roomCode, pack) {
     io.to(roomCode).emit('matchTheBlank_newRound', { prompt });
 }
 
-function startFriendQuizRound(roomCode, pack) {
+function startFriendQuizRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
         io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
     
-    const dataPack = getGameData(friendQuizData, pack);
+    const dataPack = getGameData(friendQuizData, pack, customWords);
     const question = dataPack[Math.floor(Math.random() * dataPack.length)];
 
     room.game = { question, answers: {}, phase: 'answering', secretPlayerId: null, ranges: [], bets: {} };
@@ -634,14 +640,14 @@ function findQuizCorrectRangeIndex(secretAnswer, ranges) {
     return ranges.findIndex(r => secretAnswer >= r.min && secretAnswer <= r.max);
 }
 
-function startNumberSortRound(roomCode, pack) {
+function startNumberSortRound(roomCode, pack, customWords) {
     const room = rooms[roomCode];
     if (!room || room.players.length < 2) {
         io.to(roomCode).emit('error', 'ผู้เล่นไม่พอสำหรับเกมนี้');
         room.gameState = 'waiting'; io.to(roomCode).emit('updateLobby', room.players); return;
     }
 
-    const dataPack = getGameData(numberSortData, pack);
+    const dataPack = getGameData(numberSortData, pack, customWords);
     const theme = dataPack[Math.floor(Math.random() * dataPack.length)];
     
     room.game = { theme, playerNumbers: {} };
@@ -654,15 +660,17 @@ function startNumberSortRound(roomCode, pack) {
     });
 }
 
-function generateWordGuessBoard(pack) {
-    const dataPack = getGameData(wordGuessData, pack);
+function generateWordGuessBoard(pack, customWords) {
+    const dataPack = getGameData(wordGuessData, pack, customWords);
     const shuffledWords = [...dataPack].sort(() => 0.5 - Math.random()).slice(0, 25);
     return shuffledWords.map(word => ({ word, type: 'neutral', revealed: false }));
 }
 
-function startWordGuessTeamGame(roomCode, pack) {
+function startWordGuessTeamGame(roomCode, pack, customWords) {
     const room = rooms[roomCode];
-    const board = generateWordGuessBoard(pack);
+    const board = generateWordGuessBoard(pack, customWords);
+    if(board.length < 25) { io.to(roomCode).emit('error', 'คำศัพท์ไม่พอ 25 คำสำหรับเล่นรหัสคำทาย'); return; }
+    
     let types = Array(9).fill('red').concat(Array(8).fill('blue')).concat(Array(7).fill('neutral')).concat(['assassin']);
     types.sort(() => 0.5 - Math.random());
     board.forEach((card, i) => card.type = types[i]);
@@ -676,9 +684,11 @@ function startWordGuessTeamGame(roomCode, pack) {
     room.players.forEach(p => syncGameStateToPlayer(io.sockets.sockets.get(p.id), room, roomCode));
 }
 
-function startWordGuessCoopGame(roomCode, pack) {
+function startWordGuessCoopGame(roomCode, pack, customWords) {
     const room = rooms[roomCode];
-    const board = generateWordGuessBoard(pack);
+    const board = generateWordGuessBoard(pack, customWords);
+    if(board.length < 25) { io.to(roomCode).emit('error', 'คำศัพท์ไม่พอ 25 คำสำหรับเล่นรหัสคำทาย'); return; }
+    
     let types = Array(15).fill('green').concat(Array(9).fill('neutral')).concat(['assassin']);
     types.sort(() => 0.5 - Math.random());
     board.forEach((card, i) => card.type = types[i]);
@@ -738,9 +748,7 @@ io.on('connection', (socket) => {
                     if (room.game.pendingAction.source === oldId) room.game.pendingAction.source = socket.id;
                     if (room.game.pendingAction.target === oldId) room.game.pendingAction.target = socket.id;
                 }
-                if (room.game.pendingBlock && room.game.pendingBlock.source === oldId) {
-                    room.game.pendingBlock.source = socket.id;
-                }
+                if (room.game.pendingBlock && room.game.pendingBlock.source === oldId) room.game.pendingBlock.source = socket.id;
                 if (room.game.playerLosingCard === oldId) room.game.playerLosingCard = socket.id;
 
                 if (room.game.responses && room.game.responses[oldId]) {
@@ -853,6 +861,31 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('host_kickPlayer', (targetId) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id && targetId !== socket.id) {
+            const targetSocket = io.sockets.sockets.get(targetId);
+            if (targetSocket) targetSocket.emit('kicked');
+            room.players = room.players.filter(p => p.id !== targetId);
+            
+            if (room.players.length === 0) {
+                delete rooms[roomCode];
+            } else {
+                io.to(roomCode).emit('updateLobby', room.players);
+                broadcastScores(roomCode);
+            }
+        }
+    });
+
+    socket.on('host_changeBGM', (trackUrl) => {
+        const roomCode = findRoomBySocketId(socket.id);
+        const room = rooms[roomCode];
+        if (room && room.players[0].id === socket.id) {
+            io.to(roomCode).emit('bgm_changed', trackUrl);
+        }
+    });
+
     socket.on('host_selectGame', (gameType) => {
         const roomCode = findRoomBySocketId(socket.id);
         if (rooms[roomCode] && rooms[roomCode].players[0].id === socket.id) {
@@ -877,11 +910,10 @@ io.on('connection', (socket) => {
             room.gameState = 'playing'; 
             room.currentPack = pack;
             
-            // ส่งข้อมูลกลับไปให้ไคลเอนต์ทั้งหมดรู้ว่าเริ่มเกมอะไร พร้อมแนบออพชันต่างๆ ด้วย
             let payload = { gameType: room.gameType, pack };
-            if (room.gameType === 'secret-agent' && data.timerMin) {
-                payload.timerMin = data.timerMin;
-            }
+            if (room.gameType === 'secret-agent' && data.timerMin) payload.timerMin = data.timerMin;
+            if (data.customWords) payload.customWords = data.customWords;
+            
             io.to(roomCode).emit('gameStarted', payload);
         }
     });
@@ -899,21 +931,22 @@ io.on('connection', (socket) => {
         const roomCode = typeof data === 'string' ? data : data.roomCode;
         const room = rooms[roomCode];
         const pack = data.pack || (room ? room.currentPack : 'mixed') || 'mixed';
-        
+        const customWords = data.customWords || null;
+
         if (room && room.players.length > 0 && room.players[0].id === socket.id) {
             room.currentPack = pack;
             try {
                 if (room.gameType === 'word-guess') {
-                    if (room.players.length >= 2 && room.players.length <= 2) startWordGuessCoopGame(roomCode, pack);
-                    else startWordGuessTeamGame(roomCode, pack);
-                } else if (room.gameType === 'number-sort') startNumberSortRound(roomCode, pack);
-                else if (room.gameType === 'friend-quiz') startFriendQuizRound(roomCode, pack);
-                else if (room.gameType === 'secret-painter') startSecretPainterRound(roomCode, pack);
-                else if (room.gameType === 'match-the-blank') startMatchTheBlankRound(roomCode, pack);
-                else if (room.gameType === 'unique-clue') startUniqueClueRound(roomCode, pack);
-                else if (room.gameType === 'truth-or-lie') startTruthOrLieRound(roomCode, pack);
+                    if (room.players.length >= 2 && room.players.length <= 2) startWordGuessCoopGame(roomCode, pack, customWords);
+                    else startWordGuessTeamGame(roomCode, pack, customWords);
+                } else if (room.gameType === 'number-sort') startNumberSortRound(roomCode, pack, customWords);
+                else if (room.gameType === 'friend-quiz') startFriendQuizRound(roomCode, pack, customWords);
+                else if (room.gameType === 'secret-painter') startSecretPainterRound(roomCode, pack, customWords);
+                else if (room.gameType === 'match-the-blank') startMatchTheBlankRound(roomCode, pack, customWords);
+                else if (room.gameType === 'unique-clue') startUniqueClueRound(roomCode, pack, customWords);
+                else if (room.gameType === 'truth-or-lie') startTruthOrLieRound(roomCode, pack, customWords);
                 else if (room.gameType === 'bluff-overthrow') startBluffRound(roomCode);
-                else if (room.gameType === 'secret-agent') startSpyfallRound(roomCode, pack, data.timerMin || 5);
+                else if (room.gameType === 'secret-agent') startSpyfallRound(roomCode, pack, data.timerMin || 5, customWords);
             } catch (e) {
                 console.error(`Error starting game logic in room ${roomCode}:`, e);
                 io.to(roomCode).emit('error', 'เกิดข้อผิดพลาดร้ายแรงขณะเริ่มเกม');
@@ -951,21 +984,19 @@ io.on('connection', (socket) => {
         const spyPlayer = room.players.find(p => p.id === room.game.spyId);
 
         if (isBonus) {
-            // โบนัสทายสถานที่ หลังจากสายลับรอดชีวิตจากการโหวต
             if (isCorrect) {
                 if (spyPlayer) spyPlayer.score += 2;
-                finishSpyfallGame(roomCode, true, `สายลับรอดตัว แถมได้โบนัสทายสถานที่ถูกเป๊ะ! (+5 แต้ม)`);
+                finishSpyfallGame(roomCode, true, true, `สายลับรอดตัว แถมได้โบนัสทายสถานที่ถูกเป๊ะ! (+5 แต้ม)`);
             } else {
-                finishSpyfallGame(roomCode, true, `สายลับรอดตัว แต่ทายสถานที่ผิด! (ได้แค่ +3 แต้ม)`);
+                finishSpyfallGame(roomCode, true, false, `สายลับรอดตัว แต่ทายสถานที่ผิด! (ได้แค่ +3 แต้ม)`);
             }
         } else {
-            // ชิงทายก่อนหมดเวลา
             if (isCorrect) {
                 if (spyPlayer) spyPlayer.score += 5;
-                finishSpyfallGame(roomCode, true, `โคตรตึง! สายลับทายถูกก่อนหมดเวลา! (+5 แต้ม)`);
+                finishSpyfallGame(roomCode, true, true, `โคตรตึง! สายลับทายถูกก่อนหมดเวลา! (+5 แต้ม)`);
             } else {
                 room.players.forEach(p => { if (p.id !== room.game.spyId) p.score += 2; });
-                finishSpyfallGame(roomCode, false, `โป๊ะแตก! สายลับชิงตอบแต่ทายผิด! (คนอื่น +2 แต้ม)`);
+                finishSpyfallGame(roomCode, false, false, `โป๊ะแตก! สายลับชิงตอบแต่ทายผิด! (คนอื่น +2 แต้ม)`);
             }
         }
     });
@@ -977,7 +1008,6 @@ io.on('connection', (socket) => {
         room.game.votes[socket.id] = votedId;
         
         if (Object.keys(room.game.votes).length === room.players.length) {
-            // นับคะแนนโหวตทั้งหมด
             const voteCounts = {};
             for (let v in room.game.votes) {
                 voteCounts[room.game.votes[v]] = (voteCounts[room.game.votes[v]] || 0) + 1;
@@ -993,16 +1023,14 @@ io.on('connection', (socket) => {
             const spyPlayer = room.players.find(p => p.id === room.game.spyId);
 
             if (spyCaught) {
-                // จับสายลับได้ คนโหวตถูกได้ +2
                 for (let voterId in room.game.votes) {
                     if (room.game.votes[voterId] === room.game.spyId) {
                         const p = room.players.find(pl => pl.id === voterId);
                         if(p) p.score += 2;
                     }
                 }
-                finishSpyfallGame(roomCode, false, `จับสายลับได้แล้ว! (คนที่โหวตถูก +2 แต้ม)`);
+                finishSpyfallGame(roomCode, false, false, `จับสายลับได้แล้ว! (คนที่โหวตถูก +2 แต้ม)`);
             } else {
-                // สายลับรอด! รับไปก่อน +3 แต้ม และให้โอกาสทายสถานที่โบนัส
                 if (spyPlayer) spyPlayer.score += 3;
                 room.game.phase = 'bonus_phase';
                 
@@ -1039,11 +1067,12 @@ io.on('connection', (socket) => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
         if (room && room.players[0].id === socket.id) {
             const timerMin = room.game.timerMin || 5; 
-            startSpyfallRound(roomCode, room.currentPack, timerMin);
+            const customWords = room.currentPack === 'custom' && room.game.allLocations ? room.game.allLocations : null;
+            startSpyfallRound(roomCode, room.currentPack, timerMin, customWords);
         }
     });
 
-    // --- Bluff Overthrow (Power Struggle) Events ---
+    // --- Bluff Overthrow Events ---
     socket.on('bluff_action', ({ type, targetId }) => {
         try {
             const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
@@ -1094,9 +1123,7 @@ io.on('connection', (socket) => {
 
             if (g.phase === 'reaction') {
                 if (response === 'challenge') {
-                    handleChallenge(roomCode, socket.id, g.pendingAction.source, g.pendingAction.claim, 
-                        'advanceTurn', 'resolveAction' 
-                    );
+                    handleChallenge(roomCode, socket.id, g.pendingAction.source, g.pendingAction.claim, 'advanceTurn', 'resolveAction');
                 } else if (response === 'block') {
                     g.pendingBlock = { source: socket.id, claim: claimRole };
                     g.phase = 'block_challenge_reaction'; g.responses = {};
@@ -1109,9 +1136,7 @@ io.on('connection', (socket) => {
                 }
             } else if (g.phase === 'block_reaction' || g.phase === 'block_challenge_reaction') {
                 if (response === 'challenge') {
-                    handleChallenge(roomCode, socket.id, g.pendingBlock.source, g.pendingBlock.claim,
-                        'resolveAction', 'advanceTurn'   
-                    );
+                    handleChallenge(roomCode, socket.id, g.pendingBlock.source, g.pendingBlock.claim, 'resolveAction', 'advanceTurn');
                 } else {
                     g.responses[socket.id] = 'pass';
                     checkReactionsComplete(roomCode);
@@ -1255,7 +1280,11 @@ io.on('connection', (socket) => {
 
     socket.on('truthOrLie_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startTruthOrLieRound(roomCode, room.currentPack);
+        if (room && room.players[0].id === socket.id) {
+            const customWords = room.currentPack === 'custom' ? room.game.prompt : null; 
+            // truthOrLie อาจจะไม่เหมาะกับ customWords แบบ list เท่าไหร่ ให้ใช้ pack เดิม
+            startTruthOrLieRound(roomCode, room.currentPack, customWords);
+        }
     });
 
     // --- Unique Clue Events ---
@@ -1312,7 +1341,9 @@ io.on('connection', (socket) => {
 
     socket.on('uniqueClue_nextRound', () => {
         const roomCode = findRoomBySocketId(socket.id); const room = rooms[roomCode];
-        if (room && room.players[0].id === socket.id) startUniqueClueRound(roomCode, room.currentPack);
+        if (room && room.players[0].id === socket.id) {
+            startUniqueClueRound(roomCode, room.currentPack);
+        }
     });
 
     // --- Secret Painter Events ---
