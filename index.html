@@ -982,17 +982,32 @@
         function updateLeaderboardUI(players) {
             leaderboardList.innerHTML = '';
             const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            
+            function getValorantRank(index, total, score) {
+                if (score === 0) return '💩 Iron';
+                if (index === 0) return '✨ Radiant';
+                if (index === 1) return '🔴 Immortal';
+                if (index === 2) return '🌺 Ascendant';
+                if (index / total <= 0.4) return '💎 Diamond';
+                if (index / total <= 0.6) return '💠 Platinum';
+                if (index / total <= 0.8) return '🏆 Gold';
+                return '🥈 Silver';
+            }
+
             sortedPlayers.forEach((p, index) => {
                 const item = document.createElement('div');
                 item.className = 'flex justify-between items-center p-2 bg-stone-100 dark:bg-stone-700 rounded-md';
-                let rankMedal = `${index + 1}.`;
-                if (index === 0) rankMedal = '🥇';
-                else if (index === 1) rankMedal = '🥈';
-                else if (index === 2) rankMedal = '🥉';
                 
+                let rankMedal = getValorantRank(index, sortedPlayers.length, p.score);
                 const offlineStatus = (p.isOnline === false) ? '<span class="text-xs text-red-500">(หลุด)</span>' : '';
                 
-                item.innerHTML = `<span class="font-bold truncate max-w-[140px] ${p.isOnline === false ? 'opacity-50' : ''}">${rankMedal} ${p.avatar} ${p.name} ${offlineStatus}</span><span class="bg-[var(--accent-color)] text-[var(--accent-text-color)] px-2 py-1 rounded-full text-xs font-bold">${p.score}</span>`;
+                item.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">${rankMedal}</span>
+                        <span class="font-bold truncate max-w-[130px] ${p.isOnline === false ? 'opacity-50' : ''}">${p.avatar} ${p.name} ${offlineStatus}</span>
+                    </div>
+                    <span class="bg-[var(--accent-color)] text-[var(--accent-text-color)] px-3 py-1 rounded-full text-xs font-bold">${p.score}</span>
+                `;
                 leaderboardList.appendChild(item);
             });
         }
@@ -2382,6 +2397,12 @@
             resetBtn.addEventListener('click', reset); finishRoundBtn.addEventListener('click', finishRound);
             reset();
         })();
+
+        // --- Render Keep-Alive ---
+        // ป้องกัน Render Free Tier แอบหลับเมื่อไม่มี HTTP Request (Socket ไม่นับ)
+        setInterval(() => {
+            fetch('/ping').catch(err => console.log('Ping failed', err));
+        }, 5 * 60 * 1000); // ส่งรีเควสไปกวนทุกๆ 5 นาที
 
     </script>
 </body>
