@@ -109,7 +109,7 @@
         #rules-title, .rule-header { color: var(--primary-text-color); }
         
         /* Game Styles */
-        .wg-card { background-color: var(--card-bg-color); color: var(--text-color); border: 2px solid var(--border-color); font-weight: 600; cursor: pointer; }
+        .wg-card { background-color: var(--card-bg-color); color: var(--text-color); border: 2px solid var(--border-color); font-weight: 600; cursor: pointer; position: relative; overflow: hidden; }
         .wg-card.revealed.red { background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color); }
         .wg-card.revealed.blue { background-color: #93c5fd; color: #1e40af; border-color: #3b82f6; }
         html.dark .wg-card.revealed.blue { background-color: #1e3a8a; color: #93c5fd; border-color: #60a5fa; }
@@ -134,9 +134,11 @@
         .ns-player-card.fail { background-color: var(--accent-color); border-color: var(--accent-text-color); color: var(--accent-text-color); }
         .fq-range-card.success, .fq-result-card.success { background-color: var(--primary-color); border-color: var(--primary-text-color); color: var(--primary-text-color); }
         .fq-range-card.fail, .fq-result-card.fail { background-color: var(--accent-color); border-color: var(--accent-text-color); color: var(--accent-text-color); }
-        .fq-range-card.selected, .sp-vote-btn.selected, .tol-vote-btn.selected, .sf-loc-btn.selected, .sf-vote-btn.selected { border-color: var(--primary-text-color); transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0, 0.15); }
+        .fq-range-card.selected, .sp-vote-btn.selected, .tol-vote-btn.selected, .sf-loc-btn.selected, .sf-vote-btn.selected, .mf-mode-btn.selected, .mf-coop-type-btn.selected { border-color: var(--primary-text-color); transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0, 0.15); }
         .sp-vote-btn.selected, .sf-vote-btn.selected { background-color: var(--accent-color); color: var(--accent-text-color); }
         .tol-vote-btn.selected, .sf-loc-btn.selected { background-color: var(--primary-color); color: var(--primary-text-color); }
+        .mf-mode-btn.selected { background-color: var(--primary-color); color: var(--primary-text-color); }
+        .mf-coop-type-btn.selected { background-color: var(--secondary-color); color: #fff; }
 
         #sp-drawing-canvas { background-color: #ffffff; cursor: crosshair; touch-action: none; }
 
@@ -153,6 +155,10 @@
         .sf-loc-card { transition: all 0.2s; border: 2px solid var(--border-color); background-color: var(--card-bg-color); }
         .sf-loc-card.played { opacity: 0.4; text-decoration: line-through; filter: grayscale(100%); pointer-events: none; }
         
+        /* Slider for Mind Frequency */
+        .mf-slider { -webkit-appearance: none; width: 100%; height: 20px; border-radius: 10px; background: linear-gradient(to right, #3b82f6, #f43f5e); outline: none; }
+        .mf-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid #1c1917; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+
         .spinner-container::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 2.5rem; color: var(--accent-color); }
         #stopwatch-time { font-family: 'monospace'; }
         #chat-messages::-webkit-scrollbar { width: 6px; }
@@ -302,7 +308,6 @@
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="👻">👻</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="💩">💩</button>
                         <button class="avatar-btn p-2 rounded-full border-2 border-transparent bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 transition" data-avatar="🤡">🤡</button>
-                        <!-- สัตว์น่ารักจะถูกโหลดผ่าน JavaScript ด้านล่าง -->
                     </div>
                 </div>
 
@@ -320,14 +325,19 @@
         
         <!-- Waiting Room (Lobby) Screen -->
         <div id="waiting-screen" class="hidden text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors w-full">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-stone-100 dark:bg-stone-800 p-4 rounded-xl border border-stone-200 dark:border-stone-700">
-                <div class="text-left mb-4 md:mb-0">
-                    <h2 class="text-2xl font-bold" style="color: var(--heading-color);">ห้องปาร์ตี้: <span id="roomCodeDisplay" class="text-3xl tracking-widest text-[var(--primary-text-color)] font-mono ml-2"></span></h2>
-                    <p class="text-stone-500 dark:text-stone-400 mt-1">ชวนเพื่อนเข้าห้องด้วยรหัสนี้ (รองรับสูงสุด 16 คน)</p>
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-stone-100 dark:bg-stone-800 p-4 rounded-xl border border-stone-200 dark:border-stone-700 relative">
+                <!-- ปุ่มออกห้อง -->
+                <button id="leave-room-btn" class="absolute top-2 right-2 md:top-4 md:right-4 text-red-500 hover:text-white hover:bg-red-500 bg-red-100 dark:bg-red-900/30 p-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1 z-10 border border-red-200 dark:border-red-800">
+                    🚪 ออกจากห้อง
+                </button>
+                
+                <div class="text-left mb-4 md:mb-0 w-full mt-8 md:mt-0">
+                    <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--heading-color);">ห้องปาร์ตี้: <span id="roomCodeDisplay" class="text-2xl sm:text-3xl tracking-widest text-[var(--primary-text-color)] font-mono ml-2"></span></h2>
+                    <p class="text-stone-500 dark:text-stone-400 mt-1 text-sm sm:text-base">ชวนเพื่อนเข้าห้องด้วยรหัสนี้ (รองรับสูงสุด 16 คน)</p>
                 </div>
-                <div class="text-right w-full md:w-auto">
+                <div class="text-center md:text-right w-full md:w-auto border-t md:border-none border-stone-200 dark:border-stone-700 pt-4 md:pt-0">
                     <h3 class="font-bold text-lg mb-2">สมาชิก (<span id="playerCount">1</span>/16)</h3>
-                    <div id="playerList" class="flex flex-wrap justify-center md:justify-end gap-2"></div>
+                    <div id="playerList" class="flex flex-wrap justify-center md:justify-end gap-3 md:gap-2"></div>
                 </div>
             </div>
 
@@ -356,6 +366,18 @@
                         <h3 class="text-lg font-bold text-red-600 dark:text-red-400">เหลี่ยมมาเฟีย 🕴️</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">อ้างบทบาท โกหก และกำจัดศัตรูให้หมด!</p>
                     </div>
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="word-guess">
+                        <h3 class="text-lg font-bold text-blue-500 dark:text-blue-400">รหัสคำทาย 🕵️‍♂️</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม หรือช่วยกันทายคำใบ้</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center border-pink-400" data-game="mind-frequency">
+                        <h3 class="text-lg font-bold text-pink-500 dark:text-pink-400">คลื่นความถี่ใจ 📻</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีมจูนใจ ทายใจเพื่อนให้ตรง! (อัปเดต)</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="same-flock">
+                        <h3 class="text-lg font-bold text-stone-700 dark:text-stone-300">แกะตามฝูง 🐑</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">ตอบให้เหมือนชาวบ้าน อย่าเป็นแกะดำ!</p>
+                    </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="truth-or-lie">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">ความจริง 1 โกหก 1 🎭</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แต่งเรื่องหลอกเพื่อนให้เนียนที่สุด!</p>
@@ -379,10 +401,6 @@
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="number-sort">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เรียงเลขวัดใจ 🔢</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">สื่อสารและเรียงลำดับตัวเลข</p>
-                    </div>
-                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="word-guess">
-                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">รหัสคำทาย 🕵️‍♂️</h3>
-                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม หรือช่วยกันทายคำใบ้</p>
                     </div>
                 </div>
 
@@ -446,6 +464,200 @@
                         <p class="text-sm text-stone-500 dark:text-stone-400">จับเวลาสำหรับการแข่งขัน</p>
                     </div>
                  </div>
+            </div>
+        </div>
+
+        <!-- Mind Frequency Game Screen -->
+        <div id="mind-frequency-screen" class="hidden w-full">
+            
+            <!-- Setup Phase (Host selects mode, Players join teams) -->
+            <div id="mf-setup-area" class="w-full max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold text-pink-500 mb-2">ตั้งค่าเกม: คลื่นความถี่ใจ 📻</h2>
+                <p class="text-stone-500 dark:text-stone-400 mb-6">เลือกโหมดการเล่นและจัดทีมก่อนเริ่มเกม</p>
+                
+                <div class="bg-white/50 dark:bg-[#3A322C]/50 p-6 rounded-xl shadow-md border border-stone-200 dark:border-stone-700 mb-6">
+                    <h3 class="text-xl font-bold mb-4">เลือกโหมดการเล่น (เฉพาะหัวหน้าห้อง)</h3>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-4">
+                        <button class="mf-mode-btn p-4 rounded-xl border-4 font-bold flex-1 text-lg selected" data-mode="versus">
+                            ⚔️ แบ่งทีมแข่งกัน (Versus)<br>
+                            <span class="text-sm font-normal">ทีมแดง ปะทะ ทีมน้ำเงิน</span>
+                        </button>
+                        <button class="mf-mode-btn p-4 rounded-xl border-4 font-bold flex-1 text-lg" data-mode="coop">
+                            🤝 เล่นด้วยกัน (Co-op)<br>
+                            <span class="text-sm font-normal">ทุกคนอยู่ทีมเดียวกัน ช่วยกันทำแต้ม</span>
+                        </button>
+                    </div>
+                    <!-- Option for Co-op type (Future logic, prepared UI) -->
+                    <div id="mf-coop-options" class="hidden mt-4 pt-4 border-t border-stone-300 dark:border-stone-600">
+                        <p class="font-bold mb-2 text-stone-600 dark:text-stone-300">รูปแบบการให้คะแนน (Co-op):</p>
+                        <div class="flex justify-center gap-2">
+                            <button class="mf-coop-type-btn px-4 py-2 rounded-lg border-2 text-sm font-bold selected" data-type="shared">🤝 หลอดเดียว ทายรวมกัน (แนะนำ)</button>
+                            <button class="mf-coop-type-btn px-4 py-2 rounded-lg border-2 text-sm font-bold" data-type="individual">🎯 แยกหลอด คะแนนใครคะแนนมัน</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Selection Area (Only visible in Versus mode) -->
+                <div id="mf-team-selection" class="flex flex-col sm:flex-row gap-6 mb-6">
+                    <div class="flex-1 p-4 bg-red-100 dark:bg-red-950/50 rounded-lg border-2 border-red-400 dark:border-red-900 transition-colors">
+                        <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-2">ทีมสีแดง</h3>
+                        <ul id="mf-red-players" class="space-y-1 text-red-800 dark:text-red-300 min-h-[50px]"></ul>
+                        <button id="mf-join-red-btn" class="w-full p-2 mt-4 text-sm btn-secondary bg-white dark:bg-stone-800 text-red-600 font-bold border-red-300 hover:bg-red-50">เข้าร่วมทีมแดง</button>
+                    </div>
+                    <div class="flex-1 p-4 bg-blue-100 dark:bg-blue-950/50 rounded-lg border-2 border-blue-400 dark:border-blue-900 transition-colors">
+                        <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2">ทีมสีน้ำเงิน</h3>
+                        <ul id="mf-blue-players" class="space-y-1 text-blue-800 dark:text-blue-300 min-h-[50px]"></ul>
+                        <button id="mf-join-blue-btn" class="w-full p-2 mt-4 text-sm btn-secondary bg-white dark:bg-stone-800 text-blue-600 font-bold border-blue-300 hover:bg-blue-50">เข้าร่วมทีมน้ำเงิน</button>
+                    </div>
+                </div>
+
+                <button id="mf-start-game-btn" class="w-full max-w-md p-4 text-xl rounded-lg btn-primary shadow-lg hidden">เริ่มเกม คลื่นความถี่ใจ!</button>
+                <p id="mf-wait-host-msg" class="text-lg font-bold text-stone-500 animate-pulse">รอหัวหน้าห้องกดเริ่มเกม...</p>
+            </div>
+
+            <!-- Main Game Area -->
+            <div id="mf-game-area" class="hidden w-full text-center">
+                <!-- Info Bar (Dynamic based on mode) -->
+                <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 border-2 transition-colors" id="mf-info-bar">
+                    <div class="text-left flex-1">
+                        <h2 class="text-2xl font-bold" id="mf-turn-title">ตาของ: ทีมแดง 📻</h2>
+                        <p id="mf-role-desc" class="text-stone-500 dark:text-stone-400 text-sm font-semibold">ใครคือคนใบ้?</p>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <div id="mf-score-red" class="hidden bg-red-100 dark:bg-red-900/50 px-4 py-2 rounded-lg border border-red-300 dark:border-red-700 shadow-sm font-bold text-lg text-red-700 dark:text-red-300">
+                            ทีมแดง: <span>0</span>
+                        </div>
+                        <div id="mf-score-blue" class="hidden bg-blue-100 dark:bg-blue-900/50 px-4 py-2 rounded-lg border border-blue-300 dark:border-blue-700 shadow-sm font-bold text-lg text-blue-700 dark:text-blue-300">
+                            ทีมน้ำเงิน: <span>0</span>
+                        </div>
+                        <div id="mf-score-coop" class="hidden bg-white dark:bg-stone-800 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 shadow-sm font-bold text-lg">
+                            คะแนนรวม: <span class="text-[var(--primary-text-color)]">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Players Bar (Coop Individual mode) -->
+                <div id="mf-active-players-bar" class="hidden mb-4 p-3 bg-stone-100 dark:bg-stone-800 rounded-lg flex flex-wrap justify-center gap-2">
+                    <!-- Avatars of players who haven't guessed this round will be added here -->
+                </div>
+
+                <!-- Concepts Display -->
+                <div class="bg-white/80 dark:bg-stone-800/80 p-6 rounded-xl shadow-md border-2 border-pink-300 dark:border-pink-900 mb-6 flex justify-between items-center relative overflow-hidden">
+                    <div class="w-1/3 text-left">
+                        <h3 id="mf-concept-left" class="text-2xl font-bold text-blue-500">เย็น</h3>
+                    </div>
+                    <div class="w-1/3 text-center opacity-30 italic font-bold">
+                        <span id="mf-hidden-target" class="text-4xl hidden">🎯</span>
+                    </div>
+                    <div class="w-1/3 text-right">
+                        <h3 id="mf-concept-right" class="text-2xl font-bold text-red-500">ร้อน</h3>
+                    </div>
+                </div>
+
+                <!-- Psychic Clue Area -->
+                <div id="mf-psychic-area" class="hidden mb-6 bg-pink-50 dark:bg-pink-900/20 p-6 rounded-xl border-2 border-pink-400">
+                    <h3 class="text-xl font-bold mb-2">ตาของคุณใบ้ให้เพื่อน! 🧠</h3>
+                    <p class="mb-4">เป้าหมายซ่อนอยู่ที่ <strong class="text-2xl text-pink-600" id="mf-psychic-target">75%</strong> (ค่อนไปทางขวา)</p>
+                    <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+                        <input type="text" id="mf-clue-input" class="input-field p-3 flex-grow rounded-lg text-center font-bold" placeholder="พิมพ์คำใบ้ 1 คำ หรือ 1 วลี...">
+                        <button id="mf-submit-clue-btn" class="btn-primary p-3 rounded-lg whitespace-nowrap">ส่งคำใบ้</button>
+                    </div>
+                </div>
+
+                <!-- Guesser Dial Area -->
+                <div id="mf-guess-area" class="hidden mb-6 p-6 bg-white dark:bg-stone-800 rounded-xl shadow-md border border-stone-200 dark:border-stone-700 relative">
+                    <h3 class="text-xl font-bold mb-4">คำใบ้คือ: <span id="mf-given-clue" class="text-3xl text-[var(--accent-color)] ml-2 bg-stone-100 dark:bg-stone-900 px-4 py-1 rounded-lg">???</span></h3>
+                    <p class="mb-6 text-stone-500 dark:text-stone-400 font-semibold" id="mf-guesser-instruction">สมาชิกในทีมช่วยกันเลื่อนหน้าปัด แล้วกด "ยืนยัน"</p>
+                    
+                    <div class="relative w-full h-16 flex items-center mt-4">
+                        <!-- The Target Zone (Hidden during guess) -->
+                        <div id="mf-target-zone" class="absolute h-10 w-[15%] bg-yellow-300/50 border-2 border-yellow-500 rounded-lg top-3 hidden transition-all" style="left: 42.5%;"></div>
+                        
+                        <!-- Track for individual guesses -->
+                        <div id="mf-individual-guesses-track" class="absolute w-full h-full pointer-events-none z-20 hidden"></div>
+                        
+                        <!-- The Slider -->
+                        <input type="range" id="mf-dial" min="0" max="100" value="50" class="mf-slider relative z-10 w-full" disabled>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <button id="mf-lock-btn" class="btn-primary p-4 px-10 text-xl rounded-xl hidden shadow-lg hover:scale-105 transition-transform">🔒 ยืนยันตำแหน่งนี้!</button>
+                        <p id="mf-active-team-notice" class="text-sm text-stone-500 mt-2 hidden">*เฉพาะคนในทีมที่ทายอยู่ถึงจะกดยืนยันได้</p>
+                        <p id="mf-individual-wait-notice" class="text-sm text-stone-500 mt-2 hidden">ยืนยันแล้ว รอเพื่อนคนอื่นตอบ...</p>
+                    </div>
+                </div>
+
+                <!-- Result Area -->
+                <div id="mf-result-area" class="hidden p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-500 shadow-md">
+                    <h3 id="mf-result-text" class="text-3xl font-bold mb-2"></h3>
+                    <p class="text-lg mb-4">ได้คะแนนรอบนี้: <span id="mf-round-points" class="font-bold text-3xl text-green-600">0</span> แต้ม</p>
+                    
+                    <div id="mf-individual-results" class="hidden flex flex-wrap justify-center gap-3 mb-6 p-4 bg-white/50 dark:bg-stone-800/50 rounded-lg">
+                        <!-- Individual scores will be shown here -->
+                    </div>
+
+                    <button id="mf-next-round-btn" class="hidden btn-primary p-4 px-10 rounded-xl text-lg shadow-md hover:scale-105 transition-transform">ไปรอบต่อไป / เปลี่ยนทีมทาย</button>
+                </div>
+            </div>
+
+            <!-- Summary Area (End of Game) -->
+            <div id="mf-summary-area" class="hidden w-full max-w-4xl mx-auto mt-8 p-8 rounded-xl border-4 shadow-2xl bg-white/90 dark:bg-[#2C2621]/90 border-[var(--primary-color)] text-center">
+                <h2 id="mf-summary-title" class="text-4xl font-bold mb-6 text-[var(--primary-text-color)]">สรุปผลการจูนใจ! 📻</h2>
+                
+                <div id="mf-summary-versus" class="hidden flex flex-col sm:flex-row justify-center gap-8 mb-8">
+                    <div class="flex-1 p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border-2 border-red-400">
+                        <h3 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">ทีมสีแดง</h3>
+                        <p class="text-5xl font-bold text-red-700 dark:text-red-300" id="mf-final-red-score">0</p>
+                    </div>
+                    <div class="text-3xl font-bold flex items-center justify-center text-stone-400">VS</div>
+                    <div class="flex-1 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-400">
+                        <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">ทีมสีน้ำเงิน</h3>
+                        <p class="text-5xl font-bold text-blue-700 dark:text-blue-300" id="mf-final-blue-score">0</p>
+                    </div>
+                </div>
+
+                <div id="mf-summary-coop" class="hidden mb-8">
+                    <p class="text-xl text-stone-600 dark:text-stone-300 mb-2">คะแนนความรู้ใจของทีมคุณคือ</p>
+                    <div class="text-6xl font-bold text-[var(--accent-color)] mb-4" id="mf-final-coop-score">0</div>
+                    <p id="mf-coop-evaluation" class="text-2xl font-bold"></p>
+                </div>
+                
+                <!-- Individual Leaderboard for Coop Individual Mode -->
+                <div id="mf-summary-individual" class="hidden mb-8 max-w-lg mx-auto">
+                    <h3 class="text-xl font-bold text-stone-700 dark:text-stone-300 mb-4 border-b pb-2">คะแนนรายบุคคล</h3>
+                    <div id="mf-individual-leaderboard" class="space-y-2"></div>
+                </div>
+
+                <button id="mf-return-setup-btn" class="hidden btn-primary p-4 px-10 rounded-xl text-lg mx-auto shadow-md">กลับไปตั้งค่าทีมใหม่</button>
+            </div>
+        </div>
+
+        <!-- Same Flock (Herd Mentality) Screen -->
+        <div id="same-flock-screen" class="hidden w-full text-center">
+            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-stone-700 dark:text-stone-300">แกะตามฝูง 🐑</h2>
+            </div>
+
+            <div class="bg-white/80 dark:bg-[#2C2621]/80 p-8 rounded-xl shadow-lg border-2 border-[var(--primary-color)] mb-6">
+                <p class="text-stone-500 dark:text-stone-400 font-bold mb-2">คำถามประจำรอบ</p>
+                <h2 id="sfk-question" class="text-3xl sm:text-4xl font-bold text-[var(--heading-color)] leading-tight"></h2>
+            </div>
+
+            <div id="sfk-answer-area" class="max-w-md mx-auto mb-6">
+                <p class="mb-4 font-semibold text-lg text-stone-600 dark:text-stone-300">พิมพ์คำตอบที่คิดว่า "คนส่วนใหญ่จะตอบเหมือนกัน"</p>
+                <div class="flex flex-col gap-3">
+                    <input type="text" id="sfk-my-answer" class="input-field p-4 text-xl font-bold rounded-xl text-center shadow-inner" placeholder="ตอบสั้นๆ ได้ใจความ...">
+                    <button id="sfk-submit-btn" class="btn-primary p-4 text-xl rounded-xl">ส่งคำตอบ</button>
+                </div>
+                <p id="sfk-wait-msg" class="hidden mt-4 text-stone-500 font-bold animate-pulse">ส่งแล้ว! รอเพื่อนๆ ก่อนนะ...</p>
+            </div>
+
+            <div id="sfk-result-area" class="hidden max-w-4xl mx-auto mb-6">
+                <h3 class="text-2xl font-bold mb-6 text-[var(--accent-color)]">ใครอยู่ฝูงไหนบ้าง มาดูกัน!</h3>
+                <div id="sfk-groups-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <!-- Groups will be rendered here -->
+                </div>
+                <button id="sfk-next-round-btn" class="hidden btn-primary p-4 px-10 text-xl rounded-xl mx-auto">เริ่มรอบต่อไป</button>
             </div>
         </div>
 
@@ -1030,7 +1242,9 @@
             'secret-painter': 'จิตรกรกำมะลอ 🎨',
             'friend-quiz': 'ทายใจเพื่อน 💖',
             'number-sort': 'เรียงเลขวัดใจ 🔢',
-            'word-guess': 'รหัสคำทาย 🕵️‍♂️'
+            'word-guess': 'รหัสคำทาย 🕵️‍♂️',
+            'mind-frequency': 'คลื่นความถี่ใจ 📻',
+            'same-flock': 'แกะตามฝูง 🐑'
         };
 
         const roleNames = {
@@ -1208,6 +1422,36 @@
                         <li>เมื่อคนใบ้ส่งคำตอบครบ ระบบจะตรวจสอบความซ้ำซ้อน <strong>หากมีคนพิมพ์คำใบ้ตรงกัน (คำเหมือนกัน) คำใบ้นั้นจะถูกลบทิ้ง!</strong></li>
                         <li>คนทายจะได้เห็นเฉพาะคำใบ้ที่ "ไม่ซ้ำกับใครเลย" และต้องทายคำศัพท์ให้ถูกต้อง</li>
                         <li><strong>การคิดคะแนน:</strong> ถ้าทายถูก คนทายได้ 2 แต้ม, และคนที่ให้คำใบ้รอด (ไม่ซ้ำ) ได้คนละ 1 แต้ม</li>
+                    </ol>
+                `
+            },
+            'mind-frequency': {
+                title: 'วิธีเล่น: คลื่นความถี่ใจ 📻',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">หาตำแหน่งจุดซ่อนเร้นบนหน้าปัดให้เจอ โดยอิงจาก "คำใบ้" ของเพื่อน</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่นแบบผลัดกันทาย:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>สามารถเลือกแบ่ง <strong>ทีมแดง vs ทีมน้ำเงิน</strong> หรือเล่น <strong>Co-op (ทีมเดียวกันหมด)</strong> ได้</li>
+                        <li>เมื่อถึงตาของทีมใด จะมี 1 คนเป็น <strong>คนใบ้ (Psychic)</strong></li>
+                        <li>Psychic จะเห็นคำตรงข้าม 2 คำ (เช่น เย็น - ร้อน) และ <strong>"เป้าหมาย"</strong></li>
+                        <li>Psychic ให้คำใบ้ 1 คำหรือ 1 วลี (เช่น "กาแฟ") เพื่อใบ้ให้ทีมตัวเอง</li>
+                        <li>สมาชิกทีมคนอื่นๆ ปรึกษากัน <strong>เลื่อนหน้าปัด</strong> ไปยังตำแหน่งที่คิดว่าถูก และ <strong>"สมาชิกทีมคนไหนก็ได้"</strong> สามารถกดยืนยันคำตอบได้</li>
+                        <li><strong>การคิดคะแนน:</strong> ทายใกล้เคียงจุดซ่อนเร้นมากที่สุดจะได้ 4 แต้ม -> 3 แต้ม -> 2 แต้ม ตามความห่าง สลับทีมทายไปเรื่อยๆ จนครบทุกคน!</li>
+                    </ol>
+                `
+            },
+            'same-flock': {
+                title: 'วิธีเล่น: แกะตามฝูง 🐑',
+                content: `
+                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
+                    <p class="mb-4">คิดให้เหมือนคนอื่น! พยายามตอบให้ตรงกับคำตอบที่ "คนหมู่มาก" ในห้องจะตอบ</p>
+                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น (แนะนำ 4 คนขึ้นไป):</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-left">
+                        <li>ระบบจะให้คำถาม 1 ข้อ (เช่น "ผลไม้สีแดงที่อร่อยที่สุด")</li>
+                        <li>ทุกคนพิมพ์คำตอบของตัวเอง <strong>ห้ามบอกเพื่อนเด็ดขาด!</strong> พยายามคิดว่า "คนส่วนใหญ่จะตอบอะไร"</li>
+                        <li>เมื่อตอบครบ ระบบจะจับกลุ่มคำตอบที่เหมือนหรือคล้ายกัน</li>
+                        <li><strong>การคิดคะแนน:</strong> กลุ่มที่คนตอบเหมือนกันเยอะที่สุด (ฝูงใหญ่สุด) ทุกคนในกลุ่มนั้นรับไปเลย 1 แต้ม! ใครอินดี้ตอบไม่เหมือนชาวบ้าน อดแต้มจ้า</li>
                     </ol>
                 `
             }
@@ -1501,6 +1745,20 @@
             if (confirm("กลับไปห้องล็อบบี้เพื่อเปลี่ยนเกมใช่ไหม? (คะแนนจะยังคงอยู่)")) socket.emit('returnToLobby');
         });
 
+        // Event ปุ่ม "ออกจากห้อง" (Leave Room)
+        document.getElementById('leave-room-btn').addEventListener('click', () => {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากปาร์ตี้นี้?")) {
+                socket.emit('leaveRoom');
+                sessionStorage.removeItem('cozyRoomCode');
+                myRoomCode = '';
+                isHost = false;
+                showScreen('entry');
+                
+                // หยุดเพลงถ้าเล่นอยู่
+                if (isBgmPlaying) bgmPlayBtn.click();
+            }
+        });
+
         socket.on('backToLobby', (players) => {
             showScreen('waiting');
             returnLobbyBtn.classList.add('hidden');
@@ -1569,7 +1827,7 @@
 
         // --- Kicked Event ---
         socket.on('kicked', () => {
-            alert("คุณถูกหัวหน้าห้องเตะออกจากห้อง!");
+            alert("คุณถูกหัวหน้าห้องเตะออกจากปาร์ตี้!");
             sessionStorage.removeItem('cozyRoomCode');
             showScreen('entry');
         });
@@ -1581,6 +1839,8 @@
             whoAmI: document.getElementById('who-am-i-screen'),
             secretAgent: document.getElementById('secret-agent-screen'),
             wordGuess: document.getElementById('word-guess-screen'),
+            mindFrequency: document.getElementById('mind-frequency-screen'),
+            sameFlock: document.getElementById('same-flock-screen'),
             numberSort: document.getElementById('number-sort-screen'),
             friendQuiz: document.getElementById('friend-quiz-screen'),
             secretPainter: document.getElementById('secret-painter-screen'),
@@ -1599,8 +1859,25 @@
 
         function showScreen(screenName) {
             Object.values(screens).forEach(s => { if (s) s.classList.add('hidden'); });
-            const screenElement = document.getElementById(`${screenName}-screen`);
-            if (screenElement) screenElement.classList.remove('hidden');
+            
+            // Map the simple names to DOM ID names
+            const idMap = {
+                'mind-frequency': 'mindFrequency',
+                'same-flock': 'sameFlock',
+                'who-am-i': 'whoAmI',
+                'secret-agent': 'secretAgent',
+                'word-guess': 'wordGuess',
+                'number-sort': 'numberSort',
+                'friend-quiz': 'friendQuiz',
+                'secret-painter': 'secretPainter',
+                'match-the-blank': 'matchTheBlank',
+                'unique-clue': 'uniqueClue',
+                'truth-or-lie': 'truthOrLie',
+                'bluff-overthrow': 'bluffOverthrow',
+            };
+            
+            const internalName = idMap[screenName] || screenName;
+            if (screens[internalName]) screens[internalName].classList.remove('hidden');
         }
 
         function updateLobby(data) {
@@ -1614,9 +1891,9 @@
                 playerDiv.className = `relative p-2 px-3 ${p.isOnline === false ? 'bg-stone-300 dark:bg-stone-800 opacity-50' : 'bg-white dark:bg-stone-700'} rounded-full text-sm font-bold shadow-sm flex items-center gap-2 group`;
                 
                 let kickBtnHtml = '';
-                // เพิ่มปุ่มเตะคนออกสำหรับหัวหน้าห้อง (ไม่เตะตัวเอง)
+                // เพิ่มปุ่มเตะคนออกสำหรับหัวหน้าห้อง (แสดงตลอดเวลา ไม่ต้องรอ hover เพื่อให้กดยากในมือถือ)
                 if (isHost && p.id !== socket.id) {
-                    kickBtnHtml = `<button onclick="kickPlayer('${p.id}')" class="hidden group-hover:flex absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 items-center justify-center text-xs shadow hover:bg-red-600">×</button>`;
+                    kickBtnHtml = `<button onclick="kickPlayer('${p.id}')" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-red-600 hover:scale-110 transition-transform z-10" title="เตะผู้เล่นนี้">×</button>`;
                 }
 
                 playerDiv.innerHTML = `<span class="flex items-center gap-2">${renderAvatar(p.avatar)} ${p.name} ${p.isOnline === false ? '(หลุด)' : ''}</span> <span class="bg-stone-200 dark:bg-stone-600 rounded-full px-2 text-xs">${p.score}</span> ${kickBtnHtml}`;
@@ -1648,6 +1925,7 @@
                     
                     let minPlayers = 2;
                     if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
+                    if (['same-flock'].includes(selectedGame)) minPlayers = 4;
                     if (selectedGame === 'who-am-i') minPlayers = 2;
                     
                     startBtn.disabled = players.length < minPlayers;
@@ -1701,6 +1979,7 @@
             const startBtn = document.getElementById('startGameBtn');
             let minPlayers = 2;
             if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
+            if (['same-flock'].includes(selectedGame)) minPlayers = 4;
             if (selectedGame === 'who-am-i') minPlayers = 2;
             
             startBtn.disabled = currentPlayersCount < minPlayers;
@@ -3314,11 +3593,19 @@
                 gameState.board.forEach((card, index) => {
                     const cardEl = document.createElement('div');
                     cardEl.className = 'wg-card flex items-center justify-center p-2 text-center font-bold rounded-lg transition-colors duration-200';
-                    cardEl.textContent = card.word;
-                    cardEl.dataset.index = index;
+                    
                     if (card.revealed) {
                         cardEl.classList.add('revealed', card.type);
+                        
+                        // [อัปเดตระบบ!] - ถ้าเป็น Spymaster จะแสดง Overlay รอยขีดฆ่าพร้อมรูปตาให้เห็นชัดๆ ว่าใบนี้เพื่อนกดไปแล้ว
+                        if (isSpymaster) {
+                            cardEl.innerHTML = `<span class="opacity-30 line-through z-10">${card.word}</span><div class="absolute inset-0 flex items-center justify-center text-3xl opacity-80 pointer-events-none">👁️</div>`;
+                            cardEl.classList.add('border-dashed', 'opacity-60');
+                        } else {
+                            cardEl.textContent = card.word;
+                        }
                     } else {
+                        cardEl.textContent = card.word;
                         if (isSpymaster) {
                             cardEl.classList.add(card.type);
                         }
@@ -3362,7 +3649,8 @@
                     const number = parseInt(wgClueNumber.value, 10);
                     if (word && number > 0) {
                         socket.emit('wordGuess_giveClue', { word, number });
-                        wgClueWord.value = ''; wgClueNumber.value = '';
+                        wgClueWord.value = '';
+                        wgClueNumber.value = '';
                     }
                 }
                 if (target.id === 'wg-end-turn-btn') socket.emit('wordGuess_endTurn');
@@ -3372,79 +3660,575 @@
             socket.on('wordGuess_gameOver', handleWordGuessGameOver);
         })();
 
-        // --- Tools (Spinner / Stopwatch) ---
+        // --- Mind Frequency (Wavelength) Client Logic [UPDATED] ---
+        (function initMindFrequency() {
+            // Setup Elements
+            const setupArea = document.getElementById('mf-setup-area');
+            const modeBtns = document.querySelectorAll('.mf-mode-btn');
+            const coopTypeBtns = document.querySelectorAll('.mf-coop-type-btn');
+            const coopOptions = document.getElementById('mf-coop-options');
+            const teamSelection = document.getElementById('mf-team-selection');
+            const startGameBtn = document.getElementById('mf-start-game-btn');
+            const waitHostMsg = document.getElementById('mf-wait-host-msg');
+            const joinRedBtn = document.getElementById('mf-join-red-btn');
+            const joinBlueBtn = document.getElementById('mf-join-blue-btn');
+            const redPlayersList = document.getElementById('mf-red-players');
+            const bluePlayersList = document.getElementById('mf-blue-players');
+
+            // Game Area Elements
+            const gameArea = document.getElementById('mf-game-area');
+            const infoBar = document.getElementById('mf-info-bar');
+            const turnTitle = document.getElementById('mf-turn-title');
+            const roleDesc = document.getElementById('mf-role-desc');
+            const scoreRed = document.getElementById('mf-score-red');
+            const scoreBlue = document.getElementById('mf-score-blue');
+            const scoreCoop = document.getElementById('mf-score-coop');
+            
+            const conceptLeft = document.getElementById('mf-concept-left');
+            const conceptRight = document.getElementById('mf-concept-right');
+            const hiddenTarget = document.getElementById('mf-hidden-target');
+            
+            const psychicArea = document.getElementById('mf-psychic-area');
+            const psychicTargetDisplay = document.getElementById('mf-psychic-target');
+            const clueInput = document.getElementById('mf-clue-input');
+            const submitClueBtn = document.getElementById('mf-submit-clue-btn');
+
+            const guessArea = document.getElementById('mf-guess-area');
+            const givenClueDisplay = document.getElementById('mf-given-clue');
+            const guesserInstruction = document.getElementById('mf-guesser-instruction');
+            const dialSlider = document.getElementById('mf-dial');
+            const targetZone = document.getElementById('mf-target-zone');
+            const lockBtn = document.getElementById('mf-lock-btn');
+            const activeTeamNotice = document.getElementById('mf-active-team-notice');
+            const individualWaitNotice = document.getElementById('mf-individual-wait-notice');
+
+            const resultArea = document.getElementById('mf-result-area');
+            const resultText = document.getElementById('mf-result-text');
+            const roundPoints = document.getElementById('mf-round-points');
+            const individualResults = document.getElementById('mf-individual-results');
+            const nextRoundBtn = document.getElementById('mf-next-round-btn');
+
+            // Summary Area Elements
+            const summaryArea = document.getElementById('mf-summary-area');
+            const summaryVersus = document.getElementById('mf-summary-versus');
+            const finalRedScore = document.getElementById('mf-final-red-score');
+            const finalBlueScore = document.getElementById('mf-final-blue-score');
+            const summaryCoop = document.getElementById('mf-summary-coop');
+            const finalCoopScore = document.getElementById('mf-final-coop-score');
+            const coopEvaluation = document.getElementById('mf-coop-evaluation');
+            const summaryIndividual = document.getElementById('mf-summary-individual');
+            const individualLeaderboard = document.getElementById('mf-individual-leaderboard');
+            const returnSetupBtn = document.getElementById('mf-return-setup-btn');
+
+            let currentMode = 'versus';
+            let currentCoopType = 'shared';
+            let myTeam = null;
+
+            // --- UI Interactions ---
+
+            modeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if(!isHost) return;
+                    modeBtns.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    currentMode = btn.dataset.mode;
+                    
+                    if(currentMode === 'versus') {
+                        teamSelection.classList.remove('hidden');
+                        coopOptions.classList.add('hidden');
+                    } else {
+                        teamSelection.classList.add('hidden');
+                        coopOptions.classList.remove('hidden');
+                    }
+                    socket.emit('mindFrequency_updateSetup', { mode: currentMode, coopType: currentCoopType });
+                });
+            });
+
+            coopTypeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if(!isHost) return;
+                    coopTypeBtns.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    currentCoopType = btn.dataset.type;
+                    socket.emit('mindFrequency_updateSetup', { mode: currentMode, coopType: currentCoopType });
+                });
+            });
+
+            joinRedBtn.addEventListener('click', () => socket.emit('mindFrequency_joinTeam', { team: 'red' }));
+            joinBlueBtn.addEventListener('click', () => socket.emit('mindFrequency_joinTeam', { team: 'blue' }));
+
+            startGameBtn.addEventListener('click', () => {
+                if(isHost) socket.emit('mindFrequency_startGameLogic');
+            });
+
+            submitClueBtn.addEventListener('click', () => {
+                const clue = clueInput.value.trim();
+                if(clue) {
+                    socket.emit('mindFrequency_submitClue', { clue });
+                    submitClueBtn.disabled = true;
+                    clueInput.disabled = true;
+                }
+            });
+
+            // ทีมเดียวกันช่วยกันขยับหน้าปัดได้
+            dialSlider.addEventListener('input', () => {
+                if(!dialSlider.disabled) {
+                    socket.emit('mindFrequency_syncDial', { value: dialSlider.value });
+                }
+            });
+
+            // สมาชิกในทีมที่กำลังทาย กดยืนยันได้
+            lockBtn.addEventListener('click', () => {
+                const val = parseInt(dialSlider.value, 10);
+                socket.emit('mindFrequency_lockGuess', { guessValue: val });
+                lockBtn.disabled = true;
+                dialSlider.disabled = true;
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if(isHost) socket.emit('mindFrequency_nextRound');
+            });
+
+            returnSetupBtn.addEventListener('click', () => {
+                if(isHost) socket.emit('mindFrequency_returnToSetup');
+            });
+
+            // --- Socket Listeners ---
+
+            socket.on('mindFrequency_setupState', (data) => {
+                setupArea.classList.remove('hidden');
+                gameArea.classList.add('hidden');
+                summaryArea.classList.add('hidden');
+                
+                currentMode = data.mode;
+                currentCoopType = data.coopType || 'shared';
+                
+                modeBtns.forEach(b => {
+                    if(b.dataset.mode === currentMode) b.classList.add('selected');
+                    else b.classList.remove('selected');
+                });
+                
+                coopTypeBtns.forEach(b => {
+                    if(b.dataset.type === currentCoopType) b.classList.add('selected');
+                    else b.classList.remove('selected');
+                });
+
+                if(currentMode === 'versus') {
+                    teamSelection.classList.remove('hidden');
+                    coopOptions.classList.add('hidden');
+                    
+                    redPlayersList.innerHTML = '';
+                    bluePlayersList.innerHTML = '';
+                    myTeam = null;
+                    
+                    data.teams.red.forEach(pId => {
+                        const p = data.allPlayers.find(x => x.id === pId);
+                        if(p) {
+                            redPlayersList.innerHTML += `<li class="flex items-center gap-1">${renderAvatar(p.avatar, 'w-5 h-5 rounded-full')} ${p.name}</li>`;
+                            if(p.id === socket.id) myTeam = 'red';
+                        }
+                    });
+                    
+                    data.teams.blue.forEach(pId => {
+                        const p = data.allPlayers.find(x => x.id === pId);
+                        if(p) {
+                            bluePlayersList.innerHTML += `<li class="flex items-center gap-1">${renderAvatar(p.avatar, 'w-5 h-5 rounded-full')} ${p.name}</li>`;
+                            if(p.id === socket.id) myTeam = 'blue';
+                        }
+                    });
+
+                } else {
+                    teamSelection.classList.add('hidden');
+                    coopOptions.classList.remove('hidden');
+                    myTeam = 'coop';
+                }
+
+                if(isHost) {
+                    startGameBtn.classList.remove('hidden');
+                    waitHostMsg.classList.add('hidden');
+                    if(currentMode === 'versus') {
+                        const canStart = data.teams.red.length > 0 && data.teams.blue.length > 0;
+                        startGameBtn.disabled = !canStart;
+                        startGameBtn.textContent = canStart ? "เริ่มเกม คลื่นความถี่ใจ!" : "ต้องมีสมาชิกทั้ง 2 ทีมก่อน";
+                    } else {
+                        startGameBtn.disabled = false;
+                        startGameBtn.textContent = "เริ่มเกม คลื่นความถี่ใจ!";
+                    }
+                } else {
+                    startGameBtn.classList.add('hidden');
+                    waitHostMsg.classList.remove('hidden');
+                }
+            });
+
+            socket.on('mindFrequency_newRound', (data) => {
+                setupArea.classList.add('hidden');
+                summaryArea.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+                
+                psychicArea.classList.add('hidden');
+                guessArea.classList.add('hidden');
+                resultArea.classList.add('hidden');
+                targetZone.classList.add('hidden');
+                hiddenTarget.classList.add('hidden');
+                individualResults.classList.add('hidden');
+                
+                clueInput.value = '';
+                clueInput.disabled = false;
+                submitClueBtn.disabled = false;
+                dialSlider.value = 50;
+                dialSlider.disabled = true;
+                lockBtn.disabled = false;
+                lockBtn.classList.add('hidden');
+                activeTeamNotice.classList.add('hidden');
+                individualWaitNotice.classList.add('hidden');
+                
+                conceptLeft.textContent = data.concept[0];
+                conceptRight.textContent = data.concept[1];
+                
+                // Score Update
+                if(data.mode === 'versus') {
+                    scoreRed.classList.remove('hidden');
+                    scoreBlue.classList.remove('hidden');
+                    scoreCoop.classList.add('hidden');
+                    scoreRed.innerHTML = `ทีมแดง: <span>${data.scores.red}</span>`;
+                    scoreBlue.innerHTML = `ทีมน้ำเงิน: <span>${data.scores.blue}</span>`;
+                    
+                    turnTitle.textContent = `ตาของ: ทีม${data.activeTeam === 'red' ? 'แดง 🔴' : 'น้ำเงิน 🔵'}`;
+                    turnTitle.className = `text-2xl font-bold ${data.activeTeam === 'red' ? 'text-red-500' : 'text-blue-500'}`;
+                } else {
+                    scoreRed.classList.add('hidden');
+                    scoreBlue.classList.add('hidden');
+                    scoreCoop.classList.remove('hidden');
+                    scoreCoop.innerHTML = `คะแนนรวม: <span class="text-[var(--primary-text-color)]">${data.scores.coop}</span>`;
+                    turnTitle.textContent = `ร่วมมือกันจูนใจ! 🤝`;
+                    turnTitle.className = `text-2xl font-bold text-[var(--primary-text-color)]`;
+                }
+
+                if (socket.id === data.psychicId) {
+                    roleDesc.innerHTML = `คุณคือคนใบ้ (Psychic) 🧠`;
+                    psychicTargetDisplay.textContent = `${data.targetValue}%`;
+                    psychicArea.classList.remove('hidden');
+                } else {
+                    const psychicPlayer = data.players.find(p => p.id === data.psychicId);
+                    roleDesc.innerHTML = `รอ <strong>${renderAvatar(psychicPlayer.avatar)} ${psychicPlayer.name}</strong> คิดคำใบ้...`;
+                }
+            });
+
+            socket.on('mindFrequency_startGuessing', (data) => {
+                guessArea.classList.remove('hidden');
+                psychicArea.classList.add('hidden');
+                givenClueDisplay.textContent = data.clue;
+                
+                const isMyTeamTurn = (currentMode === 'versus' && myTeam === data.activeTeam) || (currentMode === 'coop');
+                const amI_Psychic = (socket.id === data.psychicId);
+
+                if (isMyTeamTurn && !amI_Psychic) {
+                    if (currentMode === 'coop' && currentCoopType === 'individual') {
+                        roleDesc.textContent = "หมุนหน้าปัดของคุณ แล้วกดยืนยัน (คะแนนแยกคน)";
+                        guesserInstruction.textContent = "เลือกจุดที่คิดว่าตรงที่สุด แล้วกดยืนยันคำตอบของคุณเอง";
+                    } else {
+                        roleDesc.textContent = "ปรึกษากัน หมุนหน้าปัด แล้วกดยืนยันเลย!";
+                        guesserInstruction.textContent = "สมาชิกในทีมช่วยกันหมุน และใครกดยืนยันก็ได้";
+                    }
+                    dialSlider.disabled = false;
+                    lockBtn.classList.remove('hidden');
+                    activeTeamNotice.classList.add('hidden');
+                } else if (amI_Psychic) {
+                    roleDesc.textContent = "รอลูกทีมของคุณตัดสินใจ...";
+                    guesserInstruction.textContent = "รอลูกทีมตัดสินใจ ห้ามพูดใบ้เพิ่มนะ!";
+                    dialSlider.disabled = true;
+                    lockBtn.classList.add('hidden');
+                } else {
+                    roleDesc.textContent = "รอทีมตรงข้ามทาย...";
+                    guesserInstruction.textContent = "แอบดูพวกเขาทายอยู่เงียบๆ...";
+                    dialSlider.disabled = true;
+                    lockBtn.classList.add('hidden');
+                }
+            });
+
+            socket.on('mindFrequency_syncDial', (val) => {
+                if (!(currentMode === 'coop' && currentCoopType === 'individual')) {
+                    dialSlider.value = val;
+                }
+            });
+            
+            socket.on('mindFrequency_individualLocked', () => {
+                if (currentMode === 'coop' && currentCoopType === 'individual') {
+                     lockBtn.classList.add('hidden');
+                     individualWaitNotice.classList.remove('hidden');
+                }
+            });
+
+            socket.on('mindFrequency_showResult', (data) => {
+                dialSlider.disabled = true;
+                lockBtn.classList.add('hidden');
+                activeTeamNotice.classList.add('hidden');
+                individualWaitNotice.classList.add('hidden');
+                
+                targetZone.classList.remove('hidden');
+                targetZone.style.left = `${data.targetValue - 7.5}%`; 
+
+                resultArea.classList.remove('hidden');
+                hiddenTarget.classList.remove('hidden');
+                
+                if (data.coopType === 'individual') {
+                    roundPoints.parentElement.classList.add('hidden');
+                    resultText.textContent = "มาดูผลลัพธ์ของแต่ละคนกัน!";
+                    individualResults.classList.remove('hidden');
+                    individualResults.innerHTML = '';
+                    
+                    if(data.individualResults) {
+                        data.individualResults.sort((a,b) => b.points - a.points).forEach(r => {
+                            const div = document.createElement('div');
+                            div.className = `p-3 rounded-lg border-2 flex flex-col items-center gap-1 ${r.points > 0 ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-400'}`;
+                            div.innerHTML = `
+                                <span class="text-xs font-bold text-stone-600">${renderAvatar(r.avatar, 'w-4 h-4 rounded-full')} ${r.name}</span>
+                                <span class="text-xl font-bold ${r.points > 0 ? 'text-green-600' : 'text-red-500'}">+${r.points}</span>
+                            `;
+                            individualResults.appendChild(div);
+                        });
+                    }
+                } else {
+                    roundPoints.parentElement.classList.remove('hidden');
+                    individualResults.classList.add('hidden');
+                    roundPoints.textContent = data.points;
+                    
+                    if (data.points === 4) resultText.textContent = "🎯 เป๊ะเวอร์!! (Bullseye!)";
+                    else if (data.points === 3) resultText.textContent = "🔥 เกือบเป๊ะ! (ดีมาก)";
+                    else if (data.points === 2) resultText.textContent = "👍 ถือว่าใกล้เคียง!";
+                    else resultText.textContent = "💩 ผิดเพี้ยนไปไกลเลย...";
+                }
+
+                if (isHost) nextRoundBtn.classList.remove('hidden');
+            });
+
+            socket.on('mindFrequency_gameOver', (data) => {
+                gameArea.classList.add('hidden');
+                summaryArea.classList.remove('hidden');
+                
+                if(data.mode === 'versus') {
+                    summaryVersus.classList.remove('hidden');
+                    summaryCoop.classList.add('hidden');
+                    summaryIndividual.classList.add('hidden');
+                    finalRedScore.textContent = data.scores.red;
+                    finalBlueScore.textContent = data.scores.blue;
+                    
+                    let title = "เสมอเฉยเลย!";
+                    if(data.scores.red > data.scores.blue) title = "🔴 ทีมแดงชนะ!";
+                    if(data.scores.blue > data.scores.red) title = "🔵 ทีมน้ำเงินชนะ!";
+                    document.getElementById('mf-summary-title').textContent = title;
+                } else {
+                    summaryVersus.classList.add('hidden');
+                    
+                    if (data.coopType === 'individual') {
+                        summaryCoop.classList.add('hidden');
+                        summaryIndividual.classList.remove('hidden');
+                        individualLeaderboard.innerHTML = '';
+                        
+                        if(data.individualScores) {
+                            data.individualScores.forEach((p, index) => {
+                                const item = document.createElement('div');
+                                item.className = 'flex justify-between items-center p-3 bg-stone-100 dark:bg-stone-800 rounded-lg border border-stone-200 dark:border-stone-700';
+                                item.innerHTML = `
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-stone-500 text-lg">#${index + 1}</span>
+                                        <span class="font-bold flex items-center gap-1">${renderAvatar(p.avatar)} ${p.name}</span>
+                                    </div>
+                                    <span class="text-[var(--primary-text-color)] font-bold text-xl">${p.mfScore} แต้ม</span>
+                                `;
+                                individualLeaderboard.appendChild(item);
+                            });
+                        }
+                        
+                        document.getElementById('mf-summary-title').textContent = "สรุปคะแนนจูนใจรายบุคคล!";
+                    } else {
+                        summaryIndividual.classList.add('hidden');
+                        summaryCoop.classList.remove('hidden');
+                        finalCoopScore.textContent = data.scores.coop;
+                        
+                        let evalText = "ต้องจูนกันอีกเยอะเลยนะ!";
+                        const maxScore = data.totalRounds * 4;
+                        const percent = data.scores.coop / maxScore;
+                        
+                        if(percent >= 0.8) evalText = "✨ พลังจิตสื่อถึงกัน! รู้ใจกันสุดๆ";
+                        else if(percent >= 0.5) evalText = "👍 ถือว่ารู้ใจกันพอตัวเลยนะ";
+                        
+                        coopEvaluation.textContent = evalText;
+                        document.getElementById('mf-summary-title').textContent = "สรุปผลการร่วมมือ!";
+                    }
+                }
+
+                if(isHost) returnSetupBtn.classList.remove('hidden');
+                else returnSetupBtn.classList.add('hidden');
+            });
+
+        })();
+
+        // --- Same Flock (Herd Mentality) Client Logic ---
+        (function initSameFlock() {
+            const questionDisplay = document.getElementById('sfk-question');
+            const answerArea = document.getElementById('sfk-answer-area');
+            const myAnswerInput = document.getElementById('sfk-my-answer');
+            const submitBtn = document.getElementById('sfk-submit-btn');
+            const waitMsg = document.getElementById('sfk-wait-msg');
+            const resultArea = document.getElementById('sfk-result-area');
+            const groupsContainer = document.getElementById('sfk-groups-container');
+            const nextRoundBtn = document.getElementById('sfk-next-round-btn');
+
+            submitBtn.addEventListener('click', () => {
+                const answer = myAnswerInput.value.trim();
+                if (answer) {
+                    socket.emit('sameFlock_submitAnswer', { answer });
+                    myAnswerInput.disabled = true;
+                    submitBtn.disabled = true;
+                    waitMsg.classList.remove('hidden');
+                }
+            });
+
+            nextRoundBtn.addEventListener('click', () => {
+                if (isHost) socket.emit('sameFlock_nextRound');
+            });
+
+            socket.on('sameFlock_newRound', ({ question }) => {
+                questionDisplay.textContent = question;
+                answerArea.classList.remove('hidden');
+                resultArea.classList.add('hidden');
+                myAnswerInput.value = '';
+                myAnswerInput.disabled = false;
+                submitBtn.disabled = false;
+                waitMsg.classList.add('hidden');
+                nextRoundBtn.classList.add('hidden');
+            });
+
+            socket.on('sameFlock_showResult', ({ groups }) => {
+                answerArea.classList.add('hidden');
+                waitMsg.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+                groupsContainer.innerHTML = '';
+
+                // Sort groups by size (largest first)
+                groups.sort((a, b) => b.players.length - a.players.length);
+
+                const maxCount = groups.length > 0 ? groups[0].players.length : 0;
+
+                groups.forEach((group, index) => {
+                    const isMajority = group.players.length === maxCount && maxCount > 1;
+                    const card = document.createElement('div');
+                    let borderClass = isMajority ? 'border-[var(--primary-color)]' : 'border-stone-200 dark:border-stone-700';
+                    let bgClass = isMajority ? 'bg-[var(--primary-color)]/10' : 'bg-stone-50 dark:bg-stone-800';
+                    
+                    card.className = `p-4 rounded-xl border-2 ${borderClass} ${bgClass} shadow-sm`;
+                    
+                    let pointsBadge = isMajority ? `<span class="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">+1 แต้ม</span>` : '';
+                    
+                    let playersHtml = group.players.map(p => {
+                        return `<span class="inline-flex items-center gap-1 bg-white dark:bg-stone-700 px-2 py-1 rounded text-sm m-1 shadow-sm">${renderAvatar(p.avatar, 'w-4 h-4 rounded-full')} ${p.name}</span>`;
+                    }).join('');
+
+                    card.innerHTML = `
+                        <h4 class="text-xl font-bold mb-2 ${isMajority ? 'text-[var(--primary-text-color)]' : 'text-stone-500'}">
+                            "${group.answer}" <span class="text-sm font-normal text-stone-500">(${group.players.length} คน)</span>${pointsBadge}
+                        </h4>
+                        <div class="flex flex-wrap">${playersHtml}</div>
+                    `;
+                    groupsContainer.appendChild(card);
+                });
+
+                if (isHost) nextRoundBtn.classList.remove('hidden');
+            });
+        })();
+
+        // --- Spinner Tool Logic ---
         (function initSpinner() {
             const canvas = document.getElementById('spinner-canvas');
             const ctx = canvas.getContext('2d');
-            const spinBtn = document.getElementById('spin-btn');
+            const optionsInput = document.getElementById('spinner-options');
             const updateBtn = document.getElementById('spinner-update-btn');
-            const optionsTextarea = document.getElementById('spinner-options');
-            const resultDiv = document.getElementById('spinner-result');
+            const spinBtn = document.getElementById('spin-btn');
+            const resultDisplay = document.getElementById('spinner-result');
+            
+            let options = ["คนเปิดไมค์ล่าสุด", "คนที่เข้าห้องคนแรก", "คนที่คะแนนน้อยสุด", "คนที่เป็น Host"];
+            optionsInput.value = options.join('\n');
+            
+            let currentAngle = 0;
+            let isSpinning = false;
 
-            let options = ["กินเหล้า", "เล่าเรื่องผี", "ร้องเพลง", "เต้น", "ตอบคำถาม", "พัก 5 นาที"];
-            const colors = ["#E29578", "#A3B18A", "#DDA15E", "#F4A261", "#8AB17D", "#E9C46A", "#E07A5F"];
-            let startAngle = 0; let arc = 0; let spinTimeout = null;
-            let spinAngleStart = 10; let spinTime = 0; let spinTimeTotal = 0;
+            const colors = ['#A3B18A', '#E29578', '#DDA15E', '#344E41', '#8A3A23', '#F4EFE6', '#E3D5C8', '#93c5fd', '#fca5a5', '#fef3c7'];
 
-            function drawSpinner() {
-                if (options.length === 0) return;
-                arc = Math.PI / (options.length / 2);
-                ctx.clearRect(0, 0, 400, 400);
-                const isDarkMode = document.documentElement.classList.contains('dark');
-                ctx.strokeStyle = isDarkMode ? "#44403c" : "#e7e5e4"; 
-                ctx.lineWidth = 2; ctx.font = '16px IBM Plex Sans Thai, sans-serif';
+            function drawWheel() {
+                const numOptions = options.length;
+                const arcSize = (2 * Math.PI) / numOptions;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                for (let i = 0; i < options.length; i++) {
-                    const angle = startAngle + i * arc;
+                for (let i = 0; i < numOptions; i++) {
+                    const angle = currentAngle + i * arcSize;
+                    ctx.beginPath();
                     ctx.fillStyle = colors[i % colors.length];
-                    ctx.beginPath(); ctx.arc(200, 200, 190, angle, angle + arc, false); ctx.arc(200, 200, 0, angle + arc, angle, true);
-                    ctx.stroke(); ctx.fill();
-                    ctx.save(); ctx.fillStyle = "#28231D"; 
-                    ctx.translate(200 + Math.cos(angle + arc / 2) * 120, 200 + Math.sin(angle + arc / 2) * 120);
-                    ctx.rotate(angle + arc / 2 + Math.PI / 2);
-                    const text = options[i]; ctx.fillText(text, -ctx.measureText(text).width / 2, 0); ctx.restore();
+                    ctx.moveTo(200, 200);
+                    ctx.arc(200, 200, 190, angle, angle + arcSize);
+                    ctx.lineTo(200, 200);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.save();
+                    ctx.translate(200 + Math.cos(angle + arcSize / 2) * 120, 200 + Math.sin(angle + arcSize / 2) * 120);
+                    ctx.rotate(angle + arcSize / 2);
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = (colors[i % colors.length] === '#344E41' || colors[i % colors.length] === '#8A3A23') ? "#FFF" : "#000";
+                    ctx.font = "bold 16px 'IBM Plex Sans Thai'";
+                    ctx.fillText(options[i].substring(0, 15) + (options[i].length > 15 ? '...' : ''), 0, 5);
+                    ctx.restore();
                 }
             }
-            
-            document.getElementById('darkModeToggle').addEventListener('click', () => setTimeout(drawSpinner, 10));
 
-            function rotate() {
-                spinTime += 30;
-                if (spinTime >= spinTimeTotal) { stopRotate(); return; }
-                const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-                startAngle += (spinAngle * Math.PI / 180);
-                drawSpinner(); spinTimeout = setTimeout(rotate, 30);
-            }
-
-            function stopRotate() {
-                clearTimeout(spinTimeout);
-                const degrees = startAngle * 180 / Math.PI + 90;
-                const arcd = arc * 180 / Math.PI;
-                const index = Math.floor((360 - degrees % 360) / arcd);
-                ctx.save(); ctx.font = 'bold 30px IBM Plex Sans Thai, sans-serif';
-                resultDiv.textContent = `ผลลัพธ์: ${options[index]}`; ctx.restore();
-                spinBtn.disabled = false;
-            }
-
-            function easeOut(t, b, c, d) {
-                const ts = (t /= d) * t; const tc = ts * t;
-                return b + c * (tc + -3 * ts + 3 * t);
-            }
-
-            spinBtn.addEventListener("click", () => {
-                if (options.length === 0) return;
-                spinBtn.disabled = true; resultDiv.textContent = "หมุนนนน...";
-                spinAngleStart = Math.random() * 10 + 10; spinTime = 0; spinTimeTotal = Math.random() * 3000 + 4000;
-                rotate();
+            updateBtn.addEventListener('click', () => {
+                const lines = optionsInput.value.split('\n').map(l => l.trim()).filter(l => l);
+                if (lines.length > 1) {
+                    options = lines;
+                    drawWheel();
+                } else {
+                    alert('กรุณาใส่ตัวเลือกอย่างน้อย 2 ตัวเลือก');
+                }
             });
 
-            updateBtn.addEventListener("click", () => {
-                const newOptions = optionsTextarea.value.split('\n').filter(opt => opt.trim() !== '');
-                if (newOptions.length > 0) { options = newOptions; drawSpinner(); }
+            spinBtn.addEventListener('click', () => {
+                if (isSpinning) return;
+                isSpinning = true;
+                resultDisplay.textContent = 'กำลังสุ่ม...';
+                const spinTime = 3000 + Math.random() * 2000;
+                const spinTarget = currentAngle + (Math.PI * 10) + Math.random() * Math.PI * 2;
+                
+                const startTime = performance.now();
+                
+                function animate(time) {
+                    const elapsed = time - startTime;
+                    const progress = Math.min(elapsed / spinTime, 1);
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    
+                    currentAngle = currentAngle + (spinTarget - currentAngle) * easeOut;
+                    drawWheel();
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        isSpinning = false;
+                        const arcSize = (2 * Math.PI) / options.length;
+                        const normalizedAngle = currentAngle % (2 * Math.PI);
+                        const topAngle = (1.5 * Math.PI) - normalizedAngle;
+                        let adjustedAngle = topAngle;
+                        while(adjustedAngle < 0) adjustedAngle += 2 * Math.PI;
+                        
+                        const selectedIndex = Math.floor(adjustedAngle / arcSize) % options.length;
+                        resultDisplay.innerHTML = `<span class="text-[var(--accent-color)] animate-bounce inline-block">🎉 ${options[selectedIndex]} 🎉</span>`;
+                    }
+                }
+                requestAnimationFrame(animate);
             });
-            drawSpinner();
+
+            drawWheel();
         })();
 
+        // --- Stopwatch Tool Logic ---
         (function initStopwatch() {
             const timeDisplay = document.getElementById('stopwatch-time');
             const startBtn = document.getElementById('stopwatch-start-btn');
@@ -3453,62 +4237,76 @@
             const resetBtn = document.getElementById('stopwatch-reset-btn');
             const lapsList = document.getElementById('stopwatch-laps');
 
-            let startTime = 0; let elapsedTime = 0; let timerInterval = null; let lapCounter = 0;
+            let startTime = 0;
+            let elapsedTime = 0;
+            let timerInterval;
+            let lapCounter = 0;
 
-            function formatTime(time) {
-                const date = new Date(time);
-                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-                const milliseconds = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
+            function formatTime(ms) {
+                const totalSeconds = Math.floor(ms / 1000);
+                const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+                const seconds = String(totalSeconds % 60).padStart(2, '0');
+                const milliseconds = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
                 return `${minutes}:${seconds}.${milliseconds}`;
             }
 
             function updateDisplay() {
-                elapsedTime = Date.now() - startTime;
-                timeDisplay.textContent = formatTime(elapsedTime);
+                const currentMs = elapsedTime + (performance.now() - startTime);
+                timeDisplay.textContent = formatTime(currentMs);
             }
-            
+
             function start() {
-                startTime = Date.now() - elapsedTime;
+                startTime = performance.now();
                 timerInterval = setInterval(updateDisplay, 10);
-                startBtn.classList.add('hidden'); stopBtn.classList.remove('hidden');
-                finishRoundBtn.disabled = false; resetBtn.disabled = false;
+                startBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = false;
+                resetBtn.disabled = false;
             }
 
             function stop() {
                 clearInterval(timerInterval);
-                stopBtn.classList.add('hidden'); startBtn.classList.remove('hidden');
-                finishRoundBtn.disabled = true;
+                elapsedTime += performance.now() - startTime;
+                startBtn.classList.remove('hidden');
+                stopBtn.classList.add('hidden');
+                timeDisplay.classList.add('animate-pulse');
+                setTimeout(() => timeDisplay.classList.remove('animate-pulse'), 1000);
             }
 
             function reset() {
-                stop(); elapsedTime = 0; lapCounter = 0; timeDisplay.textContent = '00:00.00'; lapsList.innerHTML = '';
+                clearInterval(timerInterval);
+                elapsedTime = 0; lapCounter = 0; timeDisplay.textContent = '00:00.00'; lapsList.innerHTML = '';
                 resetBtn.disabled = true; finishRoundBtn.disabled = true;
+                stopBtn.classList.add('hidden'); startBtn.classList.remove('hidden');
             }
 
             function finishRound() {
-                if (!timerInterval) return;
-                clearInterval(timerInterval);
+                if (stopBtn.classList.contains('hidden') && elapsedTime === 0) return; // Not started
+                
+                const currentMs = stopBtn.classList.contains('hidden') ? elapsedTime : elapsedTime + (performance.now() - startTime);
                 lapCounter++;
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center p-2 bg-stone-100 dark:bg-stone-700 rounded transition-colors';
-                li.innerHTML = `<span class="font-semibold text-stone-600 dark:text-stone-300">รอบที่ ${lapCounter}</span><span class="font-mono text-stone-800 dark:text-stone-100">${formatTime(elapsedTime)}</span>`;
+                li.innerHTML = `<span class="font-semibold text-stone-600 dark:text-stone-300">รอบที่ ${lapCounter}</span><span class="font-mono text-stone-800 dark:text-stone-100">${formatTime(currentMs)}</span>`;
                 lapsList.prepend(li);
-                elapsedTime = 0; timeDisplay.textContent = '00:00.00';
-                stopBtn.classList.add('hidden'); startBtn.classList.remove('hidden');
-                finishRoundBtn.disabled = true; resetBtn.disabled = false;
+                
+                // Restart timer automatically for next lap
+                elapsedTime = 0; 
+                startTime = performance.now();
+                timeDisplay.textContent = '00:00.00';
             }
 
-            startBtn.addEventListener('click', start); stopBtn.addEventListener('click', stop);
-            resetBtn.addEventListener('click', reset); finishRoundBtn.addEventListener('click', finishRound);
+            startBtn.addEventListener('click', start); 
+            stopBtn.addEventListener('click', stop);
+            resetBtn.addEventListener('click', reset); 
+            finishRoundBtn.addEventListener('click', finishRound);
             reset();
         })();
 
         // --- Render Keep-Alive ---
         setInterval(() => {
             fetch('/ping').catch(err => console.log('Ping failed', err));
-        }, 5 * 60 * 1000); 
-
+        }, 30000);
     </script>
 </body>
 </html>
