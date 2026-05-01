@@ -109,7 +109,7 @@
         #rules-title, .rule-header { color: var(--primary-text-color); }
         
         /* Game Styles */
-        .wg-card { background-color: var(--card-bg-color); color: var(--text-color); border: 2px solid var(--border-color); font-weight: 600; cursor: pointer; position: relative; overflow: hidden; }
+        .wg-card { background-color: var(--card-bg-color); color: var(--text-color); border: 2px solid var(--border-color); font-weight: 600; cursor: pointer; }
         .wg-card.revealed.red { background-color: var(--accent-color); color: var(--accent-text-color); border-color: var(--accent-text-color); }
         .wg-card.revealed.blue { background-color: #93c5fd; color: #1e40af; border-color: #3b82f6; }
         html.dark .wg-card.revealed.blue { background-color: #1e3a8a; color: #93c5fd; border-color: #60a5fa; }
@@ -153,10 +153,6 @@
         .sf-loc-card { transition: all 0.2s; border: 2px solid var(--border-color); background-color: var(--card-bg-color); }
         .sf-loc-card.played { opacity: 0.4; text-decoration: line-through; filter: grayscale(100%); pointer-events: none; }
         
-        /* Slider for Mind Frequency */
-        .mf-slider { -webkit-appearance: none; width: 100%; height: 20px; border-radius: 10px; background: linear-gradient(to right, #3b82f6, #f43f5e); outline: none; }
-        .mf-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 3px solid #1c1917; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
-
         .spinner-container::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 2.5rem; color: var(--accent-color); }
         #stopwatch-time { font-family: 'monospace'; }
         #chat-messages::-webkit-scrollbar { width: 6px; }
@@ -190,7 +186,7 @@
             <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wide">Host: Change Track</span>
             <select id="bgm-track-select" class="w-full text-xs p-1 mt-1 rounded bg-stone-100 dark:bg-stone-700 text-stone-800 dark:text-stone-200 border-none outline-none">
                 <option value="/music/song1.mp3">Lofi Chill (Default)</option>
-                <option value="/music/song2.mp3">Tense / Mafia</option>
+                <option value="">Tense / Mafia</option>
                 <option value="">Funny / Upbeat</option>
             </select>
         </div>
@@ -324,18 +320,14 @@
         
         <!-- Waiting Room (Lobby) Screen -->
         <div id="waiting-screen" class="hidden text-center p-6 sm:p-8 bg-white/80 dark:bg-[#3A322C]/80 backdrop-blur-sm rounded-xl shadow-2xl transition-colors w-full">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-stone-100 dark:bg-stone-800 p-4 rounded-xl border border-stone-200 dark:border-stone-700 relative">
-                <button id="leave-room-btn" class="absolute top-2 right-2 md:top-4 md:right-4 text-red-500 hover:text-white hover:bg-red-500 bg-red-100 dark:bg-red-900/30 p-2 px-3 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-1 z-10 border border-red-200 dark:border-red-800">
-                    🚪 ออกจากห้อง
-                </button>
-                
-                <div class="text-left mb-4 md:mb-0 w-full mt-8 md:mt-0">
-                    <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--heading-color);">ห้องปาร์ตี้: <span id="roomCodeDisplay" class="text-2xl sm:text-3xl tracking-widest text-[var(--primary-text-color)] font-mono ml-2"></span></h2>
-                    <p class="text-stone-500 dark:text-stone-400 mt-1 text-sm sm:text-base">ชวนเพื่อนเข้าห้องด้วยรหัสนี้ (รองรับสูงสุด 16 คน)</p>
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-stone-100 dark:bg-stone-800 p-4 rounded-xl border border-stone-200 dark:border-stone-700">
+                <div class="text-left mb-4 md:mb-0">
+                    <h2 class="text-2xl font-bold" style="color: var(--heading-color);">ห้องปาร์ตี้: <span id="roomCodeDisplay" class="text-3xl tracking-widest text-[var(--primary-text-color)] font-mono ml-2"></span></h2>
+                    <p class="text-stone-500 dark:text-stone-400 mt-1">ชวนเพื่อนเข้าห้องด้วยรหัสนี้ (รองรับสูงสุด 16 คน)</p>
                 </div>
-                <div class="text-center md:text-right w-full md:w-auto border-t md:border-none border-stone-200 dark:border-stone-700 pt-4 md:pt-0">
+                <div class="text-right w-full md:w-auto">
                     <h3 class="font-bold text-lg mb-2">สมาชิก (<span id="playerCount">1</span>/16)</h3>
-                    <div id="playerList" class="flex flex-wrap justify-center md:justify-end gap-3 md:gap-2"></div>
+                    <div id="playerList" class="flex flex-wrap justify-center md:justify-end gap-2"></div>
                 </div>
             </div>
 
@@ -364,18 +356,6 @@
                         <h3 class="text-lg font-bold text-red-600 dark:text-red-400">เหลี่ยมมาเฟีย 🕴️</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">อ้างบทบาท โกหก และกำจัดศัตรูให้หมด!</p>
                     </div>
-                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="word-guess">
-                        <h3 class="text-lg font-bold text-blue-500 dark:text-blue-400">รหัสคำทาย 🕵️‍♂️</h3>
-                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม หรือช่วยกันทายคำใบ้</p>
-                    </div>
-                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="mind-frequency">
-                        <h3 class="text-lg font-bold text-pink-500 dark:text-pink-400">คลื่นความถี่ใจ 📻</h3>
-                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม! หมุนหน้าปัดจูนใจให้ตรงกัน</p>
-                    </div>
-                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="same-flock">
-                        <h3 class="text-lg font-bold text-stone-700 dark:text-stone-300">แกะตามฝูง 🐑</h3>
-                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">ตอบให้เหมือนชาวบ้าน อย่าเป็นแกะดำ!</p>
-                    </div>
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="truth-or-lie">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">ความจริง 1 โกหก 1 🎭</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แต่งเรื่องหลอกเพื่อนให้เนียนที่สุด!</p>
@@ -399,6 +379,10 @@
                     <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="number-sort">
                         <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">เรียงเลขวัดใจ 🔢</h3>
                         <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">สื่อสารและเรียงลำดับตัวเลข</p>
+                    </div>
+                    <div class="card p-4 rounded-lg cursor-pointer flex flex-col justify-center" data-game="word-guess">
+                        <h3 class="text-lg font-bold" style="color: var(--primary-text-color);">รหัสคำทาย 🕵️‍♂️</h3>
+                        <p class="text-xs mt-1 text-stone-500 dark:text-stone-400">แบ่งทีม หรือช่วยกันทายคำใบ้</p>
                     </div>
                 </div>
 
@@ -462,98 +446,6 @@
                         <p class="text-sm text-stone-500 dark:text-stone-400">จับเวลาสำหรับการแข่งขัน</p>
                     </div>
                  </div>
-            </div>
-        </div>
-
-        <!-- Mind Frequency Game Screen -->
-        <div id="mind-frequency-screen" class="hidden w-full text-center">
-            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-left">
-                    <h2 class="text-2xl font-bold text-pink-500">คลื่นความถี่ใจ 📻</h2>
-                    <p id="mf-role-desc" class="text-stone-500 dark:text-stone-400 text-sm">คุณคือคนจูนคลื่น หรือ คนใบ้?</p>
-                </div>
-                <div class="bg-white dark:bg-stone-800 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 shadow-sm font-bold text-lg flex gap-4">
-                    <span class="text-red-500">🔴 <span id="mf-red-score">0</span></span>
-                    <span class="text-stone-300 dark:text-stone-600">|</span>
-                    <span class="text-blue-500">🔵 <span id="mf-blue-score">0</span></span>
-                </div>
-            </div>
-
-            <!-- Concepts Display -->
-            <div class="bg-white/80 dark:bg-stone-800/80 p-6 rounded-xl shadow-md border-2 border-pink-300 dark:border-pink-900 mb-6 flex justify-between items-center relative overflow-hidden">
-                <div class="w-1/3 text-left">
-                    <h3 id="mf-concept-left" class="text-2xl font-bold text-blue-500">เย็น</h3>
-                </div>
-                <div class="w-1/3 text-center opacity-30 italic font-bold">
-                    <span id="mf-hidden-target" class="text-4xl hidden">🎯</span>
-                </div>
-                <div class="w-1/3 text-right">
-                    <h3 id="mf-concept-right" class="text-2xl font-bold text-red-500">ร้อน</h3>
-                </div>
-            </div>
-
-            <!-- Psychic Clue Area -->
-            <div id="mf-psychic-area" class="hidden mb-6 bg-pink-50 dark:bg-pink-900/20 p-6 rounded-xl border-2 border-pink-400">
-                <h3 class="text-xl font-bold mb-2">คุณคือคนใบ้ (Psychic) 🧠</h3>
-                <p class="mb-4">เป้าหมายซ่อนอยู่ที่ <strong class="text-2xl text-pink-600" id="mf-psychic-target">75%</strong> (ค่อนไปทางขวา)</p>
-                <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-                    <input type="text" id="mf-clue-input" class="input-field p-3 flex-grow rounded-lg text-center" placeholder="พิมพ์คำใบ้ 1 คำ หรือ 1 วลี...">
-                    <button id="mf-submit-clue-btn" class="btn-primary p-3 rounded-lg whitespace-nowrap">ส่งคำใบ้</button>
-                </div>
-            </div>
-
-            <!-- Guesser Dial Area -->
-            <div id="mf-guess-area" class="hidden mb-6 p-6 bg-white dark:bg-stone-800 rounded-xl shadow-md border border-stone-200 dark:border-stone-700 relative">
-                <h3 class="text-xl font-bold mb-4">คำใบ้คือ: <span id="mf-given-clue" class="text-3xl text-[var(--accent-color)] ml-2">???</span></h3>
-                <p class="mb-6 text-stone-500">เลื่อนหน้าปัดไปยังจุดที่คุณคิดว่าตรงกับคำใบ้มากที่สุด</p>
-                
-                <div class="relative w-full h-16 flex items-center">
-                    <!-- The Target Zone (Hidden during guess) -->
-                    <div id="mf-target-zone" class="absolute h-10 w-[15%] bg-yellow-300/50 border-2 border-yellow-500 rounded-lg top-3 hidden transition-all" style="left: 42.5%;"></div>
-                    <!-- The Slider -->
-                    <input type="range" id="mf-dial" min="0" max="100" value="50" class="mf-slider relative z-10 w-full" disabled>
-                </div>
-                
-                <div class="mt-8">
-                    <button id="mf-lock-btn" class="btn-primary p-4 px-10 text-xl rounded-xl hidden">ยืนยันตำแหน่งนี้!</button>
-                    <p id="mf-host-notice" class="text-sm text-stone-500 mt-2 hidden">*ทีมที่ถึงคิวกดยืนยันได้เลย (โฮสต์กดแทนเพื่อนได้)</p>
-                </div>
-            </div>
-
-            <!-- Result Area -->
-            <div id="mf-result-area" class="hidden p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-500">
-                <h3 id="mf-result-text" class="text-3xl font-bold mb-2"></h3>
-                <p class="text-lg mb-4">ได้คะแนนรอบนี้: <span id="mf-round-points" class="font-bold text-2xl text-green-600">0</span> แต้ม</p>
-                <button id="mf-next-round-btn" class="hidden btn-primary p-3 px-8 rounded-lg">เล่นรอบต่อไป</button>
-            </div>
-        </div>
-
-        <!-- Same Flock (Herd Mentality) Screen -->
-        <div id="same-flock-screen" class="hidden w-full text-center">
-            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-stone-700 dark:text-stone-300">แกะตามฝูง 🐑</h2>
-            </div>
-
-            <div class="bg-white/80 dark:bg-[#2C2621]/80 p-8 rounded-xl shadow-lg border-2 border-[var(--primary-color)] mb-6">
-                <p class="text-stone-500 dark:text-stone-400 font-bold mb-2">คำถามประจำรอบ</p>
-                <h2 id="sfk-question" class="text-3xl sm:text-4xl font-bold text-[var(--heading-color)] leading-tight"></h2>
-            </div>
-
-            <div id="sfk-answer-area" class="max-w-md mx-auto mb-6">
-                <p class="mb-4 font-semibold text-lg text-stone-600 dark:text-stone-300">พิมพ์คำตอบที่คิดว่า "คนส่วนใหญ่จะตอบเหมือนกัน"</p>
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="sfk-my-answer" class="input-field p-4 text-xl font-bold rounded-xl text-center shadow-inner" placeholder="ตอบสั้นๆ ได้ใจความ...">
-                    <button id="sfk-submit-btn" class="btn-primary p-4 text-xl rounded-xl">ส่งคำตอบ</button>
-                </div>
-                <p id="sfk-wait-msg" class="hidden mt-4 text-stone-500 font-bold animate-pulse">ส่งแล้ว! รอเพื่อนๆ ก่อนนะ...</p>
-            </div>
-
-            <div id="sfk-result-area" class="hidden max-w-4xl mx-auto mb-6">
-                <h3 class="text-2xl font-bold mb-6 text-[var(--accent-color)]">ใครอยู่ฝูงไหนบ้าง มาดูกัน!</h3>
-                <div id="sfk-groups-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    <!-- Groups will be rendered here -->
-                </div>
-                <button id="sfk-next-round-btn" class="hidden btn-primary p-4 px-10 text-xl rounded-xl mx-auto">เริ่มรอบต่อไป</button>
             </div>
         </div>
 
@@ -1060,98 +952,6 @@
             </div>
         </div>
 
-        <!-- Mind Frequency Game Screen -->
-        <div id="mind-frequency-screen" class="hidden w-full text-center">
-            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-left">
-                    <h2 class="text-2xl font-bold text-pink-500">คลื่นความถี่ใจ 📻</h2>
-                    <p id="mf-role-desc" class="text-stone-500 dark:text-stone-400 text-sm">คุณคือคนจูนคลื่น หรือ คนใบ้?</p>
-                </div>
-                <div class="bg-white dark:bg-stone-800 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 shadow-sm font-bold text-lg flex gap-4">
-                    <span class="text-red-500">🔴 <span id="mf-red-score">0</span></span>
-                    <span class="text-stone-300 dark:text-stone-600">|</span>
-                    <span class="text-blue-500">🔵 <span id="mf-blue-score">0</span></span>
-                </div>
-            </div>
-
-            <!-- Concepts Display -->
-            <div class="bg-white/80 dark:bg-stone-800/80 p-6 rounded-xl shadow-md border-2 border-pink-300 dark:border-pink-900 mb-6 flex justify-between items-center relative overflow-hidden">
-                <div class="w-1/3 text-left">
-                    <h3 id="mf-concept-left" class="text-2xl font-bold text-blue-500">เย็น</h3>
-                </div>
-                <div class="w-1/3 text-center opacity-30 italic font-bold">
-                    <span id="mf-hidden-target" class="text-4xl hidden">🎯</span>
-                </div>
-                <div class="w-1/3 text-right">
-                    <h3 id="mf-concept-right" class="text-2xl font-bold text-red-500">ร้อน</h3>
-                </div>
-            </div>
-
-            <!-- Psychic Clue Area -->
-            <div id="mf-psychic-area" class="hidden mb-6 bg-pink-50 dark:bg-pink-900/20 p-6 rounded-xl border-2 border-pink-400">
-                <h3 class="text-xl font-bold mb-2">คุณคือคนใบ้ (Psychic) 🧠</h3>
-                <p class="mb-4">เป้าหมายซ่อนอยู่ที่ <strong class="text-2xl text-pink-600" id="mf-psychic-target">75%</strong> (ค่อนไปทางขวา)</p>
-                <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-                    <input type="text" id="mf-clue-input" class="input-field p-3 flex-grow rounded-lg text-center" placeholder="พิมพ์คำใบ้ 1 คำ หรือ 1 วลี...">
-                    <button id="mf-submit-clue-btn" class="btn-primary p-3 rounded-lg whitespace-nowrap">ส่งคำใบ้</button>
-                </div>
-            </div>
-
-            <!-- Guesser Dial Area -->
-            <div id="mf-guess-area" class="hidden mb-6 p-6 bg-white dark:bg-stone-800 rounded-xl shadow-md border border-stone-200 dark:border-stone-700 relative">
-                <h3 class="text-xl font-bold mb-4">คำใบ้คือ: <span id="mf-given-clue" class="text-3xl text-[var(--accent-color)] ml-2">???</span></h3>
-                <p class="mb-6 text-stone-500">เลื่อนหน้าปัดไปยังจุดที่คุณคิดว่าตรงกับคำใบ้มากที่สุด</p>
-                
-                <div class="relative w-full h-16 flex items-center">
-                    <!-- The Target Zone (Hidden during guess) -->
-                    <div id="mf-target-zone" class="absolute h-10 w-[15%] bg-yellow-300/50 border-2 border-yellow-500 rounded-lg top-3 hidden transition-all" style="left: 42.5%;"></div>
-                    <!-- The Slider -->
-                    <input type="range" id="mf-dial" min="0" max="100" value="50" class="mf-slider relative z-10 w-full" disabled>
-                </div>
-                
-                <div class="mt-8">
-                    <button id="mf-lock-btn" class="btn-primary p-4 px-10 text-xl rounded-xl hidden">ยืนยันตำแหน่งนี้!</button>
-                    <p id="mf-host-notice" class="text-sm text-stone-500 mt-2 hidden">*ทีมที่ถึงคิวกดยืนยันได้เลย (โฮสต์กดแทนเพื่อนได้)</p>
-                </div>
-            </div>
-
-            <!-- Result Area -->
-            <div id="mf-result-area" class="hidden p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-500">
-                <h3 id="mf-result-text" class="text-3xl font-bold mb-2"></h3>
-                <p class="text-lg mb-4">ได้คะแนนรอบนี้: <span id="mf-round-points" class="font-bold text-2xl text-green-600">0</span> แต้ม</p>
-                <button id="mf-next-round-btn" class="hidden btn-primary p-3 px-8 rounded-lg">เล่นรอบต่อไป</button>
-            </div>
-        </div>
-
-        <!-- Same Flock (Herd Mentality) Screen -->
-        <div id="same-flock-screen" class="hidden w-full text-center">
-            <div class="mb-4 p-4 bg-stone-100 dark:bg-[#3A322C] rounded-lg shadow-sm flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-stone-700 dark:text-stone-300">แกะตามฝูง 🐑</h2>
-            </div>
-
-            <div class="bg-white/80 dark:bg-[#2C2621]/80 p-8 rounded-xl shadow-lg border-2 border-[var(--primary-color)] mb-6">
-                <p class="text-stone-500 dark:text-stone-400 font-bold mb-2">คำถามประจำรอบ</p>
-                <h2 id="sfk-question" class="text-3xl sm:text-4xl font-bold text-[var(--heading-color)] leading-tight"></h2>
-            </div>
-
-            <div id="sfk-answer-area" class="max-w-md mx-auto mb-6">
-                <p class="mb-4 font-semibold text-lg text-stone-600 dark:text-stone-300">พิมพ์คำตอบที่คิดว่า "คนส่วนใหญ่จะตอบเหมือนกัน"</p>
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="sfk-my-answer" class="input-field p-4 text-xl font-bold rounded-xl text-center shadow-inner" placeholder="ตอบสั้นๆ ได้ใจความ...">
-                    <button id="sfk-submit-btn" class="btn-primary p-4 text-xl rounded-xl">ส่งคำตอบ</button>
-                </div>
-                <p id="sfk-wait-msg" class="hidden mt-4 text-stone-500 font-bold animate-pulse">ส่งแล้ว! รอเพื่อนๆ ก่อนนะ...</p>
-            </div>
-
-            <div id="sfk-result-area" class="hidden max-w-4xl mx-auto mb-6">
-                <h3 class="text-2xl font-bold mb-6 text-[var(--accent-color)]">ใครอยู่ฝูงไหนบ้าง มาดูกัน!</h3>
-                <div id="sfk-groups-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    <!-- Groups will be rendered here -->
-                </div>
-                <button id="sfk-next-round-btn" class="hidden btn-primary p-4 px-10 text-xl rounded-xl mx-auto">เริ่มรอบต่อไป</button>
-            </div>
-        </div>
-
         <!-- Spinner Tool Screen -->
         <div id="spinner-screen" class="hidden w-full">
             <button id="spinner-back-btn" class="absolute top-4 left-4 btn-secondary p-2 rounded-full">← กลับ</button>
@@ -1230,9 +1030,7 @@
             'secret-painter': 'จิตรกรกำมะลอ 🎨',
             'friend-quiz': 'ทายใจเพื่อน 💖',
             'number-sort': 'เรียงเลขวัดใจ 🔢',
-            'word-guess': 'รหัสคำทาย 🕵️‍♂️',
-            'mind-frequency': 'คลื่นความถี่ใจ 📻',
-            'same-flock': 'แกะตามฝูง 🐑'
+            'word-guess': 'รหัสคำทาย 🕵️‍♂️'
         };
 
         const roleNames = {
@@ -1412,36 +1210,6 @@
                         <li><strong>การคิดคะแนน:</strong> ถ้าทายถูก คนทายได้ 2 แต้ม, และคนที่ให้คำใบ้รอด (ไม่ซ้ำ) ได้คนละ 1 แต้ม</li>
                     </ol>
                 `
-            },
-            'mind-frequency': {
-                title: 'วิธีเล่น: คลื่นความถี่ใจ 📻',
-                content: `
-                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
-                    <p class="mb-4">แบ่งทีมหาตำแหน่งจุดซ่อนเร้นบนหน้าปัดให้เจอ โดยอิงจาก "คำใบ้" ของคนในทีม</p>
-                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น:</h4>
-                    <ol class="list-decimal list-inside space-y-2 text-left">
-                        <li>ระบบจะสุ่มแบ่งเป็นทีม แดง-น้ำเงิน และผลัดกันเล่นทีละทีม</li>
-                        <li>ทีมที่ถึงคิวจะถูกสุ่มคนใบ้ 1 คน <strong>(Psychic)</strong> ซึ่งจะเห็นคำตรงข้าม 2 คำ และเห็น <strong>"เป้าหมาย"</strong></li>
-                        <li>Psychic ต้องให้คำใบ้ 1 คำหรือ 1 วลี (เช่น "กาแฟ") เพื่อใบ้ว่าเป้าหมายอยู่ตำแหน่งไหน</li>
-                        <li>ลูกทีมที่เหลือ <strong>ปรึกษากันและเลื่อนหน้าปัด</strong> ไปยังตำแหน่งที่คิดว่าตรงกับคำใบ้ที่สุด (และกดยืนยัน)</li>
-                        <li>ส่วนทีมฝั่งตรงข้ามทำได้แค่นั่งดูและภาวนาให้ทายผิด 🤣</li>
-                        <li><strong>การคิดคะแนน:</strong> ถ้ายิ่งเลื่อนเป้าได้ใกล้เคียงจุดซ่อนเร้นมากเท่าไหร่ ทีมยิ่งได้คะแนนเยอะ! (สูงสุด 4 แต้ม)</li>
-                    </ol>
-                `
-            },
-            'same-flock': {
-                title: 'วิธีเล่น: แกะตามฝูง 🐑',
-                content: `
-                    <h4 class="font-bold text-lg mb-2 rule-header">เป้าหมาย:</h4>
-                    <p class="mb-4">คิดให้เหมือนคนอื่น! พยายามตอบให้ตรงกับคำตอบที่ "คนหมู่มาก" ในห้องจะตอบ</p>
-                    <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น (แนะนำ 4 คนขึ้นไป):</h4>
-                    <ol class="list-decimal list-inside space-y-2 text-left">
-                        <li>ระบบจะให้คำถาม 1 ข้อ (เช่น "ผลไม้สีแดงที่อร่อยที่สุด")</li>
-                        <li>ทุกคนพิมพ์คำตอบของตัวเอง <strong>ห้ามบอกเพื่อนเด็ดขาด!</strong> พยายามคิดว่า "คนส่วนใหญ่จะตอบอะไร"</li>
-                        <li>เมื่อตอบครบ ระบบจะจับกลุ่มคำตอบที่เหมือนหรือคล้ายกัน</li>
-                        <li><strong>การคิดคะแนน:</strong> กลุ่มที่คนตอบเหมือนกันเยอะที่สุด (ฝูงใหญ่สุด) ทุกคนในกลุ่มนั้นรับไปเลย 1 แต้ม! ใครอินดี้ตอบไม่เหมือนชาวบ้าน อดแต้มจ้า</li>
-                    </ol>
-                `
             }
         };
 
@@ -1521,6 +1289,7 @@
         const removeProfileBtn = document.getElementById('remove-profile-btn');
         let selectedAvatar = '🎮';
         
+        // ย่อรูปเพื่อไม่ให้เซิร์ฟเวอร์โหลดหนักเวลาส่ง Base64 ไปมา
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -1528,6 +1297,7 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
+                    // ลดขนาดภาพให้เหลือ 100x100
                     const MAX_SIZE = 100;
                     let width = img.width;
                     let height = img.height;
@@ -1540,6 +1310,7 @@
                     
                     canvas.width = width; canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
+                    // คุณภาพ 0.7 
                     callback(canvas.toDataURL('image/jpeg', 0.7));
                 }
                 img.src = e.target.result;
@@ -1572,6 +1343,7 @@
             });
         });
 
+        // Add standard emojis
         const extraAvatars = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🐓','🦃','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🐿️','🦔'];
         extraAvatars.forEach(emoji => {
             const btn = document.createElement('button');
@@ -1809,8 +1581,6 @@
             whoAmI: document.getElementById('who-am-i-screen'),
             secretAgent: document.getElementById('secret-agent-screen'),
             wordGuess: document.getElementById('word-guess-screen'),
-            mindFrequency: document.getElementById('mind-frequency-screen'),
-            sameFlock: document.getElementById('same-flock-screen'),
             numberSort: document.getElementById('number-sort-screen'),
             friendQuiz: document.getElementById('friend-quiz-screen'),
             secretPainter: document.getElementById('secret-painter-screen'),
@@ -1878,7 +1648,6 @@
                     
                     let minPlayers = 2;
                     if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
-                    if (['same-flock'].includes(selectedGame)) minPlayers = 4;
                     if (selectedGame === 'who-am-i') minPlayers = 2;
                     
                     startBtn.disabled = players.length < minPlayers;
@@ -1932,7 +1701,6 @@
             const startBtn = document.getElementById('startGameBtn');
             let minPlayers = 2;
             if (['unique-clue', 'truth-or-lie', 'secret-agent', 'secret-painter'].includes(selectedGame)) minPlayers = 3;
-            if (['same-flock'].includes(selectedGame)) minPlayers = 4;
             if (selectedGame === 'who-am-i') minPlayers = 2;
             
             startBtn.disabled = currentPlayersCount < minPlayers;
@@ -2258,6 +2026,7 @@
                 if (remain <= 0) {
                     clearInterval(sfTimerInterval);
                     timerDisplay.textContent = "00:00";
+                    // ถ้าโฮสยังไม่ได้กดเริ่มโหวต ให้ยิงไปเซิร์ฟ
                     if (isHost && currentSfState.phase === 'playing') {
                         socket.emit('spyfall_timeUp');
                     }
@@ -3603,335 +3372,79 @@
             socket.on('wordGuess_gameOver', handleWordGuessGameOver);
         })();
 
-        // --- Mind Frequency (Wavelength) Client Logic ---
-        (function initMindFrequency() {
-            const roleDesc = document.getElementById('mf-role-desc');
-            const conceptLeft = document.getElementById('mf-concept-left');
-            const conceptRight = document.getElementById('mf-concept-right');
-            const hiddenTarget = document.getElementById('mf-hidden-target');
-            
-            const psychicArea = document.getElementById('mf-psychic-area');
-            const psychicTarget = document.getElementById('mf-psychic-target');
-            const clueInput = document.getElementById('mf-clue-input');
-            const submitClueBtn = document.getElementById('mf-submit-clue-btn');
-
-            const guessArea = document.getElementById('mf-guess-area');
-            const givenClue = document.getElementById('mf-given-clue');
-            const dial = document.getElementById('mf-dial');
-            const targetZone = document.getElementById('mf-target-zone');
-            const lockBtn = document.getElementById('mf-lock-btn');
-            const hostNotice = document.getElementById('mf-host-notice');
-
-            const resultArea = document.getElementById('mf-result-area');
-            const resultText = document.getElementById('mf-result-text');
-            const roundPoints = document.getElementById('mf-round-points');
-            const nextRoundBtn = document.getElementById('mf-next-round-btn');
-
-            submitClueBtn.addEventListener('click', () => {
-                const clue = clueInput.value.trim();
-                if(clue) {
-                    socket.emit('mf_submitClue', { clue });
-                    clueInput.value = '';
-                    psychicArea.classList.add('hidden');
-                    roleDesc.textContent = "รอเพื่อนในทีมช่วยกันหมุนเข็มทิศ...";
-                }
-            });
-
-            dial.addEventListener('input', (e) => {
-                socket.emit('mf_updateDial', { value: e.target.value });
-            });
-
-            lockBtn.addEventListener('click', () => {
-                socket.emit('mf_lockDial', { value: dial.value });
-                lockBtn.disabled = true;
-            });
-
-            nextRoundBtn.addEventListener('click', () => {
-                if (isHost) socket.emit('mf_nextRound');
-            });
-
-            socket.on('mf_newRound', (data) => {
-                psychicArea.classList.add('hidden');
-                guessArea.classList.add('hidden');
-                resultArea.classList.add('hidden');
-                targetZone.classList.add('hidden');
-                hiddenTarget.classList.add('hidden');
-                dial.disabled = true;
-                dial.value = 50;
-                lockBtn.classList.add('hidden');
-                hostNotice.classList.add('hidden');
-                
-                conceptLeft.textContent = data.concept[0];
-                conceptRight.textContent = data.concept[1];
-                document.getElementById('mf-red-score').textContent = data.teamData.redScore;
-                document.getElementById('mf-blue-score').textContent = data.teamData.blueScore;
-
-                const turnColorHtml = data.teamData.turn === 'red' ? '<span class="text-red-500">ทีมแดง</span>' : '<span class="text-blue-500">ทีมน้ำเงิน</span>';
-
-                if (socket.id === data.psychicId) {
-                    roleDesc.innerHTML = `ตาของ${turnColorHtml}! คุณคือคนใบ้: <strong>${data.concept[0]}</strong> หรือ <strong>${data.concept[1]}</strong>?`;
-                    psychicTarget.textContent = `${data.targetValue}%`;
-                    psychicArea.classList.remove('hidden');
-                } else {
-                    const psychicPlayer = data.players.find(p => p.id === data.psychicId);
-                    roleDesc.innerHTML = `ตาของ${turnColorHtml}! รอ <strong>${renderAvatar(psychicPlayer.avatar)} ${psychicPlayer.name}</strong> ใบ้คำ...`;
-                }
-            });
-
-            socket.on('mf_startGuessing', (data) => {
-                guessArea.classList.remove('hidden');
-                givenClue.textContent = data.clue;
-                
-                const myTeam = data.teamData.redPlayers.includes(socket.id) ? 'red' : (data.teamData.bluePlayers.includes(socket.id) ? 'blue' : null);
-                const isActiveTeam = myTeam === data.teamData.turn;
-
-                if (socket.id !== data.psychicId) {
-                    if (isActiveTeam) {
-                        roleDesc.textContent = "ตาของทีมคุณ! ปรึกษากัน หมุนหน้าปัด แล้วกดยืนยัน!";
-                        dial.disabled = false;
-                        lockBtn.classList.remove('hidden');
-                        lockBtn.disabled = false;
-                    } else {
-                        roleDesc.textContent = "ตาทีมอื่น! รอดูว่าพวกเขาจะทายถูกไหม (ทีมคุณหมุนไม่ได้นะ)";
-                        dial.disabled = true;
-                        lockBtn.classList.add('hidden');
-                    }
-                }
-                
-                if (isHost && socket.id !== data.psychicId) {
-                    hostNotice.classList.remove('hidden');
-                    lockBtn.classList.remove('hidden'); // โฮสต์เห็นปุ่มเผื่อฉุกเฉิน
-                    lockBtn.disabled = false;
-                } else {
-                    hostNotice.classList.add('hidden');
-                }
-            });
-
-            socket.on('mf_syncDial', (val) => {
-                dial.value = val;
-            });
-
-            socket.on('mf_showResult', (data) => {
-                dial.disabled = true;
-                lockBtn.classList.add('hidden');
-                hostNotice.classList.add('hidden');
-                
-                document.getElementById('mf-red-score').textContent = data.teamData.redScore;
-                document.getElementById('mf-blue-score').textContent = data.teamData.blueScore;
-
-                // Show Target Zone
-                targetZone.classList.remove('hidden');
-                targetZone.style.left = `${data.targetValue - 7.5}%`; // Center the 15% width zone
-
-                resultArea.classList.remove('hidden');
-                hiddenTarget.classList.remove('hidden');
-                roundPoints.textContent = data.points;
-                
-                if (data.points === 4) resultText.textContent = "🎯 เป๊ะเวอร์!! (Bullseye!)";
-                else if (data.points === 3) resultText.textContent = "🔥 เกือบเป๊ะ! (ดีมาก)";
-                else if (data.points === 2) resultText.textContent = "👍 ถือว่าใกล้เคียง!";
-                else resultText.textContent = "💩 ผิดเพี้ยนไปไกลเลย...";
-
-                if (isHost) nextRoundBtn.classList.remove('hidden');
-            });
-        })();
-
-        // --- Same Flock (Herd Mentality) Client Logic ---
-        (function initSameFlock() {
-            const questionDisplay = document.getElementById('sfk-question');
-            const answerArea = document.getElementById('sfk-answer-area');
-            const myAnswerInput = document.getElementById('sfk-my-answer');
-            const submitBtn = document.getElementById('sfk-submit-btn');
-            const waitMsg = document.getElementById('sfk-wait-msg');
-            
-            const resultArea = document.getElementById('sfk-result-area');
-            const groupsContainer = document.getElementById('sfk-groups-container');
-            const nextRoundBtn = document.getElementById('sfk-next-round-btn');
-
-            submitBtn.addEventListener('click', () => {
-                const answer = myAnswerInput.value.trim();
-                if(answer) {
-                    socket.emit('flock_submitAnswer', { answer });
-                    myAnswerInput.disabled = true;
-                    submitBtn.disabled = true;
-                    waitMsg.classList.remove('hidden');
-                }
-            });
-
-            nextRoundBtn.addEventListener('click', () => {
-                if (isHost) socket.emit('flock_nextRound');
-            });
-
-            socket.on('flock_newRound', ({ question }) => {
-                questionDisplay.textContent = question;
-                
-                answerArea.classList.remove('hidden');
-                resultArea.classList.add('hidden');
-                nextRoundBtn.classList.add('hidden');
-                
-                myAnswerInput.value = '';
-                myAnswerInput.disabled = false;
-                submitBtn.disabled = false;
-                waitMsg.classList.add('hidden');
-            });
-
-            socket.on('flock_showResult', ({ groups }) => {
-                answerArea.classList.add('hidden');
-                resultArea.classList.remove('hidden');
-                groupsContainer.innerHTML = '';
-
-                groups.forEach((group, index) => {
-                    const card = document.createElement('div');
-                    const isMajority = group.isMajority;
-                    
-                    let styles = 'bg-stone-100 dark:bg-stone-800 border-stone-300 dark:border-stone-600';
-                    let titleStyle = 'text-stone-600 dark:text-stone-300';
-                    let badge = '';
-
-                    if (isMajority) {
-                        styles = 'bg-[var(--primary-color)]/20 border-[var(--primary-color)]';
-                        titleStyle = 'text-[var(--primary-text-color)]';
-                        badge = '<span class="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full shadow-md flex items-center gap-1">⭐ +1 แต้ม</span>';
-                    }
-
-                    card.className = `p-4 rounded-xl border-2 ${styles} relative transition-transform hover:scale-105`;
-                    
-                    let playersHtml = group.players.map(p => `
-                        <div class="flex items-center gap-2 mb-1">
-                            ${renderAvatar(p.avatar, 'w-5 h-5 rounded-full')}
-                            <span class="font-semibold text-sm">${p.name}</span>
-                        </div>
-                    `).join('');
-
-                    card.innerHTML = `
-                        ${badge}
-                        <h4 class="text-xl font-bold mb-3 ${titleStyle}">"${group.answer}"</h4>
-                        <div class="border-t border-black/10 dark:border-white/10 pt-2">
-                            ${playersHtml}
-                        </div>
-                        <p class="text-xs font-bold mt-2 opacity-70 text-right">${group.count} คน</p>
-                    `;
-                    groupsContainer.appendChild(card);
-                });
-
-                if (isHost) nextRoundBtn.classList.remove('hidden');
-            });
-        })();
-
-        // --- Spinner Logic ---
+        // --- Tools (Spinner / Stopwatch) ---
         (function initSpinner() {
             const canvas = document.getElementById('spinner-canvas');
             const ctx = canvas.getContext('2d');
             const spinBtn = document.getElementById('spin-btn');
-            const resultDiv = document.getElementById('spinner-result');
-            const optionsTextarea = document.getElementById('spinner-options');
             const updateBtn = document.getElementById('spinner-update-btn');
-            
-            let options = ["ดื่มน้ำ 1 แก้ว", "เต้นเพลงฮิต", "ร้องเพลงช้าง", "ทำหน้าตลก", "สารภาพความลับ", "บอกรักคนข้างซ้าย"];
-            optionsTextarea.value = options.join('\n');
-            
-            let currentAngle = 0;
-            let isSpinning = false;
-            let spinTimeout = null;
+            const optionsTextarea = document.getElementById('spinner-options');
+            const resultDiv = document.getElementById('spinner-result');
 
-            const colors = ['#A3B18A', '#E29578', '#DDA15E', '#93c5fd', '#fca5a5', '#fde047', '#c4b5fd', '#f9a8d4'];
+            let options = ["กินเหล้า", "เล่าเรื่องผี", "ร้องเพลง", "เต้น", "ตอบคำถาม", "พัก 5 นาที"];
+            const colors = ["#E29578", "#A3B18A", "#DDA15E", "#F4A261", "#8AB17D", "#E9C46A", "#E07A5F"];
+            let startAngle = 0; let arc = 0; let spinTimeout = null;
+            let spinAngleStart = 10; let spinTime = 0; let spinTimeTotal = 0;
 
             function drawSpinner() {
-                const numOptions = options.length;
-                const arc = Math.PI * 2 / numOptions;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.save();
-                ctx.translate(200, 200);
-                ctx.rotate(currentAngle);
-                
-                for (let i = 0; i < numOptions; i++) {
-                    ctx.beginPath();
+                if (options.length === 0) return;
+                arc = Math.PI / (options.length / 2);
+                ctx.clearRect(0, 0, 400, 400);
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                ctx.strokeStyle = isDarkMode ? "#44403c" : "#e7e5e4"; 
+                ctx.lineWidth = 2; ctx.font = '16px IBM Plex Sans Thai, sans-serif';
+
+                for (let i = 0; i < options.length; i++) {
+                    const angle = startAngle + i * arc;
                     ctx.fillStyle = colors[i % colors.length];
-                    ctx.moveTo(0, 0);
-                    ctx.arc(0, 0, 200, i * arc, (i + 1) * arc);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    ctx.save();
-                    ctx.fillStyle = '#28231D';
-                    ctx.translate(Math.cos(i * arc + arc / 2) * 120, Math.sin(i * arc + arc / 2) * 120);
-                    ctx.rotate(i * arc + arc / 2);
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.font = "bold 16px 'IBM Plex Sans Thai'";
-                    let text = options[i];
-                    if(text.length > 15) text = text.substring(0, 15) + '...';
-                    ctx.fillText(text, 0, 0);
-                    ctx.restore();
+                    ctx.beginPath(); ctx.arc(200, 200, 190, angle, angle + arc, false); ctx.arc(200, 200, 0, angle + arc, angle, true);
+                    ctx.stroke(); ctx.fill();
+                    ctx.save(); ctx.fillStyle = "#28231D"; 
+                    ctx.translate(200 + Math.cos(angle + arc / 2) * 120, 200 + Math.sin(angle + arc / 2) * 120);
+                    ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                    const text = options[i]; ctx.fillText(text, -ctx.measureText(text).width / 2, 0); ctx.restore();
                 }
-                ctx.restore();
-                
-                ctx.beginPath();
-                ctx.arc(200, 200, 15, 0, Math.PI * 2);
-                ctx.fillStyle = '#2C2621';
-                ctx.fill();
+            }
+            
+            document.getElementById('darkModeToggle').addEventListener('click', () => setTimeout(drawSpinner, 10));
+
+            function rotate() {
+                spinTime += 30;
+                if (spinTime >= spinTimeTotal) { stopRotate(); return; }
+                const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+                startAngle += (spinAngle * Math.PI / 180);
+                drawSpinner(); spinTimeout = setTimeout(rotate, 30);
             }
 
-            function rotateWheel() {
-                const spinAngleStart = Math.random() * 10 + 10;
-                let spinTime = 0;
-                const spinTimeTotal = Math.random() * 3000 + 4000;
-                
-                function rotate() {
-                    spinTime += 30;
-                    if (spinTime >= spinTimeTotal) {
-                        stopRotateWheel();
-                        return;
-                    }
-                    const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
-                    currentAngle += (spinAngle * Math.PI / 180);
-                    drawSpinner();
-                    spinTimeout = setTimeout(rotate, 30);
-                }
-                rotate();
-            }
-
-            function stopRotateWheel() {
+            function stopRotate() {
                 clearTimeout(spinTimeout);
-                const degrees = currentAngle * 180 / Math.PI + 90;
-                const arcd = 360 / options.length;
+                const degrees = startAngle * 180 / Math.PI + 90;
+                const arcd = arc * 180 / Math.PI;
                 const index = Math.floor((360 - degrees % 360) / arcd);
-                resultDiv.textContent = `ผลลัพธ์: ${options[index]}`;
-                resultDiv.classList.add('text-[var(--accent-color)]', 'animate-bounce');
-                setTimeout(() => resultDiv.classList.remove('animate-bounce'), 2000);
-                isSpinning = false;
+                ctx.save(); ctx.font = 'bold 30px IBM Plex Sans Thai, sans-serif';
+                resultDiv.textContent = `ผลลัพธ์: ${options[index]}`; ctx.restore();
                 spinBtn.disabled = false;
             }
 
             function easeOut(t, b, c, d) {
-                const ts = (t /= d) * t;
-                const tc = ts * t;
+                const ts = (t /= d) * t; const tc = ts * t;
                 return b + c * (tc + -3 * ts + 3 * t);
             }
 
-            updateBtn.addEventListener('click', () => {
-                const newOptions = optionsTextarea.value.split('\n').map(o => o.trim()).filter(o => o.length > 0);
-                if (newOptions.length < 2) { alert("ต้องมีอย่างน้อย 2 ตัวเลือก"); return; }
-                options = newOptions;
-                currentAngle = 0;
-                drawSpinner();
-                resultDiv.textContent = '';
+            spinBtn.addEventListener("click", () => {
+                if (options.length === 0) return;
+                spinBtn.disabled = true; resultDiv.textContent = "หมุนนนน...";
+                spinAngleStart = Math.random() * 10 + 10; spinTime = 0; spinTimeTotal = Math.random() * 3000 + 4000;
+                rotate();
             });
 
-            spinBtn.addEventListener('click', () => {
-                if (isSpinning) return;
-                isSpinning = true;
-                spinBtn.disabled = true;
-                resultDiv.textContent = 'กำลังหมุน...';
-                resultDiv.classList.remove('text-[var(--accent-color)]');
-                rotateWheel();
+            updateBtn.addEventListener("click", () => {
+                const newOptions = optionsTextarea.value.split('\n').filter(opt => opt.trim() !== '');
+                if (newOptions.length > 0) { options = newOptions; drawSpinner(); }
             });
-
             drawSpinner();
         })();
 
-        // --- Stopwatch Logic ---
         (function initStopwatch() {
             const timeDisplay = document.getElementById('stopwatch-time');
             const startBtn = document.getElementById('stopwatch-start-btn');
@@ -3940,44 +3453,36 @@
             const resetBtn = document.getElementById('stopwatch-reset-btn');
             const lapsList = document.getElementById('stopwatch-laps');
 
-            let timerInterval;
-            let startTime = 0;
-            let elapsedTime = 0;
-            let lapCounter = 0;
+            let startTime = 0; let elapsedTime = 0; let timerInterval = null; let lapCounter = 0;
 
-            function formatTime(ms) {
-                const totalSeconds = Math.floor(ms / 1000);
-                const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-                const seconds = String(totalSeconds % 60).padStart(2, '0');
-                const milliseconds = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
+            function formatTime(time) {
+                const date = new Date(time);
+                const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+                const milliseconds = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
                 return `${minutes}:${seconds}.${milliseconds}`;
             }
 
-            function updateTime() {
+            function updateDisplay() {
                 elapsedTime = Date.now() - startTime;
                 timeDisplay.textContent = formatTime(elapsedTime);
             }
-
+            
             function start() {
                 startTime = Date.now() - elapsedTime;
-                timerInterval = setInterval(updateTime, 10);
-                startBtn.classList.add('hidden');
-                stopBtn.classList.remove('hidden');
-                finishRoundBtn.disabled = false;
-                resetBtn.disabled = false;
+                timerInterval = setInterval(updateDisplay, 10);
+                startBtn.classList.add('hidden'); stopBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = false; resetBtn.disabled = false;
             }
 
             function stop() {
                 clearInterval(timerInterval);
-                startBtn.classList.remove('hidden');
-                stopBtn.classList.add('hidden');
+                stopBtn.classList.add('hidden'); startBtn.classList.remove('hidden');
+                finishRoundBtn.disabled = true;
             }
 
             function reset() {
-                clearInterval(timerInterval);
-                startBtn.classList.remove('hidden');
-                stopBtn.classList.add('hidden');
-                elapsedTime = 0; lapCounter = 0; timeDisplay.textContent = '00:00.00'; lapsList.innerHTML = '';
+                stop(); elapsedTime = 0; lapCounter = 0; timeDisplay.textContent = '00:00.00'; lapsList.innerHTML = '';
                 resetBtn.disabled = true; finishRoundBtn.disabled = true;
             }
 
@@ -4002,7 +3507,7 @@
         // --- Render Keep-Alive ---
         setInterval(() => {
             fetch('/ping').catch(err => console.log('Ping failed', err));
-        }, 30000);
+        }, 5 * 60 * 1000); 
 
     </script>
 </body>
