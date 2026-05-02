@@ -1448,10 +1448,11 @@
                     <p class="mb-4">คิดให้เหมือนคนอื่น! พยายามตอบให้ตรงกับคำตอบที่ "คนหมู่มาก" ในห้องจะตอบ</p>
                     <h4 class="font-bold text-lg mb-2 rule-header">ขั้นตอนการเล่น (แนะนำ 4 คนขึ้นไป):</h4>
                     <ol class="list-decimal list-inside space-y-2 text-left">
-                        <li>ระบบจะให้คำถาม 1 ข้อ (เช่น "ผลไม้สีแดงที่อร่อยที่สุด")</li>
+                        <li>ระบบจะให้คำถาม 1 ข้อ (เช่น "ยี่ห้อรถยนต์ยอดฮิต")</li>
                         <li>ทุกคนพิมพ์คำตอบของตัวเอง <strong>ห้ามบอกเพื่อนเด็ดขาด!</strong> พยายามคิดว่า "คนส่วนใหญ่จะตอบอะไร"</li>
                         <li>เมื่อตอบครบ ระบบจะจับกลุ่มคำตอบที่เหมือนหรือคล้ายกัน</li>
-                        <li><strong>การคิดคะแนน:</strong> กลุ่มที่คนตอบเหมือนกันเยอะที่สุด (ฝูงใหญ่สุด) ทุกคนในกลุ่มนั้นรับไปเลย 1 แต้ม! ใครอินดี้ตอบไม่เหมือนชาวบ้าน อดแต้มจ้า</li>
+                        <li><strong>การคิดคะแนน:</strong> กลุ่มที่คนตอบเหมือนกันเยอะที่สุด (ฝูงใหญ่สุด) ทุกคนในกลุ่มนั้นรับไปเลย 1 แต้ม!</li>
+                        <li><strong>🐑 แกะดำ:</strong> หากมีผู้เล่นที่ "ตอบไม่เหมือนใครเลย" เพียงแค่คนเดียวในรอบนั้น จะได้เป็น "แกะดำประจำฝูง" จนกว่าจะมีคนอื่นมาแย่งตำแหน่งไป!</li>
                     </ol>
                 `
             }
@@ -4100,7 +4101,7 @@
                 nextRoundBtn.classList.add('hidden');
             });
 
-            socket.on('sameFlock_showResult', ({ groups }) => {
+            socket.on('sameFlock_showResult', ({ groups, blackSheep }) => {
                 answerArea.classList.add('hidden');
                 waitMsg.classList.add('hidden');
                 resultArea.classList.remove('hidden');
@@ -4117,12 +4118,15 @@
                     let borderClass = isMajority ? 'border-[var(--primary-color)]' : 'border-stone-200 dark:border-stone-700';
                     let bgClass = isMajority ? 'bg-[var(--primary-color)]/10' : 'bg-stone-50 dark:bg-stone-800';
                     
-                    card.className = `p-4 rounded-xl border-2 ${borderClass} ${bgClass} shadow-sm`;
+                    card.className = `p-4 rounded-xl border-2 ${borderClass} ${bgClass} shadow-sm relative overflow-hidden`;
                     
                     let pointsBadge = isMajority ? `<span class="ml-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">+1 แต้ม</span>` : '';
                     
                     let playersHtml = group.players.map(p => {
-                        return `<span class="inline-flex items-center gap-1 bg-white dark:bg-stone-700 px-2 py-1 rounded text-sm m-1 shadow-sm">${renderAvatar(p.avatar, 'w-4 h-4 rounded-full')} ${p.name}</span>`;
+                        const isThisBlackSheep = blackSheep && blackSheep.id === p.id;
+                        const bsClass = isThisBlackSheep ? 'border-2 border-stone-800 dark:border-stone-200 bg-stone-800 text-white dark:bg-stone-200 dark:text-black' : 'bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-200';
+                        const bsIcon = isThisBlackSheep ? '🐑' : '';
+                        return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-sm m-1 shadow-sm ${bsClass}">${renderAvatar(p.avatar, 'w-4 h-4 rounded-full')} ${p.name} ${bsIcon}</span>`;
                     }).join('');
 
                     card.innerHTML = `
@@ -4133,6 +4137,13 @@
                     `;
                     groupsContainer.appendChild(card);
                 });
+
+                if (blackSheep) {
+                    const bsBanner = document.createElement('div');
+                    bsBanner.className = 'col-span-full mt-2 p-4 bg-stone-800 text-white rounded-xl shadow-lg border-2 border-stone-600 flex flex-col sm:flex-row items-center justify-center gap-4 animate-pulse';
+                    bsBanner.innerHTML = `<span class="text-5xl">🐑</span> <div class="text-center sm:text-left"><span class="text-stone-300 text-sm block font-bold mb-1">แกะดำประจำฝูง (คิดไม่เหมือนใครคนเดียว)</span><span class="font-bold text-xl inline-flex items-center gap-2">${renderAvatar(blackSheep.avatar, 'w-6 h-6 rounded-full')} ${blackSheep.name}</span></div>`;
+                    groupsContainer.appendChild(bsBanner);
+                }
 
                 if (isHost) nextRoundBtn.classList.remove('hidden');
             });

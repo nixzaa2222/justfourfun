@@ -27,16 +27,18 @@ const whoAmIData = {
         "มาร์ก ซักเคอร์เบิร์ก", "มิสเตอร์บีส (MrBeast)", "แฮร์รี่ พอตเตอร์", "เจมส์ บอนด์", "แจ็ค สแปร์โรว์", "เทย์เลอร์ สวิฟต์", "จัสติน บีเบอร์", "คริสเตียโน โรนัลโด", "ลิโอเนล เมสซี",
         "โดราเอมอน", "ชินจัง", "โคนัน", "นารูโตะ", "ลูฟี่", "ซุน โกคู (ดราก้อนบอล)", "สไปเดอร์แมน", "ไอรอนแมน", "กัปตันอเมริกา", "แบทแมน", "ซูเปอร์แมน",
         "โธมัส เชลบี้ (Peaky Blinders)", "จอน สโนว์ (Game of Thrones)", "ดาร์ธ เวเดอร์", "โจ๊กเกอร์", "ธานอส", "มิกกี้ เมาส์", "สพันจ์บ็อบ", "คิตตี้", "หมีพูห์",
-        "มาริโอ้", "ปิกาจู", "เซเลอร์มูน", "ก็อตซิลล่า", "คิงคอง", "บาร์บี้", "กัปตันแจ็ค สแปร์โรว์", "อินเดียน่า โจนส์", "เจมส์ คาเมรอน", "สตีเวน สปีลเบิร์ก"
+        "มาริโอ้", "ปิกาจู", "เซเลอร์มูน", "ก็อตซิลล่า", "คิงคอง", "บาร์บี้", "เจมส์ คาเมรอน", "สตีเวน สปีลเบิร์ก", "แบล็คพิงก์", "BTS", "เบลล่า ราณี",
+        "ญาญ่า อุรัสยา", "ณเดชน์", "มาริโอ้ เมาเร่อ", "แจ็คสัน หวัง", "ไมเคิล แจ็คสัน", "อัลเบิร์ต ไอน์สไตน์", "สตีฟ จอบส์", "ทอม ครูซ", "จอห์น วิค", "Deadpool",
+        "วันเดอร์วูแมน", "อควาแมน", "แฟลช", "บักส์ บันนี", "สเมิร์ฟ", "เทเลทับบีส์", "พาวเวอร์พัฟฟ์เกิลส์", "ดร.สเตรนจ์", "แพทริค สตาร์ (เพื่อนสพันจ์บ๊อบ)", "เปปป้าพิก"
     ],
     valo: [
-        "Jett", "Reyna", "Raze", "Phoenix", "Omen", "Yoru", "Neon", "Brimstone", "Viper", "Omen", "Astra", "Harbor", "Sova", "Killjoy", "Cypher", "Killjoy", "Cypher", "Chamber", "Sage", "Skye", "KAY/O", "Fade", "Breach", "Breach"
+        "Jett", "Reyna", "Raze", "Phoenix", "Omen", "Yoru", "Neon", "Brimstone", "Viper", "Omen", "Astra", "Harbor", "Sova", "Killjoy", "Cypher", "Chamber", "Sage", "Skye", "KAY/O", "Fade", "Breach", "Gekko", "Deadlock", "Iso", "Clove"
     ],
     marvel: [
-        "Iron Man", "Captain America", "Thor", "Hulk", "Black Widow", "Hawkeye", "Spider-Man", "Doctor Strange", "Ant-Man", "Black Panther", "Captain Marvel", "Winter Soldier", "Falcon", "Scarlet Witch", "Vision", "Groot", "Wolverine", "Star-Lord", "Gamora", "Drax", "Rocket", "Mantis", "Nebula", "Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Killmonger", "Vulture", "Ronan", "Ego", "Malekith", "Abomination", "Yellowjacket", "Ghost", "Crossbones", "Batroc", "Zemo", "Klaw", "Korath", "Kurse", "Aldrich Killian", "Mandarin", "Iron Monger", "Whiplash", "Justin Hammer", "Obadiah Stane", "Alexander Pierce", "Arnim Zola", "Baron Zemo", "Helmut Zemo", "Brock Rumlow"
+        "Iron Man", "Captain America", "Thor", "Hulk", "Black Widow", "Hawkeye", "Spider-Man", "Doctor Strange", "Ant-Man", "Black Panther", "Captain Marvel", "Winter Soldier", "Falcon", "Scarlet Witch", "Vision", "Groot", "Wolverine", "Star-Lord", "Gamora", "Drax", "Rocket", "Mantis", "Nebula", "Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Killmonger", "Vulture", "Nick Fury", "Deadpool", "Daredevil", "Punisher", "Magneto", "Professor X", "Mystique", "Venom", "Shang-Chi", "Moon Knight"
     ],
     anime: [
-        "Naruto", "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Nami", "Usopp", "Sanji", "Chopper", "Robin", "Franky", "Brook", "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Frieza", "Cell", "Majin Buu", "Ichigo", "Rukia", "Orihime", "Renji", "Uryu", "Aizen", "Ulquiorra", "Grimmjow", "Nnoitra", "Starrk", "Halibel", "Barragan", "Yammy", "Aaroniero", "Szayelaporro", "Zommari", "Edrad", "Shawlong", "Ilfort", "Di Roy", "Yylfordt", "Nakeem", "Luppi", "Tesla", "Findorr", "Ggio", "Abirama", "Charlotte", "Choe Neng", "Poww", "Nirgge", "Gantenbainne", "Dordoni", "Cirucci", "Loly", "Menoly", "Apache", "Mila Rose", "Sung-Sun", "Franceska", "Cyan", "Aldegor", "Garr", "Dordoni", "Cirucci", "Gantenbainne"
+        "Naruto", "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Nami", "Usopp", "Sanji", "Chopper", "Robin", "Franky", "Brook", "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Frieza", "Cell", "Majin Buu", "Ichigo", "Rukia", "Orihime", "Renji", "Uryu", "Aizen", "Ulquiorra", "Grimmjow", "Gojo Satoru", "Yuji Itadori", "Megumi Fushiguro", "Nobara Kugisaki", "Sukuna", "Tanjiro", "Nezuko", "Zenitsu", "Inosuke", "Rengoku", "Levi", "Mikasa", "Eren", "Armin", "Saitama", "Deku", "Midoriya"
     ]
 };
 
@@ -46,35 +48,53 @@ const spyfallLocations = [
     "ท่าเรือ", "ป้ายรถเมล์", "สถานีดับเพลิง", "ค่ายทหาร", "ฐานทัพ", "เรือดำน้ำ", "ยานอวกาศ", "สถานีอวกาศ", 
     "สถานีวิจัย", "ห้องทดลอง", "โรงงาน", "โกดัง", "เหมืองแร่", "แท่นขุดเจาะน้ำมัน", "เรือสำราญ", "เรือโจรสลัด", 
     "เกาะร้าง", "ปราสาท", "พระราชวัง", "วัด", "โบสถ์", "มัสยิด", "ศาลเจ้า", "สุสาน", "ป่าช้า", "คาสิโน", 
-    "ค่ายลูกเสือ", "ค่ายลูกเสือ", "ค่ายลูกเสือ", "สตูดิโอถ่ายทำ", "กองถ่ายหนัง", "สถานีโทรทัศน์", "สถานีวิทยุ"
+    "ค่ายลูกเสือ", "สตูดิโอถ่ายทำ", "กองถ่ายหนัง", "สถานีโทรทัศน์", "สถานีวิทยุ", "สวนสนุก", "สวนน้ำ", "สนามกีฬา",
+    "ยิม/ฟิตเนส", "สระว่ายน้ำ", "สนามมวย", "สนามกอล์ฟ", "ลานสเก็ต", "ร้านตัดผม/ซาลอน", "ร้านสปา", "คลินิกทันตกรรม", "ร้านขายยา", "ห้างสรรพสินค้า",
+    "ซุปเปอร์มาร์เก็ต", "ตลาดสด", "ตลาดนัดกลางคืน", "ร้านสะดวกซื้อ", "ร้านขายของเล่น", "ร้านหนังสือ", "ร้านขายดอกไม้", "ฟาร์ม/ไร่", "สถานีอวกาศนานาชาติ", "บ้านผีสิง"
 ];
 
 const wordGuessData = {
     general: [
-        "หมา", "แมว", "นก", "ปลา", "ช้าง", "ม้า", "วัว", "ควาย", "หมู", "ไก่", "เป็ด", "ห่าน", "สิงโต", "เสือ", "หมี", "ลิง", "งู", "จระเข้", "เต่า", "ตะพาบ", "กิ้งก่า", "จิ้งจก", "ตุ๊กแก", "จิ้งเหลน", "แย้", "แมงมุม", "แมงป่อง", "ตะขาบ", "กิ้งกือ", "ยุง", "แมลงวัน", "แมลงสาบ", "มด", "ปลวก", "ผึ้ง", "ต่อ", "แตน", "แมลงปอ", "ผีเสื้อ", "หนอน", "หอย", "ปู", "กุ้ง", "ปลาหมึก", "ดาวทะเล", "ม้าน้ำ", "โลมา", "วาฬ", "ฉลาม", "แมงกะพรุน"
+        "หมา", "แมว", "นก", "ปลา", "ช้าง", "ม้า", "วัว", "ควาย", "หมู", "ไก่", "เป็ด", "ห่าน", "สิงโต", "เสือ", "หมี", "ลิง", "งู", "จระเข้", "เต่า", "ตะพาบ", "กิ้งก่า", "จิ้งจก", "ตุ๊กแก", "จิ้งเหลน", "แย้", "แมงมุม", "แมงป่อง", "ตะขาบ", "กิ้งกือ", "ยุง", "แมลงวัน", "แมลงสาบ", "มด", "ปลวก", "ผึ้ง", "ต่อ", "แตน", "แมลงปอ", "ผีเสื้อ", "หนอน", "หอย", "ปู", "กุ้ง", "ปลาหมึก", "ดาวทะเล", "ม้าน้ำ", "โลมา", "วาฬ", "ฉลาม", "แมงกะพรุน",
+        "ทีวี", "ตู้เย็น", "พัดลม", "แอร์", "เตารีด", "โทรศัพท์", "คอมพิวเตอร์", "คีย์บอร์ด", "เมาส์", "โต๊ะ", "เก้าอี้", "เตียง", "หมอน", "ผ้าห่ม", "กระเป๋า", "รองเท้า", "เสื้อ", "กางเกง", "หมวก", "แว่นตา",
+        "แอปเปิ้ล", "กล้วย", "ส้ม", "แตงโม", "สับปะรด", "มะม่วง", "ฝรั่ง", "เงาะ", "ชมพู่", "ทุเรียน", "ทะเล", "ภูเขา", "น้ำตก", "แม่น้ำ", "ป่า", "ดวงอาทิตย์", "ดวงจันทร์", "ดาว", "เมฆ", "ฝน"
     ],
     valo: [
-        "Spike", "Operator", "Vandal", "Phantom", "Sheriff", "Spectre", "Judge", "Bucky", "Ares", "Stinger", "Marshal", "Ghost", "Frenzy", "Classic", "Shorty", "Odin", "Bulldog", "Ascent", "Bind", "Haven", "Split", "Icebox", "Breeze", "Fracture", "Pearl", "Lotus", "Defuse", "Plant", "Ace", "Clutch", "Flawless", "Thrifty", "Headshot", "Wallbang", "Eco", "Buy", "Drop", "Save", "Rotate", "Rush", "Hold", "Camp", "Lurk", "Flank", "Bait", "Trade", "Peek", "Push", "Hold", "Defend"
+        "Spike", "Operator", "Vandal", "Phantom", "Sheriff", "Spectre", "Judge", "Bucky", "Ares", "Stinger", "Marshal", "Ghost", "Frenzy", "Classic", "Shorty", "Odin", "Bulldog", "Ascent", "Bind", "Haven", "Split", "Icebox", "Breeze", "Fracture", "Pearl", "Lotus", "Sunset", "Defuse", "Plant", "Ace", "Clutch", "Flawless", "Thrifty", "Headshot", "Wallbang", "Eco", "Buy", "Drop", "Save", "Rotate", "Rush", "Hold", "Camp", "Lurk", "Flank", "Bait", "Trade", "Peek", "Push", "Defend"
     ],
     marvel: [
-        "Iron Man", "Captain America", "Thor", "Hulk", "Black Widow", "Hawkeye", "Spider-Man", "Doctor Strange", "Ant-Man", "Black Panther", "Captain Marvel", "Winter Soldier", "Falcon", "Scarlet Witch", "Vision", "Groot", "Wolverine", "Star-Lord", "Gamora", "Drax", "Rocket", "Mantis", "Nebula", "Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Killmonger", "Vulture", "Ronan", "Ego", "Malekith", "Abomination", "Yellowjacket", "Ghost", "Crossbones", "Batroc", "Zemo", "Klaw", "Korath", "Kurse", "Aldrich Killian", "Mandarin", "Iron Monger", "Whiplash", "Justin Hammer", "Obadiah Stane", "Alexander Pierce", "Arnim Zola", "Baron Zemo", "Helmut Zemo", "Brock Rumlow"
+        "Iron Man", "Captain America", "Thor", "Hulk", "Black Widow", "Hawkeye", "Spider-Man", "Doctor Strange", "Ant-Man", "Black Panther", "Captain Marvel", "Winter Soldier", "Falcon", "Scarlet Witch", "Vision", "Groot", "Wolverine", "Star-Lord", "Gamora", "Drax", "Rocket", "Mantis", "Nebula", "Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Killmonger", "Vulture", "Nick Fury", "Deadpool", "Daredevil", "Punisher", "Magneto", "Professor X", "Mystique", "Venom", "S.H.I.E.L.D.", "Hydra"
     ],
     anime: [
-        "Naruto", "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Nami", "Usopp", "Sanji", "Chopper", "Robin", "Franky", "Brook", "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Frieza", "Cell", "Majin Buu", "Ichigo", "Rukia", "Orihime", "Renji", "Uryu", "Aizen", "Ulquiorra", "Grimmjow", "Nnoitra", "Starrk", "Halibel", "Barragan", "Yammy", "Aaroniero", "Szayelaporro", "Zommari", "Edrad", "Shawlong", "Ilfort", "Di Roy", "Yylfordt", "Nakeem", "Luppi", "Tesla", "Findorr", "Ggio", "Abirama", "Charlotte", "Choe Neng", "Poww", "Nirgge", "Gantenbainne", "Dordoni", "Cirucci", "Loly", "Menoly", "Apache", "Mila Rose", "Sung-Sun", "Franceska", "Cyan", "Aldegor", "Garr", "Dordoni", "Cirucci", "Gantenbainne"
+        "Naruto", "Sasuke", "Sakura", "Kakashi", "Luffy", "Zoro", "Nami", "Usopp", "Sanji", "Chopper", "Robin", "Franky", "Brook", "Goku", "Vegeta", "Gohan", "Piccolo", "Krillin", "Frieza", "Cell", "Majin Buu", "Ichigo", "Rukia", "Orihime", "Renji", "Uryu", "Aizen", "Gojo", "Yuji", "Megumi", "Nobara", "Sukuna", "Tanjiro", "Nezuko", "Zenitsu", "Inosuke", "Rengoku", "Levi", "Mikasa", "Eren", "Armin", "Saitama", "Deku", "Kacchan", "Todoroki", "All Might"
     ]
 };
 
 const truthOrLiePrompts = [
     "บอกของแปลกที่สุดที่คุณเคยกินมา 2 อย่าง",
     "บอกวีรกรรมตอนเด็กที่พ่อแม่ยังไม่รู้มา 2 เรื่อง",
-    "บอกของที่เคยขโมยมา 2 อย่าง",
+    "บอกของที่เคยขโมย (หรือหยิบติดมือ) มา 2 อย่าง",
     "บอกสถานที่ที่เคยไปเดทมา 2 ที่",
-    "บอกโรคประจำตัวแปลกๆ มา 2 อย่าง",
+    "บอกโรคประจำตัวแปลกๆ หรืออาการแพ้แปลกๆ มา 2 อย่าง",
     "บอกสัตว์เลี้ยงที่เคยเลี้ยงมา 2 ชนิด",
-    "บอกชื่อแฟนเก่ามา 2 คน",
+    "บอกชื่อแฟนเก่า (หรือคนคุย) มา 2 คน",
     "บอกความลับที่ปิดบังเพื่อนมา 2 เรื่อง",
-    "บอกสิ่งที่เคยทำพลาดในที่ทำงานมา 2 อย่าง",
-    "บอกอุบัติเหตุร้ายแรงที่เคยเจอมา 2 ครั้ง"
+    "บอกสิ่งที่เคยทำพลาดในที่ทำงาน/โรงเรียนมา 2 อย่าง",
+    "บอกอุบัติเหตุร้ายแรงที่เคยเจอมา 2 ครั้ง",
+    "บอกเรื่องน่าอายที่เกิดขึ้นในห้องน้ำมา 2 เรื่อง",
+    "บอกความฝันที่อยากเป็นตอนเด็กๆ มา 2 อาชีพ",
+    "บอกความกลัว (Phobia) ที่คุณเป็นมา 2 อย่าง",
+    "บอกนิสัยแย่ๆ ที่คุณแก้ไม่หายมา 2 อย่าง",
+    "บอกดารา/ศิลปินที่คุณเคยคลั่งไคล้มากๆ มา 2 คน",
+    "บอกหนัง/ซีรีส์ที่คุณดูแล้วร้องไห้หนักมากมา 2 เรื่อง"
+];
+
+const sameFlockPrompts = [
+    "ยี่ห้อรถยนต์ยอดฮิต", "ร้านสะดวกซื้อ", "เครื่องดื่มเกลือแร่", "ยี่ห้อบะหมี่กึ่งสำเร็จรูป", "แอปพลิเคชันแชท",
+    "สีสัญญาณไฟจราจรที่แปลว่าหยุด", "ยี่ห้อรองเท้าผ้าใบยอดนิยม", "เมนูไก่ทอดแบรนด์ดัง", "เมนูอาหารตามสั่งยอดฮิตเวลาคิดไม่ออก", "ธนาคารที่มีสีเขียว",
+    "เครือข่ายมือถือ", "เว็บดูวิดีโอยอดนิยม", "แอปสั่งอาหาร (Delivery)", "ยี่ห้อน้ำอัดลมสีดำ", "ผลไม้ที่มีสีแดง",
+    "สัตว์เลี้ยงยอดนิยมในบ้าน", "โซเชียลมีเดียที่เปิดบ่อยที่สุด", "สถานที่ท่องเที่ยววันหยุดยาว", "รถไฟฟ้าในกรุงเทพ (เช่น BTS, MRT)", "รสชาติไอศกรีมยอดฮิต",
+    "สัตว์ที่ดุร้ายที่สุดในป่า", "อาวุธในเกมยิงปืนยอดฮิต", "ประเทศที่คนไทยชอบไปเที่ยว", "เครื่องดื่มแก้ง่วง", "ตัวละครหลักในโดราเอมอน"
 ];
 
 const uniqueClueWords = [
@@ -82,44 +102,52 @@ const uniqueClueWords = [
     "คอมพิวเตอร์", "โทรศัพท์", "แท็บเล็ต", "คีย์บอร์ด", "เมาส์", "หน้าจอ", "ลำโพง", "หูฟัง", "ไมโครโฟน", "ปริ้นเตอร์",
     "รถยนต์", "มอเตอร์ไซค์", "จักรยาน", "รถบัส", "รถบรรทุก", "รถไฟ", "เครื่องบิน", "เรือ", "เฮลิคอปเตอร์", "เรือดำน้ำ",
     "เสื้อ", "กางเกง", "กระโปรง", "รองเท้า", "ถุงเท้า", "หมวก", "เข็มขัด", "แว่นตา", "นาฬิกา", "กระเป๋า",
-    "เตียง", "ตู้", "โต๊ะ", "เก้าอี้", "โซฟา", "ทีวี", "ตู้เย็น", "พัดลม", "แอร์", "เครื่องซักผ้า"
+    "เตียง", "ตู้", "โต๊ะ", "เก้าอี้", "โซฟา", "ทีวี", "ตู้เย็น", "พัดลม", "แอร์", "เครื่องซักผ้า",
+    "โรงเรียน", "โรงพยาบาล", "วัด", "ตลาด", "ห้างสรรพสินค้า", "สวนสัตว์", "สวนสนุก", "ทะเล", "ภูเขา", "น้ำตก",
+    "หมอ", "พยาบาล", "ครู", "ตำรวจ", "ทหาร", "วิศวกร", "ดารา", "นักร้อง", "ชาวนา", "พ่อครัว"
 ];
 
 const matchTheBlankPrompts = [
     "น้ำ ___", "ข้าว ___", "ผัด ___", "ต้ม ___", "แกง ___", "ทอด ___", "ย่าง ___", "ปิ้ง ___", "อบ ___", "นึ่ง ___",
     "คน ___", "ช่าง ___", "หมอ ___", "ครู ___", "นัก ___", "ผู้ ___", "หัวหน้า ___", "ลูกน้อง ___", "เพื่อน ___", "แฟน ___",
     "รถ ___", "เรือ ___", "เครื่องบิน ___", "รถไฟ ___", "รถบัส ___", "รถบรรทุก ___", "จักรยาน ___", "มอเตอร์ไซค์ ___", "แท็กซี่ ___", "ตุ๊กตุ๊ก ___",
-    "หนัง ___", "เพลง ___", "เกม ___", "การ์ตูน ___", "หนังสือ ___", "ละคร ___", "ซีรีส์ ___", "รายการ ___", "ข่าว ___", "โฆษณา ___"
+    "หนัง ___", "เพลง ___", "เกม ___", "การ์ตูน ___", "หนังสือ ___", "ละคร ___", "ซีรีส์ ___", "รายการ ___", "ข่าว ___", "โฆษณา ___",
+    "ไฟ ___", "ลม ___", "ดิน ___", "ฟ้า ___", "ดาว ___", "เดือน ___", "ตะวัน ___", "พระ ___", "เทพ ___", "มาร ___"
 ];
 
 const secretPainterCategories = {
     general: [
-        { c: "สัตว์เลี้ยง", w: "สุนัข,แมว,ปลาทอง,กระต่าย,นกแก้ว" },
-        { c: "ผลไม้", w: "แอปเปิ้ล,กล้วย,ส้ม,แตงโม,มะม่วง" },
-        { c: "ยานพาหนะ", w: "รถยนต์,เครื่องบิน,เรือ,จักรยาน,รถไฟ" },
-        { c: "เครื่องใช้ไฟฟ้า", w: "ทีวี,พัดลม,ตู้เย็น,เตารีด,หม้อหุงข้าว" }
+        { c: "สัตว์เลี้ยง", w: "สุนัข,แมว,ปลาทอง,กระต่าย,นกแก้ว,หนูแฮมสเตอร์,เต่า,นกขุนทอง" },
+        { c: "ผลไม้", w: "แอปเปิ้ล,กล้วย,ส้ม,แตงโม,มะม่วง,สับปะรด,องุ่น,สตรอว์เบอร์รี" },
+        { c: "ยานพาหนะ", w: "รถยนต์,เครื่องบิน,เรือ,จักรยาน,รถไฟ,เฮลิคอปเตอร์,จรวด,รถม้า" },
+        { c: "เครื่องใช้ไฟฟ้า", w: "ทีวี,พัดลม,ตู้เย็น,เตารีด,หม้อหุงข้าว,ไมโครเวฟ,เครื่องปั่น,ไดร์เป่าผม" },
+        { c: "อาหาร", w: "แฮมเบอร์เกอร์,พิซซ่า,ซูชิ,ส้มตำ,ต้มยำกุ้ง,ก๋วยเตี๋ยว,สเต็ก,เฟรนช์ฟรายส์" },
+        { c: "อวัยวะ", w: "ดวงตา,จมูก,ปาก,หู,มือ,เท้า,หัวใจ,สมอง" }
     ],
     valo: [
-        { c: "อาวุธ", w: "Vandal,Phantom,Operator,Sheriff,Judge" },
-        { c: "เอเจนต์", w: "Jett,Sage,Reyna,Omen,Killjoy" }
+        { c: "อาวุธ", w: "Vandal,Phantom,Operator,Sheriff,Judge,Odin,Classic,Knife" },
+        { c: "เอเจนต์", w: "Jett,Sage,Reyna,Omen,Killjoy,Sova,Cypher,Viper" }
     ]
 };
 
 const friendQuizQuestions = [
     "อายุเท่าไหร่?", "มีแฟนมาแล้วกี่คน?", "เคยไปเที่ยวต่างประเทศกี่ประเทศ?", "มีเงินเก็บในบัญชีตอนนี้กี่บาท?", "น้ำหนักเท่าไหร่?",
-    "ส่วนสูงเท่าไหร่?", "ไซส์รองเท้าเบอร์อะไร?", "ใช้เวลาอาบน้ำกี่นาที?", "นอนกี่ชั่วโมงต่อวัน?", "กินข้าววันละกี่มื้อ?"
+    "ส่วนสูงเท่าไหร่ (cm)?", "ไซส์รองเท้าเบอร์อะไร?", "ใช้เวลาอาบน้ำกี่นาที?", "นอนกี่ชั่วโมงต่อวัน?", "กินข้าววันละกี่มื้อ?",
+    "ใน 1 เดือน ดูหนังกี่เรื่อง?", "วันเกิดวันที่เท่าไหร่ (เลขวัน)?", "เคยโดนแฟนทิ้งกี่ครั้ง?", "เคยแอบชอบเพื่อนกี่คน?", "มีเสื้อสีดำกี่ตัวในตู้?"
 ];
 
 const numberSortThemes = [
     "ระดับความเผ็ดของอาหาร", "ระดับความน่ากลัวของผี", "ระดับความเจ็บปวดจากการโดนเตะ", "ระดับความอร่อยของของหวาน", "ระดับความยากของข้อสอบ",
-    "ระดับความง่วงนอนตอนบ่าย", "ระดับความหิวตอนดึก", "ระดับความหนาวของแอร์", "ระดับความร้อนของแดด", "ระดับความเหม็นของขยะ"
+    "ระดับความง่วงนอนตอนบ่าย", "ระดับความหิวตอนดึก", "ระดับความหนาวของแอร์", "ระดับความร้อนของแดด", "ระดับความเหม็นของขยะ",
+    "ระดับความขี้เกียจตื่นตอนเช้า", "ระดับความดีใจที่ถูกหวย", "ระดับความเศร้าตอนอกหัก", "ระดับความแพงของกระเป๋าแบรนด์เนม", "ระดับความเร็วของอินเทอร์เน็ต"
 ];
 
 const wavelengthConcepts = [
     ["ร้อน", "เย็น"], ["ดี", "แย่"], ["ถูก", "แพง"], ["นุ่ม", "แข็ง"], ["สว่าง", "มืด"],
     ["เร็ว", "ช้า"], ["เงียบ", "ดัง"], ["ง่าย", "ยาก"], ["สวย", "น่าเกลียด"], ["หอม", "เหม็น"],
     ["หวาน", "ขม"], ["เปรี้ยว", "เค็ม"], ["ใหญ่", "เล็ก"], ["สูง", "เตี้ย"], ["ยาว", "สั้น"],
-    ["กว้าง", "แคบ"], ["ลึก", "ตื้น"], ["หนัก", "เบา"], ["หนา", "บาง"], ["หนา", "บาง"]
+    ["กว้าง", "แคบ"], ["ลึก", "ตื้น"], ["หนัก", "เบา"], ["หนา", "บาง"], ["ตลก", "จริงจัง"],
+    ["อันตราย", "ปลอดภัย"], ["มีประโยชน์", "ไร้สาระ"], ["ผู้ชายชอบ", "ผู้หญิงชอบ"], ["เด็กชอบ", "ผู้ใหญ่ชอบ"], ["หายาก", "หาง่าย"]
 ];
 
 // ==========================================
@@ -140,6 +168,18 @@ function findRoomBySocketId(socketId) {
         if (rooms[code].players.some(p => p.id === socketId)) return code;
     }
     return null;
+}
+
+// ------------------------------------------
+// WORD POOLING LOGIC (No Duplicates)
+// ------------------------------------------
+function getUniqueWord(roomCode, gameKey, arrayProvider) {
+    const room = rooms[roomCode];
+    if (!room.wordPools) room.wordPools = {};
+    if (!room.wordPools[gameKey] || room.wordPools[gameKey].length === 0) {
+        room.wordPools[gameKey] = shuffleArray([...arrayProvider()]);
+    }
+    return room.wordPools[gameKey].pop();
 }
 
 function updateRoomLobby(roomCode) {
@@ -205,7 +245,8 @@ io.on('connection', (socket) => {
             gameType: null,
             gameState: 'lobby',
             pack: 'mixed',
-            game: {}
+            game: {},
+            wordPools: {} // Initialize Word Pools
         };
         socket.join(roomCode);
         socket.emit('roomCreated', { roomCode, players: rooms[roomCode].players });
@@ -235,7 +276,6 @@ io.on('connection', (socket) => {
             // Reconnect logic
             if (room.gameState !== 'lobby') {
                 socket.emit('rejoinGameStarted', room.gameType);
-                // Trigger re-sync depending on game type... (simplified for now)
             }
 
         } else {
@@ -341,6 +381,7 @@ io.on('connection', (socket) => {
             rooms[roomCode].gameState = 'lobby';
             rooms[roomCode].gameType = null;
             rooms[roomCode].game = {}; // Clear game data
+            rooms[roomCode].wordPools = {}; // Reset Word Pools here!
             io.to(roomCode).emit('backToLobby', rooms[roomCode].players);
         }
     });
@@ -407,12 +448,11 @@ io.on('connection', (socket) => {
     // ==========================================
     function startWhoAmI(roomCode) {
         const room = rooms[roomCode];
-        let words = shuffleArray([...getWordsArray(room)]);
         room.game = { answers: {} };
         const activePlayers = room.players.filter(p => p.isOnline);
         
-        activePlayers.forEach((p, idx) => {
-            room.game.answers[p.id] = words[idx % words.length];
+        activePlayers.forEach((p) => {
+            room.game.answers[p.id] = getUniqueWord(roomCode, 'whoAmI', () => getWordsArray(room));
         });
 
         activePlayers.forEach(p => {
@@ -479,15 +519,19 @@ io.on('connection', (socket) => {
         if(availableLocs.length === 0) { availableLocs = allLocs; room.game.playedLocations = []; }
 
         const chosenLoc = availableLocs[Math.floor(Math.random() * availableLocs.length)];
+        
+        // Copy before pushing, so the client doesn't see it crossed out on the first turn!
+        const locsToSendToClient = [...room.game.playedLocations];
+        
         room.game.playedLocations.push(chosenLoc);
         
-        // Select 10 random locs to show on board (including chosen)
+        // Select random locs to show on board (including chosen)
         let locBoard = shuffleArray([...allLocs]);
         if(!locBoard.includes(chosenLoc)) locBoard[0] = chosenLoc;
         locBoard = shuffleArray(locBoard.slice(0, 15)); // Show 15 locations
 
         const spyIdx = Math.floor(Math.random() * activePlayers.length);
-        const roles = ["คนปกติ", "นักสืบ", "ผู้จัดการ", "พนักงานทำความสะอาด", "นักท่องเที่ยว"]; // Basic roles
+        const roles = ["คนปกติ", "นักสืบ", "ผู้จัดการ", "พนักงานทำความสะอาด", "นักท่องเที่ยว", "ยาม", "ผู้โชคร้าย", "ช่างซ่อมบำรุง", "ดาราหน้าใหม่", "ลูกค้าวีไอพี"]; 
         
         room.game.spyId = activePlayers[spyIdx].id;
         room.game.location = chosenLoc;
@@ -503,7 +547,7 @@ io.on('connection', (socket) => {
             const role = roles[Math.floor(Math.random() * roles.length)];
             io.to(p.id).emit('spyfall_newRound', {
                 isSpy, location: chosenLoc, role, endTime: room.game.endTime,
-                allLocations: locBoard, playedLocations: room.game.playedLocations
+                allLocations: locBoard, playedLocations: locsToSendToClient // Send safe copy
             });
         });
     }
@@ -523,10 +567,14 @@ io.on('connection', (socket) => {
         if (!room || room.gameType !== 'secret-agent') return;
         if (room.game.spyId === socket.id && room.game.phase === 'playing') {
             room.game.phase = 'spy_guessing';
+            
+            // Remove current loc before sending to Spy for guess so it's not crossed out
+            const locsToGuess = room.game.playedLocations.filter(loc => loc !== room.game.location);
+            
             io.to(roomCode).emit('spyfall_spyGuessingPhase', { 
                 spyId: socket.id, 
                 allLocations: room.game.allLocations,
-                playedLocations: room.game.playedLocations
+                playedLocations: locsToGuess
             });
         }
     });
@@ -607,7 +655,6 @@ io.on('connection', (socket) => {
 
         if (spyCaught) {
             // จับได้! ใครโหวตสายลับได้ +2 แต้ม
-            // (ง่ายๆ แจกแต้มทุกคนยกเว้นสายลับไปก่อน)
             room.players.forEach(p => { if(p.id !== room.game.spyId && p.isOnline) p.score += 2; });
             updateRoomScores(roomCode);
             
@@ -621,8 +668,10 @@ io.on('connection', (socket) => {
             updateRoomScores(roomCode);
             room.game.phase = 'bonus_guess';
             
+            const locsToGuess = room.game.playedLocations.filter(loc => loc !== room.game.location);
+
             io.to(roomCode).emit('spyfall_bonusPhase', {
-                spyId: room.game.spyId, allLocations: room.game.allLocations, playedLocations: room.game.playedLocations
+                spyId: room.game.spyId, allLocations: room.game.allLocations, playedLocations: locsToGuess
             });
         }
     }
@@ -905,8 +954,7 @@ io.on('connection', (socket) => {
     function startTruthOrLie(roomCode) {
         const room = rooms[roomCode];
         room.game = { 
-            prompts: shuffleArray([...truthOrLiePrompts]), 
-            roundPrompt: "", 
+            roundPrompt: getUniqueWord(roomCode, 'truthOrLie', () => truthOrLiePrompts), 
             answers: {}, 
             phase: 'answering',
             turnOrder: [],
@@ -915,7 +963,6 @@ io.on('connection', (socket) => {
             votersDict: {}
         };
 
-        room.game.roundPrompt = room.game.prompts.pop();
         const activePlayers = room.players.filter(p => p.isOnline);
         room.game.turnOrder = shuffleArray(activePlayers.map(p=>p.id));
 
@@ -1044,7 +1091,6 @@ io.on('connection', (socket) => {
     // ==========================================
     function startUniqueClue(roomCode, data) {
         const room = rooms[roomCode];
-        let words = getWordsArray(room);
         
         if (!room.game || !room.game.turnOrder) {
             const activePlayers = room.players.filter(p => p.isOnline);
@@ -1053,7 +1099,9 @@ io.on('connection', (socket) => {
             room.game.currentTurnIndex = (room.game.currentTurnIndex + 1) % room.game.turnOrder.length;
         }
 
-        room.game.word = words[Math.floor(Math.random() * words.length)];
+        room.game.word = getUniqueWord(roomCode, 'uniqueClue', () => getWordsArray(room));
+        if(!room.game.word) room.game.word = getUniqueWord(roomCode, 'uniqueClue', () => uniqueClueWords); // Fallback
+        
         room.game.clues = {};
         room.game.guesserId = room.game.turnOrder[room.game.currentTurnIndex];
         
@@ -1155,7 +1203,7 @@ io.on('connection', (socket) => {
         
         const cat = cats[Math.floor(Math.random() * cats.length)];
         const wordsList = cat.w.split(',');
-        const chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+        const chosenWord = getUniqueWord(roomCode, 'secretPainter', () => wordsList);
         
         const painterIdx = Math.floor(Math.random() * activePlayers.length);
         
@@ -1280,7 +1328,7 @@ io.on('connection', (socket) => {
     // ==========================================
     function startMatchTheBlank(roomCode) {
         const room = rooms[roomCode];
-        room.game = { answers: {}, prompt: matchTheBlankPrompts[Math.floor(Math.random() * matchTheBlankPrompts.length)] };
+        room.game = { answers: {}, prompt: getUniqueWord(roomCode, 'matchTheBlank', () => matchTheBlankPrompts) };
         io.to(roomCode).emit('matchTheBlank_newRound', { prompt: room.game.prompt });
     }
 
@@ -1338,7 +1386,7 @@ io.on('connection', (socket) => {
     // ==========================================
     function startFriendQuiz(roomCode) {
         const room = rooms[roomCode];
-        room.game = { answers: {}, bets: {}, question: friendQuizQuestions[Math.floor(Math.random() * friendQuizQuestions.length)] };
+        room.game = { answers: {}, bets: {}, question: getUniqueWord(roomCode, 'friendQuiz', () => friendQuizQuestions) };
         io.to(roomCode).emit('friendQuiz_newRound', { question: room.game.question });
     }
 
@@ -1452,7 +1500,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         const activePlayers = room.players.filter(p => p.isOnline);
         
-        room.game = { theme: numberSortThemes[Math.floor(Math.random() * numberSortThemes.length)], numbers: {} };
+        room.game = { theme: getUniqueWord(roomCode, 'numberSort', () => numberSortThemes), numbers: {} };
         
         let nums = []; while(nums.length < activePlayers.length) {
             let r = Math.floor(Math.random() * 100) + 1; if(nums.indexOf(r) === -1) nums.push(r);
@@ -1506,7 +1554,7 @@ io.on('connection', (socket) => {
         const isCoop = room.players.length === 2; // Auto-coop for 2 players
         room.game = {
             isCoop: isCoop,
-            board: generateWordGuessBoard(getWordsArray(room), isCoop),
+            board: generateWordGuessBoard(roomCode, getWordsArray(room), isCoop),
             teams: { red: { players: [], spymaster: null }, blue: { players: [], spymaster: null } },
             turn: 'red',
             clue: null,
@@ -1525,15 +1573,16 @@ io.on('connection', (socket) => {
         broadcastWordGuessState(roomCode);
     }
 
-    function generateWordGuessBoard(wordList, isCoop) {
-        let selectedWords = shuffleArray([...wordList]).slice(0, 25);
+    function generateWordGuessBoard(roomCode, wordList, isCoop) {
+        let selectedWords = [];
+        for(let i=0; i<25; i++) {
+            selectedWords.push(getUniqueWord(roomCode, 'wordGuess', () => wordList));
+        }
+
         let types = [];
-        
         if (isCoop) {
-            // Coop: 15 green, 9 neutral, 1 assassin
             types = Array(15).fill('green').concat(Array(9).fill('neutral')).concat(['assassin']);
         } else {
-            // Versus: 9 red, 8 blue, 7 neutral, 1 assassin (red starts first)
             types = Array(9).fill('red').concat(Array(8).fill('blue')).concat(Array(7).fill('neutral')).concat(['assassin']);
         }
         
@@ -1731,9 +1780,17 @@ io.on('connection', (socket) => {
     // ==========================================
     function startSameFlock(roomCode) {
         const room = rooms[roomCode];
+        // Maintain Black Sheep state
+        const bsId = room.game && room.game.blackSheepId;
+        const bsName = room.game && room.game.blackSheepName;
+        const bsAvatar = room.game && room.game.blackSheepAvatar;
+        
         room.game = { 
             answers: {}, 
-            question: truthOrLiePrompts[Math.floor(Math.random() * truthOrLiePrompts.length)].replace('มา 2 อย่าง', '').replace('มา 2 ชนิด', '').replace('มา 2 ที่', '') 
+            question: getUniqueWord(roomCode, 'sameFlock', () => sameFlockPrompts),
+            blackSheepId: bsId,
+            blackSheepName: bsName,
+            blackSheepAvatar: bsAvatar
         };
         io.to(roomCode).emit('sameFlock_newRound', { question: room.game.question });
     }
@@ -1757,21 +1814,31 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         io.to(roomCode).emit('updateProgress', { hide: true });
 
-        // Group by similarity (exact match for simplicity, can enhance to fuzzy match)
+        // Group by similarity
         const groupsObj = {};
         for(let pId in room.game.answers) {
             const ans = room.game.answers[pId].toLowerCase();
             const player = room.players.find(p => p.id === pId);
-            if(!groupsObj[ans]) groupsObj[ans] = { answer: room.game.answers[pId], players: [] }; // Use original case for display
+            if(!groupsObj[ans]) groupsObj[ans] = { answer: room.game.answers[pId], players: [] }; 
             if(player) groupsObj[ans].players.push({ name: player.name, avatar: player.avatar, id: player.id });
         }
 
         const groups = Object.values(groupsObj);
         groups.sort((a, b) => b.players.length - a.players.length);
 
+        // --- BLACK SHEEP LOGIC ---
+        let groupsOfOne = groups.filter(g => g.players.length === 1);
+        if (groupsOfOne.length === 1) {
+            // If EXACTLY one person is unique, they become the new Black Sheep
+            room.game.blackSheepId = groupsOfOne[0].players[0].id;
+            room.game.blackSheepName = groupsOfOne[0].players[0].name;
+            room.game.blackSheepAvatar = groupsOfOne[0].players[0].avatar;
+        }
+
+        // --- SCORING ---
         if (groups.length > 0) {
             const maxPlayers = groups[0].players.length;
-            if (maxPlayers > 1) { // Only award if more than 1 person answered the same
+            if (maxPlayers > 1) { 
                 groups.forEach(g => {
                     if (g.players.length === maxPlayers) {
                         g.players.forEach(pData => {
@@ -1784,7 +1851,9 @@ io.on('connection', (socket) => {
             }
         }
 
-        io.to(roomCode).emit('sameFlock_showResult', { groups });
+        const blackSheepData = room.game.blackSheepId ? { name: room.game.blackSheepName, avatar: room.game.blackSheepAvatar, id: room.game.blackSheepId } : null;
+
+        io.to(roomCode).emit('sameFlock_showResult', { groups, blackSheep: blackSheepData });
     }
 
     socket.on('sameFlock_nextRound', () => {
@@ -1849,7 +1918,7 @@ io.on('connection', (socket) => {
     function startMindFrequencyRound(roomCode) {
         const room = rooms[roomCode];
         room.game.roundCount++;
-        room.game.concept = wavelengthConcepts[Math.floor(Math.random() * wavelengthConcepts.length)];
+        room.game.concept = getUniqueWord(roomCode, 'mindFrequency', () => wavelengthConcepts);
         
         // Pick psychic based on mode
         let availablePlayers = [];
