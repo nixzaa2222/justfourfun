@@ -1,15 +1,13 @@
 {
-  "name": "party-hub",
+  "name": "order-overload-multiplayer",
   "version": "1.0.0",
-  "description": "A party game hub for friends",
+  "description": "Order Overload Multiplayer (Max 8 Players)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
   }
 }
